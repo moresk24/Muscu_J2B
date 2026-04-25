@@ -1190,19 +1190,24 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
   if (doneSeries < 4) {
     const s = doneSeries;
     // Paramètres suggérés stockés ou défaut
+    const enAttente = state.suggestionEnCours && state.suggestionEnCours[a.nom];
     const suggested = state.suggestionEnAttente && state.suggestionEnAttente[a.nom];
     const serieCharge = suggested ? suggested.charge : (charge ? charge : 0);
     const serieReps   = suggested ? suggested.reps   : reps;
     const serieInt    = suggested ? suggested.intensite : intensite;
 
+    const affichageParams = enAttente
+      ? `<span style="color:var(--muted)">? <span style="color:var(--blue);font-weight:400">×</span> ? ${a.unite}</span>`
+      : `${serieReps} <span style="color:var(--blue);font-weight:400">×</span> ${serieCharge} ${a.unite}`;
+
     html += `<div class="serie-row active-serie" id="sr-${key}-${s}">
       <div class="serie-num">${s+1}</div>
       <div class="serie-info">
-        <div class="serie-charge" id="sc-${key}-${s}">${serieReps} <span style="color:var(--blue);font-weight:400">×</span> ${serieCharge} ${a.unite}</div>
+        <div class="serie-charge" id="sc-${key}-${s}">${affichageParams}</div>
       </div>
       <div class="serie-ressenti">
         ${['F','D','TD','E'].map(r=>`
-          <button class="ressenti-btn" ${isEditable()?`onclick="onRessenti('${a.nom}','${a.unite}',${s},'${r}',${serieCharge},${serieReps},${serieInt})"` : 'disabled'}>
+          <button class="ressenti-btn" ${!enAttente && isEditable() ? `onclick="onRessenti('${a.nom}','${a.unite}',${s},'${r}',${serieCharge},${serieReps},${serieInt})"` : 'disabled'}>
             ${r}
           </button>`).join('')}
       </div>
@@ -1247,6 +1252,9 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   // Marquer la série comme faite et reconstruire la grille
   const a = ATELIERS.find(x => x.nom === nomAtelier);
   const maxi = parseFloat(state.maxis[nomAtelier]) || 0;
+  // Si TD → on affiche directement les mêmes params ; sinon on attend la validation
+  if (!state.suggestionEnCours) state.suggestionEnCours = {};
+  state.suggestionEnCours[nomAtelier] = (ressenti !== 'TD');
   const sgEl = document.getElementById('sg-' + key);
   if (sgEl && a) {
     sgEl.innerHTML = buildSeriesHTML(a, maxi, state.serieLocale[nomAtelier]);
@@ -1438,9 +1446,10 @@ function applySuggestion(nomAtelier, newIntensite, newCharge, newReps) {
   const nextIdx = local.length;
   const a = ATELIERS.find(x=>x.nom===nomAtelier);
 
-  // Stocker la suggestion en attente
+  // Stocker la suggestion en attente et lever le flag
   if (!state.suggestionEnAttente) state.suggestionEnAttente = {};
   state.suggestionEnAttente[nomAtelier] = {charge:newCharge, reps:newReps, intensite:newIntensite};
+  if (state.suggestionEnCours) state.suggestionEnCours[nomAtelier] = false;
   state.intensite = newIntensite;
 
   // Cacher la suggestion
