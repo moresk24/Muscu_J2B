@@ -1343,13 +1343,24 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
         </div>`;
     }
   } else {
-    sugBox.innerHTML = `
-      <div class="suggestion-title">💡 Série ${nextSerie + 1} — Augmenter l'effort</div>
-      <div class="suggestion-text">Tu veux augmenter l'effort en faisant varier :</div>
-      <div class="suggestion-actions" style="margin-top:.6rem">
-        <button class="btn" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps})">↑ La charge</button>
-        <button class="btn btn-outline" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps})">↑ Les reps</button>
-      </div>`;
+    const atMaxReps = currentReps >= p.repsMax;
+    const atMinReps = currentReps <= p.repsMin;
+    const canReps = ressenti === 'E' ? !atMinReps : !atMaxReps;
+
+    if (!canReps) {
+      // Seule option : varier la charge
+      appliquerChoixCharge(nomAtelier, key, unite, ressenti, currentCharge, currentReps);
+    } else {
+      const arrow = ressenti === 'E' ? '↓' : '↑';
+      const titre = ressenti === 'E' ? 'Diminuer l\'effort' : 'Augmenter l\'effort';
+      sugBox.innerHTML = `
+        <div class="suggestion-title">💡 Série ${nextSerie + 1} — ${titre}</div>
+        <div class="suggestion-text">Tu veux ${ressenti === 'E' ? 'ajuster' : 'augmenter l\'effort'} en faisant varier :</div>
+        <div class="suggestion-actions" style="margin-top:.6rem">
+          <button class="btn" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps})">${arrow} La charge</button>
+          <button class="btn btn-outline" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps})">${arrow} Les reps</button>
+        </div>`;
+    }
   }
 }
 
