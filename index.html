@@ -807,11 +807,20 @@ function buildMaxis() {
   }
   $('save-count').textContent = `${maxisFilled}/${total}`;
 
-  document.querySelectorAll('.maxi-input').forEach(inp => {
+  const allInputs = Array.from(document.querySelectorAll('.maxi-input'));
+  allInputs.forEach((inp, idx) => {
     inp.addEventListener('input', () => {
       state.maxis[inp.dataset.atelier] = inp.value;
       const filled = ATELIERS.filter(a=>state.maxis[a.nom]!==''&&state.maxis[a.nom]!==undefined&&state.maxis[a.nom]!==null).length;
       $('save-count').textContent = `${filled}/${total}`;
+    });
+    inp.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        const next = allInputs[idx + 1];
+        if (next) next.focus();
+        else inp.blur();
+      }
     });
   });
 
