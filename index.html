@@ -616,7 +616,57 @@ async function initLogin() {
       o.value = o.textContent = c;
       sel.appendChild(o);
     });
+
+    // Auto-connexion si identifiants sauvegardés
+    const saved = getSavedLogin();
+    if (saved) {
+      loading(false);
+      await autoConnect(saved, d.classes||[]);
+      return;
+    }
   } catch(e) { toast('Erreur de connexion au serveur','error'); }
+  loading(false);
+}
+
+function getSavedLogin() {
+  try {
+    const s = localStorage.getItem('muscu_login');
+    return s ? JSON.parse(s) : null;
+  } catch(e) { return null; }
+}
+
+async function autoConnect(saved, classes) {
+  // Vérifier que la classe existe toujours
+  if (!classes.includes(saved.classe)) return;
+  loading(true);
+  try {
+    const d = await api({action:'loadEleve', classe:saved.classe, nom:saved.nom, prenom:saved.prenom});
+    if (d.error || d.mdp !== saved.mdp) {
+      localStorage.removeItem('muscu_login');
+      loading(false);
+      return;
+    }
+    // Connecter directement
+    state.classe  = saved.classe;
+    state.nom     = saved.nom;
+    state.prenom  = saved.prenom;
+    state.mdp     = saved.mdp;
+    state.projet  = d.projet || '';
+    state.maxis   = d.maxis  || {};
+    state.series  = d.series || {};
+    const newSession = saved.classe + saved.nom + saved.prenom + new Date().toDateString();
+    if (localStorage.getItem('sessionId') !== newSession) {
+      localStorage.setItem('sessionId', newSession);
+      localStorage.setItem('compteurSeance', '0');
+      state.compteurSeance = 0;
+      state.serieLocale = {};
+    }
+    $('tb-prenom').textContent = saved.prenom;
+    $('tb-classe').textContent = saved.classe;
+    $('screen-login').classList.remove('active');
+    $('screen-app').classList.add('active');
+    showPage('maxis');
+  } catch(e) { console.error(e); }
   loading(false);
 }
 
@@ -712,6 +762,9 @@ $('btn-login').addEventListener('click', async () => {
       state.serieLocale = {};
     }
 
+    // Sauvegarder identifiants en localStorage
+    localStorage.setItem('muscu_login', JSON.stringify({classe:cls, nom:eInfo.nom, prenom:eInfo.prenom, mdp}));
+
     // Afficher app
     $('tb-prenom').textContent = eInfo.prenom;
     $('tb-classe').textContent = cls;
@@ -744,6 +797,8 @@ document.querySelectorAll('.nav-btn').forEach(b => {
   b.addEventListener('click', ()=>showPage(b.dataset.page));
 });
 $('btn-logout').addEventListener('click', () => {
+  // Effacer login sauvegardé → permettre à un autre élève de se connecter
+  localStorage.removeItem('muscu_login');
   $('screen-app').classList.remove('active');
   $('screen-login').classList.add('active');
   state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurSeance:parseInt(localStorage.getItem('compteurSeance')||'0'),sessionId:localStorage.getItem('sessionId')||''};
@@ -878,8 +933,10 @@ function buildProjet() {
       <div class="projet-desc">${p.desc}</div>
       <div class="projet-tags">
         <span class="tag">💪 ${p.intensites[0]}–${p.intensites[p.intensites.length-1]}% maxi</span>
-        <span class="tag">🔁 4 séries</span>
         <span class="tag">📊 ${p.repsMin}–${p.repsMax} reps</span>
+        <span class="tag">🔁 ${p.seriesMin}–${p.seriesMax} séries</span>
+        <span class="tag">⚡ ${p.vitesse}</span>
+        <span class="tag">⏱ ${p.recup}</span>
       </div>
     </div>`;
   });
