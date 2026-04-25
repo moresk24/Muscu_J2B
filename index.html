@@ -1176,8 +1176,7 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
     html += `<div class="serie-row done" id="sr-${key}-${s}">
       <div class="serie-num">${s+1}</div>
       <div class="serie-info">
-        <div class="serie-charge">${local.charge} ${a.unite}</div>
-        <div class="serie-reps">${local.reps} rép.</div>
+        <div class="serie-charge">${local.reps} <span style="color:var(--blue);font-weight:400">×</span> ${local.charge} ${a.unite}</div>
       </div>
       <div class="serie-ressenti">
         ${['F','D','TD','E'].map(r=>`
@@ -1199,8 +1198,7 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
     html += `<div class="serie-row active-serie" id="sr-${key}-${s}">
       <div class="serie-num">${s+1}</div>
       <div class="serie-info">
-        <div class="serie-charge" id="sc-${key}-${s}">${serieCharge} ${a.unite}</div>
-        <div class="serie-reps" id="sr2-${key}-${s}">${serieReps} rép.</div>
+        <div class="serie-charge" id="sc-${key}-${s}">${serieReps} <span style="color:var(--blue);font-weight:400">×</span> ${serieCharge} ${a.unite}</div>
       </div>
       <div class="serie-ressenti">
         ${['F','D','TD','E'].map(r=>`
