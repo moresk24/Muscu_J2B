@@ -325,6 +325,31 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .suggestion-actions{display:flex;gap:.5rem;margin-top:.6rem}
 .suggestion-actions .btn{padding:.5rem;font-size:.85rem;flex:1}
 
+/* Drum picker */
+.drum-picker-wrap{display:flex;gap:1rem;margin:.5rem 0}
+.drum-picker-col{flex:1;text-align:center}
+.drum-picker{
+  position:relative;height:200px;overflow:hidden;
+  cursor:ns-resize;touch-action:none;
+  border-radius:8px;
+}
+.drum-picker::before,.drum-picker::after{
+  content:'';position:absolute;left:0;right:0;height:80px;z-index:2;pointer-events:none;
+}
+.drum-picker::before{top:0;background:linear-gradient(to bottom,rgba(22,22,31,.95),transparent)}
+.drum-picker::after{bottom:0;background:linear-gradient(to top,rgba(22,22,31,.95),transparent)}
+.drum-highlight{
+  position:absolute;top:80px;left:8px;right:8px;height:40px;
+  border-top:1px solid var(--accent);border-bottom:1px solid var(--accent);
+  border-radius:4px;pointer-events:none;z-index:1;
+}
+.drum-track{position:absolute;left:0;right:0;top:0;user-select:none}
+.drum-item{
+  height:40px;display:flex;align-items:center;justify-content:center;
+  font-size:1.15rem;color:var(--muted);transition:color .1s,font-size .1s;
+}
+.drum-item.selected{color:var(--text);font-weight:700;font-size:1.35rem}
+
 /* Bravo */
 .bravo-box{
   background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3);
@@ -1467,36 +1492,117 @@ function applySuggestion(nomAtelier, newIntensite, newCharge, newReps) {
   }
 }
 
+const drumState = {};
+
+function genChargeValues(maxi, projet) {
+  const ints = PROJETS[projet].intensites;
+  const step = v => v < 10 ? 0.5 : v < 50 ? 1 : 2.5;
+  const round = (v, s) => Math.round(v / s) * s;
+
+  let min = maxi ? round(maxi * ints[0] / 100, step(maxi * ints[0] / 100)) : 0;
+  let max = maxi ? round(maxi * ints[ints.length-1] / 100, step(maxi * ints[ints.length-1] / 100)) : 100;
+  if (min < 0) min = 0;
+  if (max <= min) max = min + 10;
+
+  const values = [];
+  let v = min;
+  while (v <= max + 0.01) {
+    values.push(Math.round(v * 10) / 10);
+    v += step(v);
+  }
+  return values;
+}
+
+function initDrumPicker(containerId, values, initialValue, onChange) {
+  const ITEM_H = 40, PAD = 2;
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const track = container.querySelector('.drum-track');
+
+  let idx = values.findIndex(v => String(v) === String(initialValue));
+  if (idx < 0) idx = 0;
+
+  function render() {
+    const rows = [];
+    for (let i = 0; i < PAD; i++) rows.push('<div class="drum-item"></div>');
+    values.forEach((v, i) => rows.push(`<div class="drum-item${i===idx?' selected':''}">${v}</div>`));
+    for (let i = 0; i < PAD; i++) rows.push('<div class="drum-item"></div>');
+    track.innerHTML = rows.join('');
+  }
+
+  function goTo(newIdx, animate) {
+    idx = Math.max(0, Math.min(values.length - 1, newIdx));
+    track.style.transition = animate ? 'transform .15s ease' : 'none';
+    track.style.transform = `translateY(${-idx * ITEM_H}px)`;
+    track.querySelectorAll('.drum-item').forEach((el, i) =>
+      el.classList.toggle('selected', i === idx + PAD));
+    onChange(values[idx]);
+  }
+
+  render();
+  goTo(idx, false);
+
+  let startY = 0, startIdx = 0, dragging = false;
+
+  container.addEventListener('touchstart', e => {
+    startY = e.touches[0].clientY; startIdx = idx; dragging = true;
+  }, {passive: true});
+  container.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    goTo(Math.round(startIdx + (startY - e.touches[0].clientY) / ITEM_H), false);
+  }, {passive: true});
+  container.addEventListener('touchend', () => { dragging = false; goTo(idx, true); });
+
+  container.addEventListener('mousedown', e => {
+    startY = e.clientY; startIdx = idx; dragging = true; e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    goTo(Math.round(startIdx + (startY - e.clientY) / ITEM_H), false);
+  });
+  document.addEventListener('mouseup', () => { if (dragging) { dragging = false; goTo(idx, true); } });
+}
+
 function modifierSuggestion(nomAtelier, key, unite, newCharge, newReps, newIntensite) {
-  // Afficher un formulaire de saisie manuelle dans la suggestion box
+  const p = PROJETS[state.projet];
+  const maxi = parseFloat(state.maxis[nomAtelier]) || 100;
+  const chargeVals = genChargeValues(maxi, state.projet);
+  const repsVals = [];
+  for (let i = p.repsMin; i <= p.repsMax; i++) repsVals.push(i);
+
+  drumState[key] = { reps: newReps, charge: newCharge };
+
   const sugBox = document.getElementById('sug-'+key);
   sugBox.innerHTML = `
     <div class="suggestion-title">✏️ Modifier les paramètres</div>
-    <div style="display:flex;gap:.5rem;align-items:center;margin:.5rem 0">
-      <div style="flex:1">
-        <div class="field-label">Reps</div>
-        <input type="number" id="custom-reps-${key}" class="maxi-input" style="width:100%"
-          value="${newReps}" min="1" step="1" inputmode="numeric">
+    <div class="drum-picker-wrap">
+      <div class="drum-picker-col">
+        <div class="field-label" style="margin-bottom:.3rem">Reps</div>
+        <div class="drum-picker" id="drum-reps-${key}">
+          <div class="drum-highlight"></div>
+          <div class="drum-track"></div>
+        </div>
       </div>
-      <div style="flex:1">
-        <div class="field-label">Charge (${unite})</div>
-        <input type="number" id="custom-charge-${key}" class="maxi-input" style="width:100%"
-          value="${newCharge}" min="0" step="0.5" inputmode="decimal">
+      <div class="drum-picker-col">
+        <div class="field-label" style="margin-bottom:.3rem">Charge (${unite})</div>
+        <div class="drum-picker" id="drum-charge-${key}">
+          <div class="drum-highlight"></div>
+          <div class="drum-track"></div>
+        </div>
       </div>
     </div>
     <div class="suggestion-actions">
       <button class="btn" onclick="validerModification('${nomAtelier}','${key}','${unite}',${newIntensite})">✓ Valider</button>
       <button class="btn btn-outline" onclick="document.getElementById('sug-${key}').classList.remove('visible')">Annuler</button>
-    </div>
-  `;
+    </div>`;
+
+  initDrumPicker('drum-reps-'+key,    repsVals,   newReps,   v => drumState[key].reps   = v);
+  initDrumPicker('drum-charge-'+key,  chargeVals, newCharge, v => drumState[key].charge = v);
 }
 
 function validerModification(nomAtelier, key, unite, newIntensite) {
-  const chargeInput = document.getElementById('custom-charge-'+key);
-  const repsInput   = document.getElementById('custom-reps-'+key);
-  const newCharge   = parseFloat(chargeInput.value)||0;
-  const newReps     = parseInt(repsInput.value)||1;
-  applySuggestion(nomAtelier, newIntensite, newCharge, newReps);
+  const s = drumState[key];
+  applySuggestion(nomAtelier, newIntensite, s.charge, s.reps);
 }
 
 // ═══════════════════════════════════════════════════
