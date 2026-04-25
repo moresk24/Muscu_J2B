@@ -1567,6 +1567,8 @@ function initDrumPicker(containerId, values, initialValue, onChange) {
   document.addEventListener('mouseup', () => { if (dragging) { dragging = false; goTo(idx, true); } });
 }
 
+const savedSuggestions = {};
+
 function modifierSuggestion(nomAtelier, key, unite, newCharge, newReps, newIntensite) {
   const p = PROJETS[state.projet];
   const maxi = parseFloat(state.maxis[nomAtelier]) || 100;
@@ -1577,6 +1579,8 @@ function modifierSuggestion(nomAtelier, key, unite, newCharge, newReps, newInten
   drumState[key] = { reps: newReps, charge: newCharge };
 
   const sugBox = document.getElementById('sug-'+key);
+  savedSuggestions[key] = sugBox.innerHTML;
+
   sugBox.innerHTML = `
     <div class="suggestion-title">✏️ Modifier les paramètres</div>
     <div class="drum-picker-wrap">
@@ -1596,12 +1600,17 @@ function modifierSuggestion(nomAtelier, key, unite, newCharge, newReps, newInten
       </div>
     </div>
     <div class="suggestion-actions">
-      <button class="btn" onclick="validerModification('${nomAtelier}','${key}','${unite}',${newIntensite})">✓ Valider</button>
-      <button class="btn btn-outline" onclick="document.getElementById('sug-${key}').classList.remove('visible')">Annuler</button>
+      <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="validerModification('${nomAtelier}','${key}','${unite}',${newIntensite})">✓ Valider</button>
+      <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="annulerModification('${key}')">Annuler</button>
     </div>`;
 
   initDrumPicker('drum-reps-'+key,    repsVals,   newReps,   v => drumState[key].reps   = v);
   initDrumPicker('drum-charge-'+key,  chargeVals, newCharge, v => drumState[key].charge = v);
+}
+
+function annulerModification(key) {
+  const sugBox = document.getElementById('sug-'+key);
+  if (savedSuggestions[key]) sugBox.innerHTML = savedSuggestions[key];
 }
 
 function validerModification(nomAtelier, key, unite, newIntensite) {
