@@ -325,7 +325,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .suggestion-title{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
 .suggestion-text{font-size:.85rem;line-height:1.4}
 .suggestion-actions{display:flex;gap:.5rem;margin-top:.6rem}
-.suggestion-actions .btn{padding:.5rem;font-size:.85rem;flex:1}
+.suggestion-actions .btn{padding:.5rem;font-size:.85rem;flex:1;transition:all .2s}
+.btn-dimmed{background:var(--s2) !important;color:var(--muted) !important;transform:none !important;opacity:1 !important}
+.btn-activated{background:linear-gradient(135deg,var(--accent),#ffaa00) !important;color:#fff !important;border-color:transparent !important}
 
 /* Drum picker */
 .drum-picker-wrap{display:flex;gap:1rem;margin:.5rem 0}
@@ -1318,11 +1320,11 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     sugBox.innerHTML = `
       <div class="suggestion-title" style="color:var(--green)">🔥 Parfait !</div>
       <div class="suggestion-text">C'est exactement l'objectif ! Continue comme ça.<br>
-        Série conseillée : <strong>${currentReps} <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
+        Série conseillée : <strong>${currentReps} reps <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
       </div>
       <div class="suggestion-actions">
-        <button class="btn" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${currentReps})">✓ On y va !</button>
-        <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${currentReps},${intensiteRef})">✏️ Modifier</button>
+        <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${currentReps})">✓ On y va !</button>
+        <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${currentReps},${intensiteRef})">✏️ Modifier</button>
       </div>`;
     return;
   }
@@ -1334,19 +1336,19 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
       sugBox.innerHTML = `
         <div class="suggestion-title">⚠️ Série ${nextSerie + 1}</div>
         <div class="suggestion-text">Intensité déjà au minimum — réduis les répétitions.<br>
-          Série conseillée : <strong>${newReps} <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
+          Série conseillée : <strong>${newReps} reps <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
-          <button class="btn" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
-          <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${intensiteRef})">✏️ Modifier</button>
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${intensiteRef})">✏️ Modifier</button>
         </div>`;
     } else {
       sugBox.innerHTML = `
         <div class="suggestion-title">⚠️ Série ${nextSerie + 1} — Diminuer l'effort</div>
         <div class="suggestion-text">Comment veux-tu ajuster ?</div>
         <div class="suggestion-actions" style="margin-top:.6rem">
-          <button class="btn" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">↓ La charge</button>
-          <button class="btn btn-outline" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">↓ Les reps</button>
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">↓ La charge</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">↓ Les reps</button>
         </div>`;
     }
     return;
@@ -1372,11 +1374,11 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
       sugBox.innerHTML = `
         <div class="suggestion-title">💡 Série ${nextSerie + 1}</div>
         <div class="suggestion-text">Intensité au maximum — augmente les répétitions.<br>
-          Série conseillée : <strong>${newReps} <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
+          Série conseillée : <strong>${newReps} reps <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
-          <button class="btn" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
-          <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${intensiteRef})">✏️ Modifier</button>
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${intensiteRef})">✏️ Modifier</button>
         </div>`;
     }
   } else {
@@ -1394,8 +1396,8 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
         <div class="suggestion-title">💡 Série ${nextSerie + 1} — ${titre}</div>
         <div class="suggestion-text">Tu veux ${ressenti === 'E' ? 'ajuster' : 'augmenter l\'effort'} en faisant varier :</div>
         <div class="suggestion-actions" style="margin-top:.6rem">
-          <button class="btn" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">${arrow} La charge</button>
-          <button class="btn btn-outline" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">${arrow} Les reps</button>
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">${arrow} La charge</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">${arrow} Les reps</button>
         </div>`;
     }
   }
@@ -1421,11 +1423,11 @@ function appliquerChoixCharge(nomAtelier, key, unite, ressenti, currentCharge, c
   sugBox.innerHTML = `
     <div class="suggestion-title">💡 Charge modifiée</div>
     <div class="suggestion-text">${arrow} Intensité : ${intensiteRef}% → ${newIntensite}%<br>
-      Série conseillée : <strong>${currentReps} <span style="color:var(--blue)">×</span> ${newCharge} ${unite}</strong>
+      Série conseillée : <strong>${currentReps} reps <span style="color:var(--blue)">×</span> ${newCharge} ${unite}</strong>
     </div>
     <div class="suggestion-actions">
-      <button class="btn" onclick="applySuggestion('${nomAtelier}',${newIntensite},${newCharge},${currentReps})">✓ Accepter</button>
-      <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${newCharge},${currentReps},${newIntensite})">✏️ Modifier</button>
+      <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${newIntensite},${newCharge},${currentReps})">✓ Accepter</button>
+      <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${newCharge},${currentReps},${newIntensite})">✏️ Modifier</button>
     </div>`;
 }
 
@@ -1442,11 +1444,11 @@ function appliquerChoixReps(nomAtelier, key, unite, ressenti, currentCharge, cur
   sugBox.innerHTML = `
     <div class="suggestion-title">💡 Répétitions modifiées</div>
     <div class="suggestion-text">${arrow} Reps : ${currentReps} → ${newReps}<br>
-      Série conseillée : <strong>${newReps} <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
+      Série conseillée : <strong>${newReps} reps <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
     </div>
     <div class="suggestion-actions">
-      <button class="btn" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
-      <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${intensiteRef})">✏️ Modifier</button>
+      <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
+      <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${intensiteRef})">✏️ Modifier</button>
     </div>`;
 }
 
@@ -1614,6 +1616,30 @@ initLogin();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js');
+}
+
+function onSugBtnIn(el) {
+  const all = [...el.closest('.suggestion-actions').querySelectorAll('.btn')];
+  all.filter(b => b !== el).forEach(b => {
+    b.style.background = 'var(--s2)';
+    b.style.color = 'var(--muted)';
+    b.style.transform = 'none';
+    b.style.opacity = '1';
+  });
+  if (el.classList.contains('btn-outline')) {
+    el.style.background = 'linear-gradient(135deg,var(--accent),#ffaa00)';
+    el.style.color = '#fff';
+    el.style.borderColor = 'transparent';
+  }
+}
+function onSugBtnOut(el) {
+  el.closest('.suggestion-actions').querySelectorAll('.btn').forEach(b => {
+    b.style.background = '';
+    b.style.color = '';
+    b.style.transform = '';
+    b.style.opacity = '';
+    b.style.borderColor = '';
+  });
 }
 </script>
 </body>
