@@ -307,6 +307,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .ressenti-btn.selected-TD{background:#f39c12;border-color:#f39c12;color:#fff}
 .ressenti-btn.selected-E{background:#c0392b;border-color:#c0392b;color:#fff}
 .serie-row.done{opacity:.7}
+  .serie-row.active-serie{border-color:var(--accent);background:rgba(255,107,43,.05)}
 
 /* Suggestion */
 .suggestion-box{
@@ -1029,6 +1030,7 @@ function buildSeance() {
   }
   const p = PROJETS[state.projet];
   if (!state.intensite) state.intensite = p.intensites[0];
+  if (!state.suggestionEnAttente) state.suggestionEnAttente = {};
 
   const count = state.compteurSeance;
   const pct = Math.min((count/20)*100,100).toFixed(0);
@@ -1114,29 +1116,53 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
   const charge = maxi ? Math.round(maxi * intensite / 100 * 2) / 2 : null;
   const reps = calcReps(state.projet, intensite);
   const a = atelier;
+  const key = a.nom.replace(/[^a-zA-Z]/g,'_');
+  const doneSeries = localSeries.length;
 
   let html = '';
-  for (let s = 0; s < 4; s++) {
+
+  // Séries déjà faites
+  for (let s = 0; s < doneSeries; s++) {
     const local = localSeries[s];
-    const done = !!local;
-    const serieCharge = local ? local.charge : (charge ? charge + ' ' + a.unite : '— ' + a.unite);
-    const serieReps   = local ? local.reps   : reps;
-    html += `<div class="serie-row ${done?'done':''}" id="sr-${a.nom.replace(/[^a-zA-Z]/g,'_')}-${s}">
+    html += `<div class="serie-row done" id="sr-${key}-${s}">
       <div class="serie-num">${s+1}</div>
       <div class="serie-info">
-        <div class="serie-charge">${typeof serieCharge==='number'?serieCharge+' '+a.unite:serieCharge}</div>
-        <div class="serie-reps">${serieReps} rép.</div>
+        <div class="serie-charge">${local.charge} ${a.unite}</div>
+        <div class="serie-reps">${local.reps} rép.</div>
       </div>
       <div class="serie-ressenti">
         ${['F','D','TD','E'].map(r=>`
-          <button class="ressenti-btn ${done&&local.ressenti===r?'selected-'+r:''}"
-            onclick="onRessenti('${a.nom}','${a.unite}',${s},'${r}',${charge||0},${reps})"
-            ${done?'disabled':''}>
+          <button class="ressenti-btn ${local.ressenti===r?'selected-'+r:''}" disabled>${r}</button>
+        `).join('')}
+      </div>
+    </div>`;
+  }
+
+  // Série active (la prochaine à faire) — seulement si < 4
+  if (doneSeries < 4) {
+    const s = doneSeries;
+    // Paramètres suggérés stockés ou défaut
+    const suggested = state.suggestionEnAttente && state.suggestionEnAttente[a.nom];
+    const serieCharge = suggested ? suggested.charge : (charge ? charge : 0);
+    const serieReps   = suggested ? suggested.reps   : reps;
+    const serieInt    = suggested ? suggested.intensite : intensite;
+
+    html += `<div class="serie-row active-serie" id="sr-${key}-${s}">
+      <div class="serie-num">${s+1}</div>
+      <div class="serie-info">
+        <div class="serie-charge" id="sc-${key}-${s}">${serieCharge} ${a.unite}</div>
+        <div class="serie-reps" id="sr2-${key}-${s}">${serieReps} rép.</div>
+      </div>
+      <div class="serie-ressenti">
+        ${['F','D','TD','E'].map(r=>`
+          <button class="ressenti-btn"
+            onclick="onRessenti('${a.nom}','${a.unite}',${s},'${r}',${serieCharge},${serieReps},${serieInt})">
             ${r}
           </button>`).join('')}
       </div>
     </div>`;
   }
+
   return html;
 }
 
@@ -1145,12 +1171,12 @@ function toggleAtelier(key) {
   el.classList.toggle('open');
 }
 
-async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps) {
+async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps, serieIntensite) {
   const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
 
   // Enregistrer localement
   if (!state.serieLocale[nomAtelier]) state.serieLocale[nomAtelier] = [];
-  state.serieLocale[nomAtelier][serieIndex] = {ressenti, charge, reps, unite};
+  state.serieLocale[nomAtelier][serieIndex] = {ressenti, charge, reps, unite, intensite: serieIntensite || state.intensite};
 
   // Incrémenter compteur séance
   state.compteurSeance++;
@@ -1172,14 +1198,12 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps)
   const localSeries = state.serieLocale[nomAtelier];
   const seriesCount = localSeries.length;
 
-  // Désactiver les boutons de cette ligne
-  const row = document.getElementById(`sr-${key}-${serieIndex}`);
-  if (row) {
-    row.classList.add('done');
-    row.querySelectorAll('.ressenti-btn').forEach(b => {
-      b.disabled = true;
-      if (b.textContent.trim() === ressenti) b.classList.add('selected-'+ressenti);
-    });
+  // Marquer la série comme faite et reconstruire la grille
+  const a = ATELIERS.find(x => x.nom === nomAtelier);
+  const maxi = parseFloat(state.maxis[nomAtelier]) || 0;
+  const sgEl = document.getElementById('sg-' + key);
+  if (sgEl && a) {
+    sgEl.innerHTML = buildSeriesHTML(a, maxi, state.serieLocale[nomAtelier]);
   }
 
   // Bravo après série 4
@@ -1277,7 +1301,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
       </div>
       <div class="suggestion-actions">
         <button class="btn" onclick="applySuggestion('${nomAtelier}',${newIntensite},${newCharge},${newReps})">✓ Accepter</button>
-        <button class="btn btn-outline" onclick="document.getElementById('sug-${key}').classList.remove('visible')">Modifier</button>
+        <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${newCharge},${newReps},${newIntensite})">✏️ Modifier</button>
       </div>
     `;
   }
@@ -1310,14 +1334,52 @@ function applySuggestion(nomAtelier, newIntensite, newCharge, newReps) {
   const nextIdx = local.length;
   const a = ATELIERS.find(x=>x.nom===nomAtelier);
 
-  // Mettre à jour la prochaine ligne
-  const row = document.getElementById(`sr-${key}-${nextIdx}`);
-  if (row) {
-    row.querySelector('.serie-charge').textContent = newCharge + ' ' + a.unite;
-    row.querySelector('.serie-reps').textContent = newReps + ' rép.';
-  }
-  document.getElementById('sug-'+key).classList.remove('visible');
+  // Stocker la suggestion en attente
+  if (!state.suggestionEnAttente) state.suggestionEnAttente = {};
+  state.suggestionEnAttente[nomAtelier] = {charge:newCharge, reps:newReps, intensite:newIntensite};
   state.intensite = newIntensite;
+
+  // Cacher la suggestion
+  document.getElementById('sug-'+key).classList.remove('visible');
+
+  // Reconstruire la grille des séries pour cet atelier
+  const sgEl = document.getElementById('sg-'+key);
+  if (sgEl) {
+    const maxi = parseFloat(state.maxis[nomAtelier])||0;
+    sgEl.innerHTML = buildSeriesHTML(a, maxi, local);
+  }
+}
+
+function modifierSuggestion(nomAtelier, key, unite, newCharge, newReps, newIntensite) {
+  // Afficher un formulaire de saisie manuelle dans la suggestion box
+  const sugBox = document.getElementById('sug-'+key);
+  sugBox.innerHTML = `
+    <div class="suggestion-title">✏️ Modifier les paramètres</div>
+    <div style="display:flex;gap:.5rem;align-items:center;margin:.5rem 0">
+      <div style="flex:1">
+        <div class="field-label">Charge (${unite})</div>
+        <input type="number" id="custom-charge-${key}" class="maxi-input" style="width:100%" 
+          value="${newCharge}" min="0" step="0.5" inputmode="decimal">
+      </div>
+      <div style="flex:1">
+        <div class="field-label">Reps</div>
+        <input type="number" id="custom-reps-${key}" class="maxi-input" style="width:100%"
+          value="${newReps}" min="1" step="1" inputmode="numeric">
+      </div>
+    </div>
+    <div class="suggestion-actions">
+      <button class="btn" onclick="validerModification('${nomAtelier}','${key}','${unite}',${newIntensite})">✓ Valider</button>
+      <button class="btn btn-outline" onclick="document.getElementById('sug-${key}').classList.remove('visible')">Annuler</button>
+    </div>
+  `;
+}
+
+function validerModification(nomAtelier, key, unite, newIntensite) {
+  const chargeInput = document.getElementById('custom-charge-'+key);
+  const repsInput   = document.getElementById('custom-reps-'+key);
+  const newCharge   = parseFloat(chargeInput.value)||0;
+  const newReps     = parseInt(repsInput.value)||1;
+  applySuggestion(nomAtelier, newIntensite, newCharge, newReps);
 }
 
 // ═══════════════════════════════════════════════════
