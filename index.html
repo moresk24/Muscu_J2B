@@ -208,7 +208,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   padding:1.1rem;margin-bottom:.75rem;cursor:pointer;transition:all .2s;
 }
 .projet-card:hover{border-color:var(--accent);transform:translateY(-2px)}
-.projet-card.selected{border-color:var(--accent);background:rgba(255,107,43,.08)}
+.projet-card.selected{border-color:var(--green);background:rgba(46,213,115,.08)}
 .projet-card.locked{opacity:.4;cursor:not-allowed;pointer-events:none}
 .projet-num{
   font-family:'Bebas Neue',sans-serif;font-size:2.5rem;line-height:1;
@@ -1318,7 +1318,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     sugBox.innerHTML = `
       <div class="suggestion-title" style="color:var(--green)">🔥 Parfait !</div>
       <div class="suggestion-text">C'est exactement l'objectif ! Continue comme ça.<br>
-        <strong>${intensiteRef}% → ${currentCharge} ${unite} × ${currentReps} reps</strong>
+        Série conseillée : <strong>${currentReps} <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
       </div>
       <div class="suggestion-actions">
         <button class="btn" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${currentReps})">✓ On y va !</button>
@@ -1334,7 +1334,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
       sugBox.innerHTML = `
         <div class="suggestion-title">⚠️ Série ${nextSerie + 1}</div>
         <div class="suggestion-text">Intensité déjà au minimum — réduis les répétitions.<br>
-          <strong>${intensiteRef}% → ${currentCharge} ${unite} × ${newReps} reps</strong>
+          Série conseillée : <strong>${newReps} <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
           <button class="btn" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
@@ -1372,7 +1372,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
       sugBox.innerHTML = `
         <div class="suggestion-title">💡 Série ${nextSerie + 1}</div>
         <div class="suggestion-text">Intensité au maximum — augmente les répétitions.<br>
-          <strong>${intensiteRef}% → ${currentCharge} ${unite} × ${newReps} reps</strong>
+          Série conseillée : <strong>${newReps} <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
           <button class="btn" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
@@ -1421,7 +1421,7 @@ function appliquerChoixCharge(nomAtelier, key, unite, ressenti, currentCharge, c
   sugBox.innerHTML = `
     <div class="suggestion-title">💡 Charge modifiée</div>
     <div class="suggestion-text">${arrow} Intensité : ${intensiteRef}% → ${newIntensite}%<br>
-      <strong>${newIntensite}% → ${newCharge} ${unite} × ${currentReps} reps</strong>
+      Série conseillée : <strong>${currentReps} <span style="color:var(--blue)">×</span> ${newCharge} ${unite}</strong>
     </div>
     <div class="suggestion-actions">
       <button class="btn" onclick="applySuggestion('${nomAtelier}',${newIntensite},${newCharge},${currentReps})">✓ Accepter</button>
@@ -1442,7 +1442,7 @@ function appliquerChoixReps(nomAtelier, key, unite, ressenti, currentCharge, cur
   sugBox.innerHTML = `
     <div class="suggestion-title">💡 Répétitions modifiées</div>
     <div class="suggestion-text">${arrow} Reps : ${currentReps} → ${newReps}<br>
-      <strong>${intensiteRef}% → ${currentCharge} ${unite} × ${newReps} reps</strong>
+      Série conseillée : <strong>${newReps} <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
     </div>
     <div class="suggestion-actions">
       <button class="btn" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
