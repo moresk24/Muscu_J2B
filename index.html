@@ -832,10 +832,24 @@ async function saveMaxis() {
   try {
     const d = await apiPost({action:'saveMaxis', classe:state.classe, nom:state.nom, prenom:state.prenom, maxis:state.maxis});
     if (d.error) throw new Error(d.error);
-    toast('Maxis enregistrés ✓');
-    buildMaxis();
+    const allFilled = maxisAllFilled();
+    if (allFilled) {
+      toast('Tous les maxis enregistrés ! 🎉 Choisis ton projet !');
+      showPage('projet');
+    } else {
+      toast('Maxis enregistrés ✓');
+      buildMaxis();
+    }
   } catch(e) { toast('Erreur enregistrement','error'); }
   loading(false);
+}
+
+// ── Helper : tous les maxis sont-ils remplis ? ─────────────
+function maxisAllFilled() {
+  return ATELIERS.every(a => {
+    const v = state.maxis[a.nom];
+    return v !== '' && v !== undefined && v !== null && v !== 0 && v !== '0';
+  });
 }
 
 // ═══════════════════════════════════════════════════
@@ -843,7 +857,7 @@ async function saveMaxis() {
 // ═══════════════════════════════════════════════════
 function buildProjet() {
   const pg = $('page-projet');
-  const allFilled = ATELIERS.every(a => state.maxis[a.nom] !== '' && state.maxis[a.nom] !== undefined && state.maxis[a.nom] !== null);
+  const allFilled = maxisAllFilled();
 
   let html = '';
   if (!allFilled) {
