@@ -430,7 +430,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <span class="nav-icon">🎯</span>Projet
     </button>
     <button class="nav-btn" data-page="fiche">
-      <span class="nav-icon">📋</span>Ma fiche
+      <span class="nav-icon">📋</span>Mon projet
     </button>
     <button class="nav-btn" data-page="seance">
       <span class="nav-icon">🏋️</span>Séance
@@ -504,7 +504,7 @@ const PROJETS = {
     repsMin:10, repsMax:20,
     dureeSerie:"10 à 30 secondes",
     vitesse:"Lente",
-    recup:"Passive · 1h30 à 2h30",
+    recup:"Passive · 1'30 à 2'30",
     contractions:"Concentrique"
   },
   "3A": {
@@ -515,7 +515,7 @@ const PROJETS = {
     repsMin:25, repsMax:35,
     dureeSerie:"20 secondes à 1 mn",
     vitesse:"Rapide",
-    recup:"Active · 30 secondes à 1 mn",
+    recup:"Active · 30'' à 1'",
     contractions:"Concentrique"
   },
   "3B": {
@@ -526,7 +526,7 @@ const PROJETS = {
     repsMin:15, repsMax:25,
     dureeSerie:"15 à 30 secondes",
     vitesse:"Soutenue",
-    recup:"Active · 30 sec à 1h30",
+    recup:"Active · 30'' à 1'30",
     contractions:"Concentrique · Excentrique"
   }
 };
@@ -984,7 +984,7 @@ async function confirmProjet(num) {
 function buildFiche() {
   const pg = $('page-fiche');
   if (!state.projet) {
-    pg.innerHTML = `<div class="lock-msg" style="margin-top:2rem">🎯 Choisis d'abord ton projet pour voir ta fiche !</div>`;
+    pg.innerHTML = `<div class="lock-msg" style="margin-top:2rem">🎯 Choisis d'abord ton projet pour voir ton projet !</div>`;
     return;
   }
   const p = PROJETS[state.projet];
@@ -1198,34 +1198,53 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps)
 function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentCharge, currentReps) {
   const p = PROJETS[state.projet];
   const ints = p.intensites;
+  const idxCurrent = ints.indexOf(state.intensite);
+  const atMaxIntensite = idxCurrent >= ints.length - 1;
+  const atMinIntensite = idxCurrent <= 0;
+
   let newIntensite = state.intensite;
+  let newReps = currentReps;
   let msg = '';
 
   if (ressenti === 'F') {
-    const idx = ints.indexOf(state.intensite);
-    if (idx < ints.length-1) newIntensite = ints[idx+1];
-    msg = '😤 Trop facile ! Je te suggère de monter l\'intensité.';
+    if (!atMaxIntensite) {
+      newIntensite = ints[idxCurrent + 1];
+      newReps = calcReps(state.projet, newIntensite);
+      msg = "😤 Trop facile ! Monte l'intensité pour la prochaine série.";
+    } else {
+      newReps = Math.ceil(currentReps * 1.30);
+      msg = "😤 Trop facile et déjà au max ! Fais +30% de répétitions.";
+    }
   } else if (ressenti === 'D') {
-    const idx = ints.indexOf(state.intensite);
-    if (idx < ints.length-1) newIntensite = ints[idx+1];
-    msg = '👍 Bien ! Tu peux encore pousser un peu plus.';
+    if (!atMaxIntensite) {
+      newIntensite = ints[idxCurrent + 1];
+      newReps = calcReps(state.projet, newIntensite);
+      msg = "👍 Bien ! Tu peux encore pousser un peu plus.";
+    } else {
+      newReps = Math.ceil(currentReps * 1.15);
+      msg = "👍 Bien ! Déjà au max d'intensité, essaie +15% de répétitions.";
+    }
   } else if (ressenti === 'TD') {
-    msg = '🔥 Parfait ! C\'est exactement l\'objectif. Continue comme ça !';
+    msg = "🔥 Parfait ! C'est exactement l'objectif. Continue comme ça !";
   } else if (ressenti === 'E') {
-    const idx = ints.indexOf(state.intensite);
-    if (idx > 0) newIntensite = ints[idx-1];
-    msg = '⚠️ Baisse un peu l\'intensité pour la prochaine série.';
+    if (!atMinIntensite) {
+      newIntensite = ints[idxCurrent - 1];
+      newReps = calcReps(state.projet, newIntensite);
+      msg = "⚠️ Baisse l'intensité d'un cran pour la prochaine série.";
+    } else {
+      newReps = Math.max(1, Math.ceil(currentReps * 0.85));
+      msg = "⚠️ Déjà au minimum ! Réduis un peu les répétitions.";
+    }
   }
 
-  const maxi = parseFloat(state.maxis[nomAtelier])||0;
+  const maxi = parseFloat(state.maxis[nomAtelier]) || 0;
   const newCharge = maxi ? Math.round(maxi * newIntensite / 100 * 2) / 2 : currentCharge;
-  const newReps = calcReps(state.projet, newIntensite);
 
-  const sugBox = document.getElementById('sug-'+key);
+  const sugBox = document.getElementById('sug-' + key);
   if (!sugBox) return;
   sugBox.classList.add('visible');
   sugBox.innerHTML = `
-    <div class="suggestion-title">💡 Suggestion série ${nextSerie+1}</div>
+    <div class="suggestion-title">💡 Suggestion série ${nextSerie + 1}</div>
     <div class="suggestion-text">${msg}<br>
       <strong>${newIntensite}% → ${newCharge} ${unite} × ${newReps} reps</strong>
     </div>
