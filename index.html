@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Muscu à J2B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════════════════ */
+:root {
+  --bg:       #0a0a0f;
+  --s1:       #12121a;
+  --s2:       #1a1a26;
+  --s3:       #222233;
+  --border:   #2a2a40;
+  --accent:   #ff6b2b;
+  --accent2:  #ffb347;
+  --blue:     #3d8bff;
+  --green:    #2ecc71;
+  --red:      #e74c3c;
+  --yellow:   #f1c40f;
+  --text:     #f0f0f8;
+  --muted:    #6b6b8a;
+  --haut:     #3d8bff;
+  --bas:      #ff6b2b;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px}
+
+/* ═══════════════════════════════════════════
+   LAYOUT — SCREENS
+═══════════════════════════════════════════ */
+.screen{position:fixed;inset:0;display:none;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+
+/* ═══════════════════════════════════════════
+   TOP BAR
+═══════════════════════════════════════════ */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.7rem 1rem;
+  background:var(--s1);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  gap:.5rem;
+}
+.topbar-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.5rem;letter-spacing:.05em;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.topbar-info{font-size:.8rem;color:var(--muted);flex:1;text-align:center}
+.topbar-info span{color:var(--accent);font-weight:700}
+.btn-sm{
+  background:none;border:1px solid var(--border);border-radius:8px;
+  color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.75rem;
+  padding:.3rem .6rem;cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ═══════════════════════════════════════════
+   SCROLL CONTENT
+═══════════════════════════════════════════ */
+.scroll{flex:1;overflow-y:auto;padding:1rem;padding-bottom:5rem}
+.scroll::-webkit-scrollbar{width:4px}
+.scroll::-webkit-scrollbar-track{background:transparent}
+.scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ═══════════════════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════════════════ */
+.bottom-nav{
+  display:flex;flex-shrink:0;
+  background:var(--s1);border-top:1px solid var(--border);
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:.6rem .3rem;gap:2px;
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:.65rem;font-weight:500;
+  transition:color .2s;
+}
+.nav-btn .nav-icon{font-size:1.2rem}
+.nav-btn.active{color:var(--accent)}
+.nav-btn.active .nav-icon{filter:drop-shadow(0 0 6px var(--accent))}
+
+/* ═══════════════════════════════════════════
+   BOUTONS
+═══════════════════════════════════════════ */
+.btn{
+  display:block;width:100%;padding:.85rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:12px;
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;
+  cursor:pointer;transition:opacity .2s,transform .1s;
+}
+.btn:hover{opacity:.9;transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn-outline{
+  background:none;border:1px solid var(--border);color:var(--text);
+}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ═══════════════════════════════════════════
+   CARDS & SECTIONS
+═══════════════════════════════════════════ */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:1rem;margin-bottom:.75rem}
+.section-title{
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;
+  color:var(--muted);margin:1.25rem 0 .5rem;display:flex;align-items:center;gap:.5rem;
+}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ═══════════════════════════════════════════
+   FORMULAIRES
+═══════════════════════════════════════════ */
+.field-label{font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem;display:block}
+select,input[type=text],input[type=password],input[type=number]{
+  width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;
+  padding:.7rem .9rem;outline:none;transition:border-color .2s;
+  -webkit-appearance:none;appearance:none;
+}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b8a' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .8rem center;padding-right:2rem}
+select:focus,input:focus{border-color:var(--accent)}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+.field{margin-bottom:1rem}
+
+/* ═══════════════════════════════════════════
+   ÉCRAN 1 — CONNEXION
+═══════════════════════════════════════════ */
+#screen-login{
+  justify-content:center;align-items:center;
+  background:radial-gradient(ellipse at 30% 40%,rgba(255,107,43,.08) 0%,transparent 60%),
+             radial-gradient(ellipse at 70% 70%,rgba(61,139,255,.07) 0%,transparent 60%),
+             var(--bg);
+  padding:1.5rem;overflow-y:auto;
+}
+.login-hero{text-align:center;margin-bottom:2rem}
+.login-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:4rem;letter-spacing:.05em;line-height:1;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.login-sub{font-size:.8rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-top:.25rem}
+.login-card{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:1.5rem;width:100%;max-width:380px}
+.login-card h2{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.05em;margin-bottom:1.25rem;color:var(--text)}
+.mdp-rules{font-size:.72rem;color:var(--muted);margin-top:.35rem;line-height:1.5}
+.error-msg{color:var(--red);font-size:.8rem;margin-top:.5rem;display:none}
+
+/* ═══════════════════════════════════════════
+   ÉCRAN 2 — MAXIS
+═══════════════════════════════════════════ */
+.atelier-card{
+  background:var(--s1);border:1px solid var(--border);border-radius:12px;
+  padding:.85rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.75rem;
+  transition:border-color .2s;
+}
+.atelier-card:focus-within{border-color:var(--accent)}
+.atelier-card.validated{border-color:var(--green);background:rgba(46,204,113,.05)}
+.atelier-card.validated .atelier-name::after{content:' ✓';color:var(--green);font-size:.8rem}
+.atelier-icon{
+  width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+}
+.icon-haut{background:rgba(61,139,255,.12)}
+.icon-bas{background:rgba(255,107,43,.12)}
+.atelier-info{flex:1;min-width:0}
+.atelier-name{font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.atelier-muscles{font-size:.7rem;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.atelier-series-count{font-size:.65rem;color:var(--green);font-weight:600;margin-top:2px}
+.maxi-wrap{display:flex;align-items:center;gap:.35rem;flex-shrink:0}
+.maxi-input{
+  width:68px;background:var(--s2);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.4rem;
+  text-align:center;padding:.3rem .4rem;outline:none;transition:border-color .2s;
+}
+.maxi-input:focus{border-color:var(--accent)}
+.maxi-unit{font-size:.75rem;color:var(--muted);width:26px}
+.save-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--s1);border-top:1px solid var(--border);
+  padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;z-index:50;
+}
+.save-bar .btn{flex:1;padding:.7rem}
+.progress-maxis{font-size:.75rem;color:var(--muted);white-space:nowrap}
+.progress-maxis span{color:var(--accent);font-weight:700}
+
+/* ═══════════════════════════════════════════
+   PROJET — CHOIX
+═══════════════════════════════════════════ */
+.projet-card{
+  background:var(--s1);border:2px solid var(--border);border-radius:16px;
+  padding:1.1rem;margin-bottom:.75rem;cursor:pointer;transition:all .2s;
+}
+.projet-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.projet-card.selected{border-color:var(--accent);background:rgba(255,107,43,.08)}
+.projet-card.locked{opacity:.4;cursor:not-allowed;pointer-events:none}
+.projet-num{
+  font-family:'Bebas Neue',sans-serif;font-size:2.5rem;line-height:1;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:.2rem;
+}
+.projet-name{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em}
+.projet-desc{font-size:.78rem;color:var(--muted);margin-top:.25rem;line-height:1.4}
+.projet-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem}
+.tag{
+  font-size:.65rem;font-weight:600;padding:.2rem .5rem;border-radius:20px;
+  background:var(--s2);color:var(--muted);border:1px solid var(--border);
+}
+.lock-msg{
+  background:rgba(255,107,43,.08);border:1px solid rgba(255,107,43,.2);border-radius:12px;
+  padding:.85rem;text-align:center;font-size:.85rem;color:var(--accent);margin-bottom:1rem;
+}
+
+/* ═══════════════════════════════════════════
+   PAGE MON PROJET
+═══════════════════════════════════════════ */
+.projet-fiche{background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1rem}
+.fiche-header{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  padding:1rem 1.25rem;
+}
+.fiche-header h2{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.05em;color:#fff}
+.fiche-header p{font-size:.8rem;color:rgba(255,255,255,.8);margin-top:.25rem}
+.fiche-body{padding:1rem 1.25rem}
+.fiche-row{display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.fiche-row:last-child{border-bottom:none}
+.fiche-key{font-size:.78rem;color:var(--muted);font-weight:600}
+.fiche-val{font-size:.85rem;font-weight:700;text-align:right;max-width:55%}
+
+/* ═══════════════════════════════════════════
+   ÉCRAN SÉANCE
+═══════════════════════════════════════════ */
+.seance-header{
+  background:var(--s1);border:1px solid var(--border);border-radius:14px;
+  padding:1rem;margin-bottom:1rem;
+}
+.intensite-row{display:flex;align-items:center;gap:.75rem;margin-top:.75rem}
+.intensite-row select{flex:1}
+.intensite-badge{
+  font-family:'Bebas Neue',sans-serif;font-size:1.8rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  white-space:nowrap;
+}
+
+/* Barre de progression séance */
+.progress-bar-wrap{margin-bottom:1rem}
+.progress-bar-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.35rem}
+.progress-bar-label span{color:var(--text);font-weight:700}
+.progress-bar-track{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s cubic-bezier(.34,1.56,.64,1)}
+.progress-msg{font-size:.75rem;color:var(--accent);text-align:center;margin-top:.3rem;font-weight:600;min-height:1rem}
+
+/* Atelier séance */
+.seance-atelier{
+  background:var(--s1);border:1px solid var(--border);border-radius:14px;
+  margin-bottom:.75rem;overflow:hidden;
+}
+.seance-atelier-header{
+  display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;
+  cursor:pointer;
+}
+.seance-atelier-header .atelier-icon{flex-shrink:0}
+.seance-atelier-title{flex:1;min-width:0}
+.seance-atelier-title .atelier-name{font-size:.9rem}
+.seance-atelier-title .atelier-maxi{font-size:.72rem;color:var(--muted)}
+.seance-atelier-chevron{color:var(--muted);font-size:.8rem;transition:transform .2s;flex-shrink:0}
+.seance-atelier.open .seance-atelier-chevron{transform:rotate(180deg)}
+.seance-atelier.validated-atelier{border-color:var(--green)}
+.seance-atelier.validated-atelier .seance-atelier-header{background:rgba(46,204,113,.04)}
+.seance-atelier-body{display:none;padding:0 1rem 1rem}
+.seance-atelier.open .seance-atelier-body{display:block}
+
+/* Séries */
+.series-grid{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem}
+.serie-row{
+  background:var(--s2);border:1px solid var(--border);border-radius:10px;
+  padding:.6rem .85rem;display:flex;align-items:center;gap:.75rem;
+}
+.serie-num{
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--muted);
+  width:20px;flex-shrink:0;
+}
+.serie-info{flex:1}
+.serie-charge{font-weight:700;font-size:.95rem}
+.serie-reps{font-size:.72rem;color:var(--muted)}
+.serie-ressenti{display:flex;gap:.35rem;flex-shrink:0}
+.ressenti-btn{
+  width:34px;height:34px;border-radius:8px;border:1px solid var(--border);
+  background:var(--s3);color:var(--muted);font-size:.7rem;font-weight:700;
+  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;
+}
+.ressenti-btn:hover{border-color:var(--accent);color:var(--accent)}
+.ressenti-btn.selected-F{background:#2980b9;border-color:#2980b9;color:#fff}
+.ressenti-btn.selected-D{background:#27ae60;border-color:#27ae60;color:#fff}
+.ressenti-btn.selected-TD{background:#f39c12;border-color:#f39c12;color:#fff}
+.ressenti-btn.selected-E{background:#c0392b;border-color:#c0392b;color:#fff}
+.serie-row.done{opacity:.7}
+
+/* Suggestion */
+.suggestion-box{
+  background:rgba(255,107,43,.08);border:1px solid rgba(255,107,43,.25);
+  border-radius:10px;padding:.7rem .9rem;margin-bottom:.75rem;
+  display:none;
+}
+.suggestion-box.visible{display:block}
+.suggestion-title{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
+.suggestion-text{font-size:.85rem;line-height:1.4}
+.suggestion-actions{display:flex;gap:.5rem;margin-top:.6rem}
+.suggestion-actions .btn{padding:.5rem;font-size:.85rem;flex:1}
+
+/* Bravo */
+.bravo-box{
+  background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3);
+  border-radius:10px;padding:.85rem;text-align:center;display:none;
+}
+.bravo-box.visible{display:block}
+.bravo-emoji{font-size:2rem}
+.bravo-text{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;color:var(--green);margin-top:.25rem}
+.bravo-sub{font-size:.78rem;color:var(--muted);margin-top:.2rem}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+.toast{
+  position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-80px);
+  background:var(--green);color:#fff;font-weight:700;font-size:.9rem;
+  padding:.55rem 1.25rem;border-radius:30px;z-index:999;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.error{background:var(--red)}
+.toast.warn{background:var(--yellow);color:#000}
+
+/* ═══════════════════════════════════════════
+   LOADING
+═══════════════════════════════════════════ */
+.overlay{position:fixed;inset:0;background:rgba(10,10,15,.85);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
+.overlay.hidden{display:none}
+.spinner{width:32px;height:32px;border:3px solid rgba(255,107,43,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════════════════════════════════════
+   MODAL CONFIRMATION
+═══════════════════════════════════════════ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:300;padding:1rem}
+.modal-bg.hidden{display:none}
+.modal{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:1.5rem;max-width:340px;width:100%}
+.modal h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;margin-bottom:.5rem}
+.modal p{font-size:.85rem;color:var(--muted);line-height:1.5;margin-bottom:1.25rem}
+.modal-actions{display:flex;gap:.75rem}
+.modal-actions .btn{flex:1;padding:.7rem}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     ÉCRAN 1 — CONNEXION
+══════════════════════════════════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div style="width:100%;max-width:400px;margin:auto">
+    <div class="login-hero">
+      <div class="login-logo">💪 Muscu</div>
+      <div class="login-sub">à J2B — 2025·2026</div>
+    </div>
+    <div class="login-card">
+      <h2>Connexion</h2>
+      <div class="field">
+        <label class="field-label">Ma classe</label>
+        <select id="sel-classe"><option value="">— Choisir —</option></select>
+      </div>
+      <div class="field">
+        <label class="field-label">Mon nom</label>
+        <select id="sel-eleve" disabled><option value="">— Choisir ma classe d'abord —</option></select>
+      </div>
+      <div id="zone-mdp" style="display:none">
+        <div class="field">
+          <label class="field-label" id="mdp-label">Mon mot de passe</label>
+          <input type="password" id="inp-mdp" placeholder="••••••••" maxlength="10" autocomplete="off">
+          <div class="mdp-rules" id="mdp-rules" style="display:none">6 à 10 lettres minuscules, sans accent ni caractère spécial</div>
+          <div class="error-msg" id="err-mdp">Mot de passe incorrect.</div>
+        </div>
+        <div id="zone-mdp2" style="display:none" class="field">
+          <label class="field-label">Confirmer le mot de passe</label>
+          <input type="password" id="inp-mdp2" placeholder="••••••••" maxlength="10" autocomplete="off">
+          <div class="error-msg" id="err-mdp2">Les mots de passe ne correspondent pas.</div>
+        </div>
+      </div>
+      <button class="btn" id="btn-login" disabled>Entrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     ÉCRAN PRINCIPAL (avec nav)
+══════════════════════════════════════════════════ -->
+<div id="screen-app" class="screen">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-logo">💪 J2B</div>
+    <div class="topbar-info">
+      <span id="tb-prenom">—</span> · <span id="tb-classe">—</span>
+    </div>
+    <button class="btn-sm" id="btn-logout">Quitter</button>
+  </div>
+
+  <!-- Pages -->
+  <div id="page-maxis" class="scroll" style="display:none"></div>
+  <div id="page-projet" class="scroll" style="display:none"></div>
+  <div id="page-fiche" class="scroll" style="display:none"></div>
+  <div id="page-seance" class="scroll" style="display:none"></div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" data-page="maxis">
+      <span class="nav-icon">📊</span>Maxis
+    </button>
+    <button class="nav-btn" data-page="projet">
+      <span class="nav-icon">🎯</span>Projet
+    </button>
+    <button class="nav-btn" data-page="fiche">
+      <span class="nav-icon">📋</span>Ma fiche
+    </button>
+    <button class="nav-btn" data-page="seance">
+      <span class="nav-icon">🏋️</span>Séance
+    </button>
+  </div>
+</div>
+
+<!-- Loading overlay -->
+<div class="overlay hidden" id="loading"><div class="spinner"></div></div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Modal confirmation changement projet -->
+<div class="modal-bg hidden" id="modal-bg">
+  <div class="modal">
+    <h3>Changer de projet ?</h3>
+    <p>Tu as déjà choisi un projet. Es-tu sûr de vouloir en changer ? Ton nouveau choix remplacera l'ancien.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="modal-cancel">Annuler</button>
+      <button class="btn" id="modal-confirm">Oui, changer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════
+const WEBAPP = "https://script.google.com/macros/s/AKfycbyOOP30LcvyHaQvdIHYGNwnPsC8vsZUKLborLopVdV8zJl4EtRonbHli_MH2y-hNWoq/exec";
+
+// ═══════════════════════════════════════════════════
+//  DONNÉES STATIQUES
+// ═══════════════════════════════════════════════════
+const ATELIERS = [
+  {nom:"Développé Couché",      muscles:"Grands Pectoraux · Triceps · Deltoïde ANT.", icon:"🏋️", groupe:"haut", unite:"kg"},
+  {nom:"Développé Incliné",     muscles:"Petits Pectoraux · Triceps · Deltoïde ANT.", icon:"↗️", groupe:"haut", unite:"kg"},
+  {nom:"Pull-Down Nuque",       muscles:"Grand Rond · Grand Dorsal · Trapèze · Biceps", icon:"⬇️", groupe:"haut", unite:"kg"},
+  {nom:"Pull-Down Poitrine",    muscles:"Grand Rond · Grand Dorsal · Trapèze · Biceps", icon:"⬇️", groupe:"haut", unite:"kg"},
+  {nom:"Butterfly",             muscles:"Pectoraux · Deltoïdes ANT.", icon:"🦋", groupe:"haut", unite:"kg"},
+  {nom:"Banc Tirage Biceps",    muscles:"Trapèzes · Deltoïdes POST. · Biceps", icon:"💪", groupe:"haut", unite:"kg"},
+  {nom:"Machine Biceps",        muscles:"Biceps", icon:"🔩", groupe:"haut", unite:"kg"},
+  {nom:"Deltoïdes (haltères)",  muscles:"Deltoïde Latéral", icon:"🏅", groupe:"haut", unite:"kg"},
+  {nom:"Banc à Lombaires",      muscles:"Lombaire", icon:"🔄", groupe:"haut", unite:"kg", note:"30 rép. sur 1'"},
+  {nom:"Gainage sol",           muscles:"Lombaires · Abdominaux · Fessiers", icon:"🧱", groupe:"haut", unite:"niv."},
+  {nom:"Abdo Sol",              muscles:"Grand Droit · Transverses · Obliques", icon:"🔥", groupe:"haut", unite:"rép.", note:"30 rép. sur 1'"},
+  {nom:"Banc Ischio Jambiers",  muscles:"Ischio-Jambiers", icon:"🦵", groupe:"bas", unite:"kg"},
+  {nom:"Chaise à ADDucteurs",   muscles:"Adducteurs", icon:"↔️", groupe:"bas", unite:"kg"},
+  {nom:"Chaise à ABDucteurs",   muscles:"Fessiers · Tenseur du fascia lata", icon:"↔️", groupe:"bas", unite:"kg"},
+  {nom:"Chaise à Quadriceps",   muscles:"Quadriceps", icon:"🦿", groupe:"bas", unite:"kg"},
+  {nom:"Presse Inclinée",       muscles:"Quadriceps · Fessiers", icon:"📐", groupe:"bas", unite:"kg"},
+];
+
+const PROJETS = {
+  "1": {
+    num:"1", nom:"SPORTIF",
+    mobile:"Puissance · Explosivité",
+    desc:"Accompagner un projet sportif, gain de puissance et/ou explosivité",
+    intensites:[80,85,90], seriesMin:2, seriesMax:6,
+    repsMin:4, repsMax:8,
+    dureeSerie:"< 10 secondes",
+    vitesse:"Rapide / Explosive en phase concentrique",
+    recup:"Semi-active · 3 à 6 mn",
+    contractions:"Concentrique · Excentrique · Pliométrique · Isométrique"
+  },
+  "2": {
+    num:"2", nom:"ESTHÉTIQUE",
+    mobile:"Volume musculaire",
+    desc:"Développer sa musculature en recherchant un gain de volume musculaire",
+    intensites:[65,70,75,80], seriesMin:6, seriesMax:12,
+    repsMin:10, repsMax:20,
+    dureeSerie:"10 à 30 secondes",
+    vitesse:"Lente",
+    recup:"Passive · 1h30 à 2h30",
+    contractions:"Concentrique"
+  },
+  "3A": {
+    num:"3A", nom:"SANTÉ Endurance",
+    mobile:"Affinement silhouette",
+    desc:"Développer sa musculature en recherchant l'affinement de la silhouette",
+    intensites:[40,45,50], seriesMin:3, seriesMax:6,
+    repsMin:25, repsMax:35,
+    dureeSerie:"20 secondes à 1 mn",
+    vitesse:"Rapide",
+    recup:"Active · 30 secondes à 1 mn",
+    contractions:"Concentrique"
+  },
+  "3B": {
+    num:"3B", nom:"SANTÉ Tonification",
+    mobile:"Entretien · Raffermissement",
+    desc:"Entretenir sa forme ou se protéger des accidents par la tonification musculaire",
+    intensites:[50,55,60,65], seriesMin:3, seriesMax:6,
+    repsMin:15, repsMax:25,
+    dureeSerie:"15 à 30 secondes",
+    vitesse:"Soutenue",
+    recup:"Active · 30 sec à 1h30",
+    contractions:"Concentrique · Excentrique"
+  }
+};
+
+// Calcul des reps selon intensité (linéaire dans la fourchette)
+function calcReps(projet, intensite) {
+  const p = PROJETS[projet];
+  if (!p) return 0;
+  const ints = p.intensites;
+  const min = Math.min(...ints), max = Math.max(...ints);
+  if (min === max) return Math.round((p.repsMin + p.repsMax) / 2);
+  // Plus l'intensité est haute, moins de reps
+  const ratio = (max - intensite) / (max - min);
+  return Math.round(p.repsMin + ratio * (p.repsMax - p.repsMin));
+}
+
+// Messages progression séance
+function progressMsg(count) {
+  if (count === 0) return "";
+  if (count < 4)  return "C'est parti ! 💥";
+  if (count < 8)  return "Bon début, continue ! 🔥";
+  if (count < 12) return "Tu es dans le rythme ! ⚡";
+  if (count < 16) return "Plus que quelques séries ! 💪";
+  if (count < 20) return "Objectif atteint, tu cartonne ! 🏆";
+  return "Au-delà de l'objectif, bravo champion·ne ! 🥇";
+}
+
+// ═══════════════════════════════════════════════════
+//  ÉTAT GLOBAL
+// ═══════════════════════════════════════════════════
+let state = {
+  classe:"", nom:"", prenom:"",
+  mdp:"", isFirstLogin:false,
+  projet:"",
+  maxis:{},    // {nomAtelier: valeur}
+  series:{},   // {nomAtelier: nb séries faites (GS)}
+  // Séance locale
+  intensite:null,
+  serieLocale:{}, // {nomAtelier: [{ressenti, charge, reps}]}
+  compteurSeance: parseInt(localStorage.getItem('compteurSeance')||'0'),
+  sessionId: localStorage.getItem('sessionId')||''
+};
+
+// ═══════════════════════════════════════════════════
+//  UTILITAIRES
+// ═══════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+let toastTimer;
+function toast(msg, type='ok') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type==='error'?' error':type==='warn'?' warn':'');
+  clearTimeout(toastTimer);
+  setTimeout(()=>t.classList.add('show'),10);
+  toastTimer = setTimeout(()=>t.classList.remove('show'),3000);
+}
+function loading(show) { $('loading').classList.toggle('hidden',!show); }
+
+async function api(params) {
+  const url = WEBAPP + '?' + new URLSearchParams(params);
+  const r = await fetch(url);
+  return r.json();
+}
+async function apiPost(body) {
+  const r = await fetch(WEBAPP, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return r.json();
+}
+
+function validateMdp(v) { return /^[a-z]{6,10}$/.test(v); }
+
+// ═══════════════════════════════════════════════════
+//  INIT CONNEXION
+// ═══════════════════════════════════════════════════
+async function initLogin() {
+  loading(true);
+  try {
+    const d = await api({action:'getClasses'});
+    const sel = $('sel-classe');
+    (d.classes||[]).forEach(c => {
+      const o = document.createElement('option');
+      o.value = o.textContent = c;
+      sel.appendChild(o);
+    });
+  } catch(e) { toast('Erreur de connexion au serveur','error'); }
+  loading(false);
+}
+
+$('sel-classe').addEventListener('change', async function() {
+  const cls = this.value;
+  const selE = $('sel-eleve');
+  selE.innerHTML = '<option value="">— Choisir —</option>';
+  selE.disabled = !cls;
+  $('zone-mdp').style.display = 'none';
+  $('btn-login').disabled = true;
+  if (!cls) return;
+  loading(true);
+  try {
+    const d = await api({action:'getEleves', classe:cls});
+    (d.eleves||[]).forEach(e => {
+      const o = document.createElement('option');
+      o.value = JSON.stringify(e);
+      o.textContent = e.nom + ' ' + e.prenom;
+      selE.appendChild(o);
+    });
+  } catch(e) { toast('Erreur chargement élèves','error'); }
+  loading(false);
+});
+
+$('sel-eleve').addEventListener('change', function() {
+  if (!this.value) { $('zone-mdp').style.display='none'; $('btn-login').disabled=true; return; }
+  const e = JSON.parse(this.value);
+  $('zone-mdp').style.display = 'block';
+  $('inp-mdp').value = '';
+  $('inp-mdp2').value = '';
+  $('err-mdp').style.display = 'none';
+  $('err-mdp2').style.display = 'none';
+  if (e.hasMdp) {
+    $('mdp-label').textContent = 'Mon mot de passe';
+    $('mdp-rules').style.display = 'none';
+    $('zone-mdp2').style.display = 'none';
+  } else {
+    $('mdp-label').textContent = 'Crée ton mot de passe';
+    $('mdp-rules').style.display = 'block';
+    $('zone-mdp2').style.display = 'block';
+  }
+  $('btn-login').disabled = false;
+});
+
+$('btn-login').addEventListener('click', async () => {
+  const cls  = $('sel-classe').value;
+  const raw  = $('sel-eleve').value;
+  if (!cls || !raw) return;
+  const eInfo = JSON.parse(raw);
+  const mdp   = $('inp-mdp').value.trim();
+  const mdp2  = $('inp-mdp2').value.trim();
+
+  // Validation
+  if (!eInfo.hasMdp) {
+    if (!validateMdp(mdp)) { $('err-mdp').textContent='6 à 10 lettres minuscules, sans accent ni caractère spécial.'; $('err-mdp').style.display='block'; return; }
+    if (mdp !== mdp2) { $('err-mdp2').style.display='block'; return; }
+  }
+
+  loading(true);
+  try {
+    // Charger données élève
+    const d = await api({action:'loadEleve', classe:cls, nom:eInfo.nom, prenom:eInfo.prenom});
+    if (d.error) { toast(d.error,'error'); loading(false); return; }
+
+    // Vérifier mot de passe si existant
+    if (eInfo.hasMdp && d.mdp !== mdp) {
+      $('err-mdp').textContent = 'Mot de passe incorrect.';
+      $('err-mdp').style.display = 'block';
+      loading(false); return;
+    }
+
+    // Enregistrer mdp si première fois
+    if (!eInfo.hasMdp) {
+      await apiPost({action:'setPassword', classe:cls, nom:eInfo.nom, prenom:eInfo.prenom, mdp});
+    }
+
+    // Remplir state
+    state.classe  = cls;
+    state.nom     = eInfo.nom;
+    state.prenom  = eInfo.prenom;
+    state.mdp     = mdp;
+    state.projet  = d.projet || '';
+    state.maxis   = d.maxis  || {};
+    state.series  = d.series || {};
+    state.isFirstLogin = !eInfo.hasMdp;
+
+    // Nouvelle session → reset compteur local
+    const newSession = cls + eInfo.nom + eInfo.prenom + new Date().toDateString();
+    if (localStorage.getItem('sessionId') !== newSession) {
+      localStorage.setItem('sessionId', newSession);
+      localStorage.setItem('compteurSeance', '0');
+      state.compteurSeance = 0;
+      state.serieLocale = {};
+    }
+
+    // Afficher app
+    $('tb-prenom').textContent = eInfo.prenom;
+    $('tb-classe').textContent = cls;
+    $('screen-login').classList.remove('active');
+    $('screen-app').classList.add('active');
+
+    showPage('maxis');
+
+  } catch(e) { toast('Erreur réseau','error'); console.error(e); }
+  loading(false);
+});
+
+// ═══════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════
+const PAGES = ['maxis','projet','fiche','seance'];
+function showPage(name) {
+  PAGES.forEach(p => {
+    $('page-'+p).style.display = p===name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.page === name);
+  });
+  if (name==='maxis')  buildMaxis();
+  if (name==='projet') buildProjet();
+  if (name==='fiche')  buildFiche();
+  if (name==='seance') buildSeance();
+}
+document.querySelectorAll('.nav-btn').forEach(b => {
+  b.addEventListener('click', ()=>showPage(b.dataset.page));
+});
+$('btn-logout').addEventListener('click', () => {
+  $('screen-app').classList.remove('active');
+  $('screen-login').classList.add('active');
+  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurSeance:parseInt(localStorage.getItem('compteurSeance')||'0'),sessionId:localStorage.getItem('sessionId')||''};
+  $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
+  $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
+});
+
+// ═══════════════════════════════════════════════════
+//  PAGE MAXIS
+// ═══════════════════════════════════════════════════
+function buildMaxis() {
+  const pg = $('page-maxis');
+  const maxisFilled = ATELIERS.filter(a => state.maxis[a.nom] !== '' && state.maxis[a.nom] !== undefined && state.maxis[a.nom] !== null).length;
+  const total = ATELIERS.length;
+
+  let html = `<div style="margin-bottom:.75rem">
+    <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.35rem">
+      <span>Maxis renseignés</span><span style="color:var(--text);font-weight:700">${maxisFilled} / ${total}</span>
+    </div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${(maxisFilled/total*100).toFixed(0)}%"></div></div>
+  </div>`;
+
+  if (maxisFilled < total) {
+    html += `<div class="lock-msg">📝 Remplis tous tes maxis pour débloquer le choix du projet !</div>`;
+  }
+
+  let lastGroupe = null;
+  ATELIERS.forEach(a => {
+    if (a.groupe !== lastGroupe) {
+      lastGroupe = a.groupe;
+      html += `<div class="section-title">${a.groupe==='haut'?'🏋️ Haut du corps':'🦵 Bas du corps'}</div>`;
+    }
+    const val = state.maxis[a.nom] || '';
+    const seriesFaites = parseInt(state.series[a.nom]||0);
+    const validated = seriesFaites >= 4;
+    html += `<div class="atelier-card ${validated?'validated':''}">
+      <div class="atelier-icon ${a.groupe==='haut'?'icon-haut':'icon-bas'}">${a.icon}</div>
+      <div class="atelier-info">
+        <div class="atelier-name">${a.nom}</div>
+        <div class="atelier-muscles">${a.muscles}${a.note?` · <em>${a.note}</em>`:''}</div>
+        ${seriesFaites>0?`<div class="atelier-series-count">✓ ${seriesFaites} série${seriesFaites>1?'s':''} effectuée${seriesFaites>1?'s':''}</div>`:''}
+      </div>
+      <div class="maxi-wrap">
+        <input class="maxi-input" type="number" min="0" step="0.5" inputmode="decimal"
+          data-atelier="${a.nom}" value="${val}" placeholder="—">
+        <span class="maxi-unit">${a.unite}</span>
+      </div>
+    </div>`;
+  });
+
+  pg.innerHTML = html + '<div style="height:5rem"></div>';
+
+  // Save bar
+  let saveBar = document.querySelector('.save-bar');
+  if (!saveBar) {
+    saveBar = document.createElement('div');
+    saveBar.className = 'save-bar';
+    saveBar.innerHTML = `<div class="progress-maxis">Maxis : <span id="save-count">${maxisFilled}/${total}</span></div>
+      <button class="btn" id="btn-save-maxis" style="flex:1;padding:.7rem">Enregistrer les maxis</button>`;
+    $('screen-app').insertBefore(saveBar, document.querySelector('.bottom-nav'));
+  }
+  $('save-count').textContent = `${maxisFilled}/${total}`;
+
+  document.querySelectorAll('.maxi-input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      state.maxis[inp.dataset.atelier] = inp.value;
+      const filled = ATELIERS.filter(a=>state.maxis[a.nom]!==''&&state.maxis[a.nom]!==undefined&&state.maxis[a.nom]!==null).length;
+      $('save-count').textContent = `${filled}/${total}`;
+    });
+  });
+
+  document.getElementById('btn-save-maxis').onclick = saveMaxis;
+}
+
+async function saveMaxis() {
+  loading(true);
+  try {
+    const d = await apiPost({action:'saveMaxis', classe:state.classe, nom:state.nom, prenom:state.prenom, maxis:state.maxis});
+    if (d.error) throw new Error(d.error);
+    toast('Maxis enregistrés ✓');
+    buildMaxis();
+  } catch(e) { toast('Erreur enregistrement','error'); }
+  loading(false);
+}
+
+// ═══════════════════════════════════════════════════
+//  PAGE PROJET — CHOIX
+// ═══════════════════════════════════════════════════
+function buildProjet() {
+  const pg = $('page-projet');
+  const allFilled = ATELIERS.every(a => state.maxis[a.nom] !== '' && state.maxis[a.nom] !== undefined && state.maxis[a.nom] !== null);
+
+  let html = '';
+  if (!allFilled) {
+    html += `<div class="lock-msg">🔒 Remplis tous tes maxis pour débloquer le choix du projet !</div>`;
+  }
+  if (state.projet) {
+    html += `<div style="background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);border-radius:12px;padding:.85rem;text-align:center;font-size:.85rem;color:var(--green);margin-bottom:1rem">
+      ✓ Projet actuel : <strong>${PROJETS[state.projet]?.nom}</strong>
+    </div>`;
+  }
+
+  Object.values(PROJETS).forEach(p => {
+    const sel = state.projet === p.num;
+    const locked = !allFilled;
+    html += `<div class="projet-card ${sel?'selected':''} ${locked?'locked':''}" data-projet="${p.num}">
+      <div class="projet-num">${p.num}</div>
+      <div class="projet-name">${p.nom}</div>
+      <div class="projet-desc">${p.desc}</div>
+      <div class="projet-tags">
+        <span class="tag">💪 ${p.intensites[0]}–${p.intensites[p.intensites.length-1]}% maxi</span>
+        <span class="tag">🔁 4 séries</span>
+        <span class="tag">📊 ${p.repsMin}–${p.repsMax} reps</span>
+      </div>
+    </div>`;
+  });
+
+  pg.innerHTML = html;
+
+  if (allFilled) {
+    pg.querySelectorAll('.projet-card').forEach(card => {
+      card.addEventListener('click', () => selectProjet(card.dataset.projet));
+    });
+  }
+}
+
+let pendingProjet = null;
+function selectProjet(num) {
+  if (state.projet && state.projet !== num) {
+    pendingProjet = num;
+    $('modal-bg').classList.remove('hidden');
+  } else {
+    confirmProjet(num);
+  }
+}
+$('modal-cancel').onclick = () => { $('modal-bg').classList.add('hidden'); pendingProjet=null; };
+$('modal-confirm').onclick = () => { $('modal-bg').classList.add('hidden'); if(pendingProjet) confirmProjet(pendingProjet); };
+
+async function confirmProjet(num) {
+  loading(true);
+  try {
+    const d = await apiPost({action:'saveProjet', classe:state.classe, nom:state.nom, prenom:state.prenom, projet:num});
+    if (d.error) throw new Error(d.error);
+    state.projet = num;
+    toast(`Projet ${PROJETS[num].nom} enregistré ✓`);
+    buildProjet();
+  } catch(e) { toast('Erreur','error'); }
+  loading(false);
+}
+
+// ═══════════════════════════════════════════════════
+//  PAGE FICHE PROJET
+// ═══════════════════════════════════════════════════
+function buildFiche() {
+  const pg = $('page-fiche');
+  if (!state.projet) {
+    pg.innerHTML = `<div class="lock-msg" style="margin-top:2rem">🎯 Choisis d'abord ton projet pour voir ta fiche !</div>`;
+    return;
+  }
+  const p = PROJETS[state.projet];
+  pg.innerHTML = `
+    <div class="projet-fiche">
+      <div class="fiche-header">
+        <h2>Projet ${p.num} — ${p.nom}</h2>
+        <p>${p.mobile}</p>
+      </div>
+      <div class="fiche-body">
+        <div class="fiche-row"><span class="fiche-key">Intensité (% maxi)</span><span class="fiche-val">${p.intensites.join(' · ')}%</span></div>
+        <div class="fiche-row"><span class="fiche-key">Nombre de séries</span><span class="fiche-val">${p.seriesMin} à ${p.seriesMax}</span></div>
+        <div class="fiche-row"><span class="fiche-key">Répétitions</span><span class="fiche-val">${p.repsMin} à ${p.repsMax}</span></div>
+        <div class="fiche-row"><span class="fiche-key">Durée d'une série</span><span class="fiche-val">${p.dureeSerie}</span></div>
+        <div class="fiche-row"><span class="fiche-key">Vitesse d'exécution</span><span class="fiche-val">${p.vitesse}</span></div>
+        <div class="fiche-row"><span class="fiche-key">Récupération</span><span class="fiche-val">${p.recup}</span></div>
+        <div class="fiche-row"><span class="fiche-key">Contractions</span><span class="fiche-val">${p.contractions}</span></div>
+      </div>
+    </div>
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:1rem">
+      <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem">En pratique (4 séries par atelier)</div>
+      ${p.intensites.map(i=>{
+        const reps = calcReps(state.projet, i);
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border)">
+          <span style="font-weight:700;color:var(--accent)">${i}%</span>
+          <span style="font-size:.85rem;color:var(--muted)">${reps} répétitions</span>
+          <span style="font-size:.72rem;color:var(--muted)">maxi × ${i/100}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════
+//  PAGE SÉANCE
+// ═══════════════════════════════════════════════════
+function buildSeance() {
+  const pg = $('page-seance');
+  if (!state.projet) {
+    pg.innerHTML = `<div class="lock-msg" style="margin-top:2rem">🎯 Choisis ton projet avant de commencer une séance !</div>`;
+    return;
+  }
+  const p = PROJETS[state.projet];
+  if (!state.intensite) state.intensite = p.intensites[0];
+
+  const count = state.compteurSeance;
+  const pct = Math.min((count/20)*100,100).toFixed(0);
+
+  let html = `
+    <!-- Barre de progression séance -->
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-label"><span>Séries cette séance</span><span>${count} / 16-20</span></div>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="seance-bar" style="width:${pct}%"></div></div>
+      <div class="progress-msg" id="seance-msg">${progressMsg(count)}</div>
+    </div>
+
+    <!-- Choix intensité -->
+    <div class="seance-header">
+      <div class="field-label">Intensité de travail (${p.nom})</div>
+      <div class="intensite-row">
+        <select id="sel-intensite">
+          ${p.intensites.map(i=>`<option value="${i}" ${i===state.intensite?'selected':''}>${i}% du maxi</option>`).join('')}
+        </select>
+        <div class="intensite-badge" id="badge-reps">${calcReps(state.projet,state.intensite)} reps</div>
+      </div>
+    </div>
+  `;
+
+  // Ateliers
+  let lastGroupe = null;
+  ATELIERS.forEach(a => {
+    if (a.groupe !== lastGroupe) {
+      lastGroupe = a.groupe;
+      html += `<div class="section-title">${a.groupe==='haut'?'🏋️ Haut du corps':'🦵 Bas du corps'}</div>`;
+    }
+    const maxi = parseFloat(state.maxis[a.nom])||0;
+    const seriesFaites = parseInt(state.series[a.nom]||0);
+    const validated = seriesFaites >= 4;
+    const localSeries = state.serieLocale[a.nom] || [];
+
+    html += `<div class="seance-atelier ${validated?'validated-atelier':''}" id="sa-${a.nom.replace(/[^a-zA-Z]/g,'_')}">
+      <div class="seance-atelier-header" onclick="toggleAtelier('${a.nom.replace(/[^a-zA-Z]/g,'_')}')">
+        <div class="atelier-icon ${a.groupe==='haut'?'icon-haut':'icon-bas'}">${a.icon}</div>
+        <div class="seance-atelier-title">
+          <div class="atelier-name">${a.nom}${validated?' ✓':''}</div>
+          <div class="atelier-maxi">Maxi : ${maxi||'—'} ${a.unite} · ${seriesFaites} série${seriesFaites!==1?'s':''} au total</div>
+        </div>
+        <div class="seance-atelier-chevron">▼</div>
+      </div>
+      <div class="seance-atelier-body">
+        <div class="series-grid" id="sg-${a.nom.replace(/[^a-zA-Z]/g,'_')}">
+          ${buildSeriesHTML(a, maxi, localSeries)}
+        </div>
+        <div class="suggestion-box" id="sug-${a.nom.replace(/[^a-zA-Z]/g,'_')}"></div>
+        <div class="bravo-box" id="bravo-${a.nom.replace(/[^a-zA-Z]/g,'_')}">
+          <div class="bravo-emoji">🎉</div>
+          <div class="bravo-text">Bravo ! Atelier terminé !</div>
+          <div class="bravo-sub">4 séries effectuées sur cet atelier</div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  pg.innerHTML = html + '<div style="height:1rem"></div>';
+
+  // Intensité change
+  pg.querySelector('#sel-intensite').addEventListener('change', function() {
+    state.intensite = parseInt(this.value);
+    const reps = calcReps(state.projet, state.intensite);
+    pg.querySelector('#badge-reps').textContent = reps + ' reps';
+    buildSeance(); // rebuild
+  });
+
+  // Restaurer bravo si 4 séries locales déjà faites
+  ATELIERS.forEach(a => {
+    const key = a.nom.replace(/[^a-zA-Z]/g,'_');
+    const local = state.serieLocale[a.nom]||[];
+    if (local.length >= 4) {
+      const bravo = pg.querySelector('#bravo-'+key);
+      if (bravo) bravo.classList.add('visible');
+    }
+  });
+}
+
+function buildSeriesHTML(atelier, maxi, localSeries) {
+  const intensite = state.intensite || PROJETS[state.projet].intensites[0];
+  const charge = maxi ? Math.round(maxi * intensite / 100 * 2) / 2 : null;
+  const reps = calcReps(state.projet, intensite);
+  const a = atelier;
+
+  let html = '';
+  for (let s = 0; s < 4; s++) {
+    const local = localSeries[s];
+    const done = !!local;
+    const serieCharge = local ? local.charge : (charge ? charge + ' ' + a.unite : '— ' + a.unite);
+    const serieReps   = local ? local.reps   : reps;
+    html += `<div class="serie-row ${done?'done':''}" id="sr-${a.nom.replace(/[^a-zA-Z]/g,'_')}-${s}">
+      <div class="serie-num">${s+1}</div>
+      <div class="serie-info">
+        <div class="serie-charge">${typeof serieCharge==='number'?serieCharge+' '+a.unite:serieCharge}</div>
+        <div class="serie-reps">${serieReps} rép.</div>
+      </div>
+      <div class="serie-ressenti">
+        ${['F','D','TD','E'].map(r=>`
+          <button class="ressenti-btn ${done&&local.ressenti===r?'selected-'+r:''}"
+            onclick="onRessenti('${a.nom}','${a.unite}',${s},'${r}',${charge||0},${reps})"
+            ${done?'disabled':''}>
+            ${r}
+          </button>`).join('')}
+      </div>
+    </div>`;
+  }
+  return html;
+}
+
+function toggleAtelier(key) {
+  const el = document.getElementById('sa-'+key);
+  el.classList.toggle('open');
+}
+
+async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps) {
+  const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
+
+  // Enregistrer localement
+  if (!state.serieLocale[nomAtelier]) state.serieLocale[nomAtelier] = [];
+  state.serieLocale[nomAtelier][serieIndex] = {ressenti, charge, reps, unite};
+
+  // Incrémenter compteur séance
+  state.compteurSeance++;
+  localStorage.setItem('compteurSeance', state.compteurSeance);
+
+  // Maj barre progression
+  const pct = Math.min((state.compteurSeance/20)*100,100).toFixed(0);
+  const bar = $('seance-bar');
+  const msg = $('seance-msg');
+  if (bar) { bar.style.width = pct+'%'; }
+  if (msg) { msg.textContent = progressMsg(state.compteurSeance); }
+
+  // Incrémenter GS
+  try {
+    await apiPost({action:'incrementSerie', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier});
+    state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 1);
+  } catch(e) { console.error(e); }
+
+  const localSeries = state.serieLocale[nomAtelier];
+  const seriesCount = localSeries.length;
+
+  // Désactiver les boutons de cette ligne
+  const row = document.getElementById(`sr-${key}-${serieIndex}`);
+  if (row) {
+    row.classList.add('done');
+    row.querySelectorAll('.ressenti-btn').forEach(b => {
+      b.disabled = true;
+      if (b.textContent.trim() === ressenti) b.classList.add('selected-'+ressenti);
+    });
+  }
+
+  // Bravo après série 4
+  if (seriesCount >= 4) {
+    const bravo = document.getElementById('bravo-'+key);
+    if (bravo) bravo.classList.add('visible');
+    const sug = document.getElementById('sug-'+key);
+    if (sug) sug.classList.remove('visible');
+    return;
+  }
+
+  // Suggestion série suivante
+  showSuggestion(nomAtelier, key, unite, ressenti, serieIndex+1, charge, reps);
+}
+
+function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentCharge, currentReps) {
+  const p = PROJETS[state.projet];
+  const ints = p.intensites;
+  let newIntensite = state.intensite;
+  let msg = '';
+
+  if (ressenti === 'F') {
+    const idx = ints.indexOf(state.intensite);
+    if (idx < ints.length-1) newIntensite = ints[idx+1];
+    msg = '😤 Trop facile ! Je te suggère de monter l\'intensité.';
+  } else if (ressenti === 'D') {
+    const idx = ints.indexOf(state.intensite);
+    if (idx < ints.length-1) newIntensite = ints[idx+1];
+    msg = '👍 Bien ! Tu peux encore pousser un peu plus.';
+  } else if (ressenti === 'TD') {
+    msg = '🔥 Parfait ! C\'est exactement l\'objectif. Continue comme ça !';
+  } else if (ressenti === 'E') {
+    const idx = ints.indexOf(state.intensite);
+    if (idx > 0) newIntensite = ints[idx-1];
+    msg = '⚠️ Baisse un peu l\'intensité pour la prochaine série.';
+  }
+
+  const maxi = parseFloat(state.maxis[nomAtelier])||0;
+  const newCharge = maxi ? Math.round(maxi * newIntensite / 100 * 2) / 2 : currentCharge;
+  const newReps = calcReps(state.projet, newIntensite);
+
+  const sugBox = document.getElementById('sug-'+key);
+  if (!sugBox) return;
+  sugBox.classList.add('visible');
+  sugBox.innerHTML = `
+    <div class="suggestion-title">💡 Suggestion série ${nextSerie+1}</div>
+    <div class="suggestion-text">${msg}<br>
+      <strong>${newIntensite}% → ${newCharge} ${unite} × ${newReps} reps</strong>
+    </div>
+    <div class="suggestion-actions">
+      <button class="btn" onclick="applySuggestion('${nomAtelier}',${newIntensite},${newCharge},${newReps})">✓ Accepter</button>
+      <button class="btn btn-outline" onclick="document.getElementById('sug-${key}').classList.remove('visible')">Modifier</button>
+    </div>
+  `;
+}
+
+function applySuggestion(nomAtelier, newIntensite, newCharge, newReps) {
+  const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
+  const local = state.serieLocale[nomAtelier]||[];
+  const nextIdx = local.length;
+  const a = ATELIERS.find(x=>x.nom===nomAtelier);
+
+  // Mettre à jour la prochaine ligne
+  const row = document.getElementById(`sr-${key}-${nextIdx}`);
+  if (row) {
+    row.querySelector('.serie-charge').textContent = newCharge + ' ' + a.unite;
+    row.querySelector('.serie-reps').textContent = newReps + ' rép.';
+  }
+  document.getElementById('sug-'+key).classList.remove('visible');
+  state.intensite = newIntensite;
+}
+
+// ═══════════════════════════════════════════════════
+//  DÉMARRAGE
+// ═══════════════════════════════════════════════════
+initLogin();
+</script>
+</body>
+</html>
