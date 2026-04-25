@@ -1201,10 +1201,12 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
   const idxCurrent = ints.indexOf(state.intensite);
   const atMaxIntensite = idxCurrent >= ints.length - 1;
   const atMinIntensite = idxCurrent <= 0;
+  const maxRepsProjet = p.repsMax;
 
   let newIntensite = state.intensite;
   let newReps = currentReps;
   let msg = '';
+  let maxiARevoir = false;
 
   if (ressenti === 'F') {
     if (!atMaxIntensite) {
@@ -1213,7 +1215,12 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
       msg = "😤 Trop facile ! Monte l'intensité pour la prochaine série.";
     } else {
       newReps = Math.ceil(currentReps * 1.30);
-      msg = "😤 Trop facile et déjà au max ! Fais +30% de répétitions.";
+      if (newReps >= maxRepsProjet) {
+        newReps = maxRepsProjet;
+        maxiARevoir = true;
+      } else {
+        msg = "😤 Trop facile et déjà au max ! Fais +30% de répétitions.";
+      }
     }
   } else if (ressenti === 'D') {
     if (!atMaxIntensite) {
@@ -1222,7 +1229,12 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
       msg = "👍 Bien ! Tu peux encore pousser un peu plus.";
     } else {
       newReps = Math.ceil(currentReps * 1.15);
-      msg = "👍 Bien ! Déjà au max d'intensité, essaie +15% de répétitions.";
+      if (newReps >= maxRepsProjet) {
+        newReps = maxRepsProjet;
+        maxiARevoir = true;
+      } else {
+        msg = "👍 Bien ! Déjà au max d'intensité, essaie +15% de répétitions.";
+      }
     }
   } else if (ressenti === 'TD') {
     msg = "🔥 Parfait ! C'est exactement l'objectif. Continue comme ça !";
@@ -1243,16 +1255,53 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
   const sugBox = document.getElementById('sug-' + key);
   if (!sugBox) return;
   sugBox.classList.add('visible');
-  sugBox.innerHTML = `
-    <div class="suggestion-title">💡 Suggestion série ${nextSerie + 1}</div>
-    <div class="suggestion-text">${msg}<br>
-      <strong>${newIntensite}% → ${newCharge} ${unite} × ${newReps} reps</strong>
-    </div>
-    <div class="suggestion-actions">
-      <button class="btn" onclick="applySuggestion('${nomAtelier}',${newIntensite},${newCharge},${newReps})">✓ Accepter</button>
-      <button class="btn btn-outline" onclick="document.getElementById('sug-${key}').classList.remove('visible')">Modifier</button>
-    </div>
-  `;
+
+  if (maxiARevoir) {
+    // Cas spécial : maxi sous-évalué
+    sugBox.innerHTML = `
+      <div class="suggestion-title" style="color:var(--yellow)">⚠️ Maxi à revoir !</div>
+      <div class="suggestion-text" style="margin-bottom:.6rem">
+        Ton maxi sur cet atelier <strong>ne correspond pas à tes capacités réelles</strong>.<br>
+        Tu es capable de faire plus ! Il faut le corriger.
+      </div>
+      <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
+        onclick="allerAuxMaxis('${nomAtelier}')">
+        📊 Corriger mon maxi
+      </button>
+    `;
+  } else {
+    sugBox.innerHTML = `
+      <div class="suggestion-title">💡 Suggestion série ${nextSerie + 1}</div>
+      <div class="suggestion-text">${msg}<br>
+        <strong>${newIntensite}% → ${newCharge} ${unite} × ${newReps} reps</strong>
+      </div>
+      <div class="suggestion-actions">
+        <button class="btn" onclick="applySuggestion('${nomAtelier}',${newIntensite},${newCharge},${newReps})">✓ Accepter</button>
+        <button class="btn btn-outline" onclick="document.getElementById('sug-${key}').classList.remove('visible')">Modifier</button>
+      </div>
+    `;
+  }
+}
+
+function allerAuxMaxis(nomAtelier) {
+  showPage('maxis');
+  // Scroller jusqu'à l'atelier concerné après un court délai
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.maxi-input');
+    inputs.forEach(inp => {
+      if (inp.dataset.atelier === nomAtelier) {
+        inp.scrollIntoView({behavior:'smooth', block:'center'});
+        inp.focus();
+        // Mettre en surbrillance
+        inp.style.borderColor = 'var(--yellow)';
+        inp.style.boxShadow = '0 0 0 3px rgba(241,196,15,.3)';
+        setTimeout(() => {
+          inp.style.borderColor = '';
+          inp.style.boxShadow = '';
+        }, 3000);
+      }
+    });
+  }, 300);
 }
 
 function applySuggestion(nomAtelier, newIntensite, newCharge, newReps) {
