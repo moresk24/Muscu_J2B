@@ -1474,14 +1474,14 @@ function modifierSuggestion(nomAtelier, key, unite, newCharge, newReps, newInten
     <div class="suggestion-title">✏️ Modifier les paramètres</div>
     <div style="display:flex;gap:.5rem;align-items:center;margin:.5rem 0">
       <div style="flex:1">
-        <div class="field-label">Charge (${unite})</div>
-        <input type="number" id="custom-charge-${key}" class="maxi-input" style="width:100%" 
-          value="${newCharge}" min="0" step="0.5" inputmode="decimal">
-      </div>
-      <div style="flex:1">
         <div class="field-label">Reps</div>
         <input type="number" id="custom-reps-${key}" class="maxi-input" style="width:100%"
           value="${newReps}" min="1" step="1" inputmode="numeric">
+      </div>
+      <div style="flex:1">
+        <div class="field-label">Charge (${unite})</div>
+        <input type="number" id="custom-charge-${key}" class="maxi-input" style="width:100%"
+          value="${newCharge}" min="0" step="0.5" inputmode="decimal">
       </div>
     </div>
     <div class="suggestion-actions">
