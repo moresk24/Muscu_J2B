@@ -665,7 +665,7 @@ async function autoConnect(saved, classes) {
     $('tb-classe').textContent = saved.classe;
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
-    showPage('maxis');
+    showPage(maxisAllFilled() ? 'projet' : 'maxis');
   } catch(e) { console.error(e); }
   loading(false);
 }
@@ -771,7 +771,8 @@ $('btn-login').addEventListener('click', async () => {
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
 
-    showPage('maxis');
+    // Si tous les maxis déjà remplis → aller directement sur Projet
+    showPage(maxisAllFilled() ? 'projet' : 'maxis');
 
   } catch(e) { toast('Erreur réseau','error'); console.error(e); }
   loading(false);
@@ -788,6 +789,9 @@ function showPage(name) {
   document.querySelectorAll('.nav-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.page === name);
   });
+  // Cacher la save-bar sur toutes les pages sauf maxis
+  const saveBar = document.querySelector('.save-bar');
+  if (saveBar) saveBar.style.display = name === 'maxis' ? 'flex' : 'none';
   if (name==='maxis')  buildMaxis();
   if (name==='projet') buildProjet();
   if (name==='fiche')  buildFiche();
