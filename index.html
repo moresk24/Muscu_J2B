@@ -1609,6 +1609,10 @@ function validerModification(nomAtelier, key, unite, newIntensite) {
 //  DÉMARRAGE
 // ═══════════════════════════════════════════════════
 initLogin();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
 </script>
 </body>
 </html>
