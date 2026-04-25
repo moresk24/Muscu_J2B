@@ -409,11 +409,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 <div id="screen-app" class="screen">
   <!-- Top bar -->
   <div class="topbar">
-    <div class="topbar-logo">💪 J2B</div>
+    <div class="topbar-logo">💪 Muscu</div>
     <div class="topbar-info">
-      <span id="tb-prenom">—</span> · <span id="tb-classe">—</span>
+      <span id="tb-prenom">—</span> · <span id="tb-classe">—</span> · <span id="tb-seance" style="color:var(--accent)">—</span> <span id="tb-lock" style="display:none;color:var(--muted);font-size:.9rem" title="Mode consultation">🔒</span>
     </div>
-    <button class="btn-sm" id="btn-logout">Quitter</button>
+    <button class="btn-sm" id="btn-logout" title="Se déconnecter" style="border:none;background:none;font-size:1.2rem;padding:.3rem .4rem;cursor:pointer">⏻</button>
   </div>
 
   <!-- Pages -->
@@ -568,8 +568,40 @@ let state = {
   intensite:null,
   serieLocale:{}, // {nomAtelier: [{ressenti, charge, reps}]}
   compteurSeance: parseInt(localStorage.getItem('compteurSeance')||'0'),
-  sessionId: localStorage.getItem('sessionId')||''
+  sessionId: localStorage.getItem('sessionId')||'',
+  // Config
+  isAdmin: false,
+  isActive: false,
+  sessionNumber: 0
 };
+
+// ═══════════════════════════════════════════════════
+//  CONFIG & MODE LECTURE SEULE
+// ═══════════════════════════════════════════════════
+async function loadConfig() {
+  try {
+    const d = await api({action:'getConfig', classe:state.classe});
+    state.isActive    = d.isActive    || false;
+    state.sessionNumber = d.sessionNumber || 0;
+    state.isAdmin     = d.adminMdp && state.mdp === d.adminMdp.toString().trim();
+  } catch(e) { console.error('Config error', e); }
+  updateTopbarSeance();
+}
+
+function isEditable() { return state.isAdmin || state.isActive; }
+
+function updateTopbarSeance() {
+  const el = $('tb-seance');
+  if (!el) return;
+  if (state.sessionNumber > 0) {
+    el.textContent = 'Séance ' + state.sessionNumber;
+  } else {
+    el.textContent = '';
+  }
+  // Indicateur lecture seule
+  const lock = $('tb-lock');
+  if (lock) lock.style.display = isEditable() ? 'none' : 'inline';
+}
 
 // ═══════════════════════════════════════════════════
 //  UTILITAIRES
@@ -664,6 +696,7 @@ async function autoConnect(saved, classes) {
     }
     $('tb-prenom').textContent = saved.prenom;
     $('tb-classe').textContent = saved.classe;
+    await loadConfig();
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
     showPage(maxisAllFilled() ? (state.projet ? 'fiche' : 'projet') : 'maxis');
@@ -769,6 +802,7 @@ $('btn-login').addEventListener('click', async () => {
     // Afficher app
     $('tb-prenom').textContent = eInfo.prenom;
     $('tb-classe').textContent = cls;
+    await loadConfig();
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
 
@@ -848,7 +882,7 @@ function buildMaxis() {
       </div>
       <div class="maxi-wrap">
         <input class="maxi-input" type="number" min="0" step="0.5" inputmode="decimal"
-          data-atelier="${a.nom}" value="${val}" placeholder="—">
+          data-atelier="${a.nom}" value="${val}" placeholder="—" ${isEditable()?'':'disabled'}>
         <span class="maxi-unit">${a.unite}</span>
       </div>
     </div>`;
@@ -856,7 +890,7 @@ function buildMaxis() {
 
   pg.innerHTML = html + '<div style="height:5rem"></div>';
 
-  // Save bar
+  // Save bar — masquée en mode lecture seule
   let saveBar = document.querySelector('.save-bar');
   if (!saveBar) {
     saveBar = document.createElement('div');
@@ -866,28 +900,31 @@ function buildMaxis() {
     $('screen-app').insertBefore(saveBar, document.querySelector('.bottom-nav'));
   }
   $('save-count').textContent = `${maxisFilled}/${total}`;
+  saveBar.style.display = isEditable() ? 'flex' : 'none';
 
-  const allInputs = Array.from(document.querySelectorAll('.maxi-input'));
-  allInputs.forEach((inp, idx) => {
-    inp.addEventListener('input', () => {
-      state.maxis[inp.dataset.atelier] = inp.value;
-      const filled = ATELIERS.filter(a=>state.maxis[a.nom]!==''&&state.maxis[a.nom]!==undefined&&state.maxis[a.nom]!==null).length;
-      $('save-count').textContent = `${filled}/${total}`;
+  if (isEditable()) {
+    const allInputs = Array.from(document.querySelectorAll('.maxi-input'));
+    allInputs.forEach((inp, idx) => {
+      inp.addEventListener('input', () => {
+        state.maxis[inp.dataset.atelier] = inp.value;
+        const filled = ATELIERS.filter(a=>state.maxis[a.nom]!==''&&state.maxis[a.nom]!==undefined&&state.maxis[a.nom]!==null).length;
+        $('save-count').textContent = `${filled}/${total}`;
+      });
+      inp.addEventListener('keydown', ev => {
+        if (ev.key === 'Enter') {
+          ev.preventDefault();
+          const next = allInputs[idx + 1];
+          if (next) next.focus();
+          else inp.blur();
+        }
+      });
     });
-    inp.addEventListener('keydown', ev => {
-      if (ev.key === 'Enter') {
-        ev.preventDefault();
-        const next = allInputs[idx + 1];
-        if (next) next.focus();
-        else inp.blur();
-      }
-    });
-  });
-
-  document.getElementById('btn-save-maxis').onclick = saveMaxis;
+    document.getElementById('btn-save-maxis').onclick = saveMaxis;
+  }
 }
 
 async function saveMaxis() {
+  if (!isEditable()) { toast('Mode consultation — modifications non autorisées', 'warn'); return; }
   loading(true);
   try {
     const d = await apiPost({action:'saveMaxis', classe:state.classe, nom:state.nom, prenom:state.prenom, maxis:state.maxis});
@@ -931,7 +968,7 @@ function buildProjet() {
 
   Object.values(PROJETS).forEach(p => {
     const sel = state.projet === p.num;
-    const locked = !allFilled;
+    const locked = !allFilled || !isEditable();
     html += `<div class="projet-card ${sel?'selected':''} ${locked?'locked':''}" data-projet="${p.num}">
       <div class="projet-num">${p.num}</div>
       <div class="projet-name">${p.nom}</div>
@@ -948,7 +985,7 @@ function buildProjet() {
 
   pg.innerHTML = html;
 
-  if (allFilled) {
+  if (allFilled && isEditable()) {
     pg.querySelectorAll('.projet-card').forEach(card => {
       card.addEventListener('click', () => selectProjet(card.dataset.projet));
     });
@@ -968,6 +1005,7 @@ $('modal-cancel').onclick = () => { $('modal-bg').classList.add('hidden'); pendi
 $('modal-confirm').onclick = () => { $('modal-bg').classList.add('hidden'); if(pendingProjet) confirmProjet(pendingProjet); };
 
 async function confirmProjet(num) {
+  if (!isEditable()) { toast('Mode consultation — modifications non autorisées', 'warn'); return; }
   loading(true);
   try {
     const d = await apiPost({action:'saveProjet', classe:state.classe, nom:state.nom, prenom:state.prenom, projet:num});
@@ -1034,8 +1072,9 @@ function buildSeance() {
 
   const count = state.compteurSeance;
   const pct = Math.min((count/20)*100,100).toFixed(0);
+  const readonlyBanner = !isEditable() ? `<div class="lock-msg" style="margin-bottom:1rem">🔒 Mode consultation — enregistrement disponible uniquement pendant le cours</div>` : '';
 
-  let html = `
+  let html = `${readonlyBanner}
     <!-- Barre de progression séance -->
     <div class="progress-bar-wrap">
       <div class="progress-bar-label"><span>Séries cette séance</span><span>${count} / 16-20</span></div>
@@ -1155,8 +1194,7 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
       </div>
       <div class="serie-ressenti">
         ${['F','D','TD','E'].map(r=>`
-          <button class="ressenti-btn"
-            onclick="onRessenti('${a.nom}','${a.unite}',${s},'${r}',${serieCharge},${serieReps},${serieInt})">
+          <button class="ressenti-btn" ${isEditable()?`onclick="onRessenti('${a.nom}','${a.unite}',${s},'${r}',${serieCharge},${serieReps},${serieInt})"` : 'disabled'}>
             ${r}
           </button>`).join('')}
       </div>
