@@ -1273,86 +1273,133 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
   const idxCurrent = ints.indexOf(state.intensite);
   const atMaxIntensite = idxCurrent >= ints.length - 1;
   const atMinIntensite = idxCurrent <= 0;
-  const maxRepsProjet = p.repsMax;
-
-  let newIntensite = state.intensite;
-  let newReps = currentReps;
-  let msg = '';
-  let maxiARevoir = false;
-
-  if (ressenti === 'F') {
-    if (!atMaxIntensite) {
-      newIntensite = ints[idxCurrent + 1];
-      newReps = calcReps(state.projet, newIntensite);
-      msg = "😤 Trop facile ! Monte l'intensité pour la prochaine série.";
-    } else {
-      newReps = Math.ceil(currentReps * 1.30);
-      if (newReps >= maxRepsProjet) {
-        newReps = maxRepsProjet;
-        maxiARevoir = true;
-      } else {
-        msg = "😤 Trop facile et déjà au max ! Fais +30% de répétitions.";
-      }
-    }
-  } else if (ressenti === 'D') {
-    if (!atMaxIntensite) {
-      newIntensite = ints[idxCurrent + 1];
-      newReps = calcReps(state.projet, newIntensite);
-      msg = "👍 Bien ! Tu peux encore pousser un peu plus.";
-    } else {
-      newReps = Math.ceil(currentReps * 1.15);
-      if (newReps >= maxRepsProjet) {
-        newReps = maxRepsProjet;
-        maxiARevoir = true;
-      } else {
-        msg = "👍 Bien ! Déjà au max d'intensité, essaie +15% de répétitions.";
-      }
-    }
-  } else if (ressenti === 'TD') {
-    msg = "🔥 Parfait ! C'est exactement l'objectif. Continue comme ça !";
-  } else if (ressenti === 'E') {
-    if (!atMinIntensite) {
-      newIntensite = ints[idxCurrent - 1];
-      newReps = calcReps(state.projet, newIntensite);
-      msg = "⚠️ Baisse l'intensité d'un cran pour la prochaine série.";
-    } else {
-      newReps = Math.max(1, Math.ceil(currentReps * 0.85));
-      msg = "⚠️ Déjà au minimum ! Réduis un peu les répétitions.";
-    }
-  }
-
-  const maxi = parseFloat(state.maxis[nomAtelier]) || 0;
-  const newCharge = maxi ? Math.round(maxi * newIntensite / 100 * 2) / 2 : currentCharge;
 
   const sugBox = document.getElementById('sug-' + key);
   if (!sugBox) return;
   sugBox.classList.add('visible');
 
-  if (maxiARevoir) {
-    // Cas spécial : maxi sous-évalué
+  // ── TD : parfait, on maintient ─────────────────────────────
+  if (ressenti === 'TD') {
     sugBox.innerHTML = `
-      <div class="suggestion-title" style="color:var(--yellow)">⚠️ Maxi à revoir !</div>
-      <div class="suggestion-text" style="margin-bottom:.6rem">
-        Ton maxi sur cet atelier <strong>ne correspond pas à tes capacités réelles</strong>.<br>
-        Tu es capable de faire plus ! Il faut le corriger.
-      </div>
-      <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
-        onclick="allerAuxMaxis('${nomAtelier}')">
-        📊 Corriger mon maxi
-      </button>
-    `;
-  } else {
-    sugBox.innerHTML = `
-      <div class="suggestion-title">💡 Suggestion série ${nextSerie + 1}</div>
-      <div class="suggestion-text">${msg}<br>
-        <strong>${newIntensite}% → ${newCharge} ${unite} × ${newReps} reps</strong>
+      <div class="suggestion-title" style="color:var(--green)">🔥 Parfait !</div>
+      <div class="suggestion-text">C'est exactement l'objectif ! Continue comme ça.<br>
+        <strong>${state.intensite}% → ${currentCharge} ${unite} × ${currentReps} reps</strong>
       </div>
       <div class="suggestion-actions">
-        <button class="btn" onclick="applySuggestion('${nomAtelier}',${newIntensite},${newCharge},${newReps})">✓ Accepter</button>
-        <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${newCharge},${newReps},${newIntensite})">✏️ Modifier</button>
-      </div>
-    `;
+        <button class="btn" onclick="applySuggestion('${nomAtelier}',${state.intensite},${currentCharge},${currentReps})">✓ On y va !</button>
+        <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${currentReps},${state.intensite})">✏️ Modifier</button>
+      </div>`;
+    return;
   }
+
+  // ── E : diminuer l'effort ───────────────────────────────────
+  if (ressenti === 'E') {
+    if (atMinIntensite) {
+      const newReps = Math.max(p.repsMin, Math.ceil(currentReps * 0.85));
+      sugBox.innerHTML = `
+        <div class="suggestion-title">⚠️ Série ${nextSerie + 1}</div>
+        <div class="suggestion-text">Intensité déjà au minimum — réduis les répétitions.<br>
+          <strong>${state.intensite}% → ${currentCharge} ${unite} × ${newReps} reps</strong>
+        </div>
+        <div class="suggestion-actions">
+          <button class="btn" onclick="applySuggestion('${nomAtelier}',${state.intensite},${currentCharge},${newReps})">✓ Accepter</button>
+          <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${state.intensite})">✏️ Modifier</button>
+        </div>`;
+    } else {
+      sugBox.innerHTML = `
+        <div class="suggestion-title">⚠️ Série ${nextSerie + 1} — Diminuer l'effort</div>
+        <div class="suggestion-text">Comment veux-tu ajuster ?</div>
+        <div class="suggestion-actions" style="margin-top:.6rem">
+          <button class="btn" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps})">↓ La charge</button>
+          <button class="btn btn-outline" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps})">↓ Les reps</button>
+        </div>`;
+    }
+    return;
+  }
+
+  // ── F ou D : augmenter l'effort ────────────────────────────
+  if (atMaxIntensite) {
+    // Seule option : augmenter les reps
+    if (currentReps >= p.repsMax) {
+      sugBox.innerHTML = `
+        <div class="suggestion-title" style="color:var(--yellow)">⚠️ Maxi à revoir !</div>
+        <div class="suggestion-text" style="margin-bottom:.6rem">
+          Ton maxi sur cet atelier <strong>ne correspond pas à tes capacités réelles</strong>.<br>
+          Tu es capable de faire plus ! Il faut le corriger.
+        </div>
+        <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
+          onclick="allerAuxMaxis('${nomAtelier}')">
+          📊 Corriger mon maxi
+        </button>`;
+    } else {
+      const mult = ressenti === 'F' ? 1.30 : 1.15;
+      const newReps = Math.min(Math.ceil(currentReps * mult), p.repsMax);
+      sugBox.innerHTML = `
+        <div class="suggestion-title">💡 Série ${nextSerie + 1}</div>
+        <div class="suggestion-text">Intensité au maximum — augmente les répétitions.<br>
+          <strong>${state.intensite}% → ${currentCharge} ${unite} × ${newReps} reps</strong>
+        </div>
+        <div class="suggestion-actions">
+          <button class="btn" onclick="applySuggestion('${nomAtelier}',${state.intensite},${currentCharge},${newReps})">✓ Accepter</button>
+          <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${state.intensite})">✏️ Modifier</button>
+        </div>`;
+    }
+  } else {
+    sugBox.innerHTML = `
+      <div class="suggestion-title">💡 Série ${nextSerie + 1} — Augmenter l'effort</div>
+      <div class="suggestion-text">Tu veux augmenter l'effort en faisant varier :</div>
+      <div class="suggestion-actions" style="margin-top:.6rem">
+        <button class="btn" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps})">↑ La charge</button>
+        <button class="btn btn-outline" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps})">↑ Les reps</button>
+      </div>`;
+  }
+}
+
+function appliquerChoixCharge(nomAtelier, key, unite, ressenti, currentCharge, currentReps) {
+  const p = PROJETS[state.projet];
+  const ints = p.intensites;
+  const idxCurrent = ints.indexOf(state.intensite);
+  const maxi = parseFloat(state.maxis[nomAtelier]) || 0;
+
+  let newIdx;
+  if (ressenti === 'F')      newIdx = Math.min(idxCurrent + 2, ints.length - 1);
+  else if (ressenti === 'D') newIdx = Math.min(idxCurrent + 1, ints.length - 1);
+  else                       newIdx = Math.max(idxCurrent - 1, 0);
+
+  const newIntensite = ints[newIdx];
+  const newCharge = maxi ? Math.round(maxi * newIntensite / 100 * 2) / 2 : currentCharge;
+  const arrow = ressenti === 'E' ? '↓' : '↑';
+
+  const sugBox = document.getElementById('sug-' + key);
+  sugBox.innerHTML = `
+    <div class="suggestion-title">💡 Charge modifiée</div>
+    <div class="suggestion-text">${arrow} Intensité : ${state.intensite}% → ${newIntensite}%<br>
+      <strong>${newIntensite}% → ${newCharge} ${unite} × ${currentReps} reps</strong>
+    </div>
+    <div class="suggestion-actions">
+      <button class="btn" onclick="applySuggestion('${nomAtelier}',${newIntensite},${newCharge},${currentReps})">✓ Accepter</button>
+      <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${newCharge},${currentReps},${newIntensite})">✏️ Modifier</button>
+    </div>`;
+}
+
+function appliquerChoixReps(nomAtelier, key, unite, ressenti, currentCharge, currentReps) {
+  const p = PROJETS[state.projet];
+  let newReps;
+  if (ressenti === 'F')      newReps = Math.min(Math.ceil(currentReps * 1.30), p.repsMax);
+  else if (ressenti === 'D') newReps = Math.min(Math.ceil(currentReps * 1.15), p.repsMax);
+  else                       newReps = Math.max(Math.ceil(currentReps * 0.85), p.repsMin);
+
+  const arrow = ressenti === 'E' ? '↓' : '↑';
+  const sugBox = document.getElementById('sug-' + key);
+  sugBox.innerHTML = `
+    <div class="suggestion-title">💡 Répétitions modifiées</div>
+    <div class="suggestion-text">${arrow} Reps : ${currentReps} → ${newReps}<br>
+      <strong>${state.intensite}% → ${currentCharge} ${unite} × ${newReps} reps</strong>
+    </div>
+    <div class="suggestion-actions">
+      <button class="btn" onclick="applySuggestion('${nomAtelier}',${state.intensite},${currentCharge},${newReps})">✓ Accepter</button>
+      <button class="btn btn-outline" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${state.intensite})">✏️ Modifier</button>
+    </div>`;
 }
 
 function allerAuxMaxis(nomAtelier) {
