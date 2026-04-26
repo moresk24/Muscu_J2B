@@ -1110,7 +1110,7 @@ function buildMaxiCalc() {
       } else {
         formHtml = `
           <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.5">
-            Le maxi au Gainage sol correspond au <strong style="color:var(--text)">niveau d'exécution</strong> que tu es capable de maintenir.
+            Le maxi au Gainage sol correspond au <strong style="color:var(--text)">niveau d'exécution</strong> que vous êtes capable de maintenir.
           </p>
           <div class="field">
             <label class="field-label">Niveau atteint</label>
@@ -1182,7 +1182,7 @@ function buildMaxiCalc() {
           const charge = parseFloat($('calc-charge').value);
           const reps   = parseInt($('calc-reps').value);
           if (!charge || charge <= 0 || !reps || reps < 5 || reps > 15) {
-            toast('Indique une charge et un nombre de répétitions valides (5–15)', 'warn');
+            toast('Indiquez une charge et un nombre de répétitions valides (5–15)', 'warn');
             return;
           }
           const rm = Math.round((charge / (1.0278 - 0.0278 * reps)) * 10) / 10;
@@ -1220,7 +1220,7 @@ function buildMaxiCalc() {
     } else {
       $('btn-valid-direct').addEventListener('click', () => {
         const v = $('direct-val').value;
-        if (v === '' || v === undefined) { toast('Saisis une valeur', 'warn'); return; }
+        if (v === '' || v === undefined) { toast('Saisissez une valeur', 'warn'); return; }
         if (type === 'standard' && parseFloat(v) <= 0) { toast('La valeur doit être supérieure à 0', 'warn'); return; }
         if (type === 'gainage' && (parseInt(v) < 1 || parseInt(v) > 4)) { toast('Le niveau doit être entre 1 et 4', 'warn'); return; }
         saveSingleMaxi(a.nom, v);
@@ -1330,7 +1330,7 @@ async function confirmProjet(num) {
 function buildFiche() {
   const pg = $('page-fiche');
   if (!state.projet) {
-    pg.innerHTML = `<div class="lock-msg" style="margin-top:2rem">🎯 Choisis d'abord ton projet pour voir ton projet !</div>`;
+    pg.innerHTML = `<div class="lock-msg" style="margin-top:2rem">🎯 Choisissez d'abord votre projet pour voir votre fiche !</div>`;
     return;
   }
   const p = PROJETS[state.projet];
@@ -1370,7 +1370,7 @@ function buildFiche() {
 function buildSeance() {
   const pg = $('page-seance');
   if (!state.projet) {
-    pg.innerHTML = `<div class="lock-msg" style="margin-top:2rem">🎯 Choisis ton projet avant de commencer une séance !</div>`;
+    pg.innerHTML = `<div class="lock-msg" style="margin-top:2rem">🎯 Choisissez votre projet avant de commencer une séance !</div>`;
     return;
   }
   const p = PROJETS[state.projet];
@@ -1630,8 +1630,8 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
       sugBox.innerHTML = `
         <div class="suggestion-title" style="color:var(--yellow)">⚠️ Maxi à revoir !</div>
         <div class="suggestion-text" style="margin-bottom:.6rem">
-          Ton maxi sur cet atelier <strong>ne correspond pas à tes capacités réelles</strong>.<br>
-          Tu es capable de faire plus ! Il faut le corriger.
+          Votre maxi sur cet atelier <strong>ne correspond pas à vos capacités réelles</strong>.<br>
+          Vous êtes capable de faire plus ! Il faut le corriger.
         </div>
         <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
           onclick="allerAuxMaxis('${nomAtelier}')">

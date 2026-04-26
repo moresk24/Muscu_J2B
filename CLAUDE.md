@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Conventions de l'interface
+
+- L'application **vouvoie** l'utilisateur dans tous les textes visibles (boutons, messages, toasts, labels)
+- Langue française uniquement
+- Pas d'argot ni de familiarités
+
 ## Contrainte matérielle importante
 
 L'application est utilisée par des lycéens en cours de musculation. **Tous les appareils ne sont pas récents** — certains élèves utilisent de vieux iPhones ou Android d'entrée de gamme. Privilégier :

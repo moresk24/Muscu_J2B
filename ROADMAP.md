@@ -33,6 +33,23 @@ Ce fichier trace les évolutions prévues et réalisées de l'application.
 
 ---
 
+---
+
+## ✅ Session du 26/04/2025 (suite) — Corrections & polish UI
+
+- Fix validation reps fourchette 5–15 (était 6–15)
+- Fix affichage résultat calcul : "Atelier : votre maxi théorique est X kg"
+- Fix footer nav verrouillé au login quand maxis déjà remplis (`updateNavLock` déplacé dans `showPage`)
+- Bannière félicitations masquée si projet déjà choisi
+- Textes sous-titres projets agrandis (.78rem → .88rem / .8rem → .9rem)
+- Page Projets : affichage projet actuel avec données complètes, projet choisi masqué de la liste
+- Page Séance : titre intensité avec nom projet et fourchette, texte guide "1ère série"
+- Page Calcul maxi : labels en blanc, encadré pédagogique formule Brzycki
+- Titre page Maxis : "Vos Maxis (1RM)"
+- Passage complet au vouvoiement dans tous les textes de l'app
+
+---
+
 ## 🔜 À venir — idées en attente
 
 _(Ajoute ici tes prochains briefs)_
