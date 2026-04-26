@@ -1661,6 +1661,16 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
 
   // Bravo après série 4 — enregistrement dans le GS
   if (seriesCount >= 4) {
+    // Détecter si le maxi est à revoir (F ou D à intensité max + reps max)
+    const pCheck = PROJETS[state.projet];
+    const intsCheck = pCheck.intensites;
+    const allLocal = state.serieLocale[nomAtelier] || [];
+    const needsReview = allLocal.some(s => {
+      const idx = intsCheck.indexOf(s.intensite);
+      return (s.ressenti === 'F' || s.ressenti === 'D') && idx >= intsCheck.length - 1 && s.reps >= pCheck.repsMax;
+    });
+    if (needsReview) state.maxiARevoir[nomAtelier] = true;
+
     await validateAtelier(nomAtelier);
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
