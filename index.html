@@ -636,12 +636,12 @@ function calcReps(projet, intensite) {
 // Messages progression séance
 function progressMsg(count) {
   if (count === 0) return "";
-  if (count < 4)  return "C'est parti ! 💥";
-  if (count < 8)  return "Bon début, continuez ! 🔥";
-  if (count < 12) return "Tu es dans le rythme ! ⚡";
-  if (count < 16) return "Plus que quelques séries ! 💪";
-  if (count < 20) return "Objectif atteint, tu cartonne ! 🏆";
-  return "Au-delà de l'objectif, bravo champion·ne ! 🥇";
+  if (count === 1) return "C'est parti ! 💥";
+  if (count === 2) return "Bon rythme, continuez ! 🔥";
+  if (count === 3) return "À mi-chemin ! ⚡";
+  if (count === 4) return "Plus qu'un atelier ! 💪";
+  if (count >= 5) return "Objectif atteint, bravo ! 🏆";
+  return "";
 }
 
 // ═══════════════════════════════════════════════════
@@ -656,7 +656,7 @@ let state = {
   // Séance locale
   intensite:null,
   serieLocale:{}, // {nomAtelier: [{ressenti, charge, reps}]}
-  compteurSeance: parseInt(localStorage.getItem('compteurSeance')||'0'),
+  compteurAteliersSeance: parseInt(localStorage.getItem('compteurAteliersSeance')||'0'),
   sessionId: localStorage.getItem('sessionId')||'',
   // Config
   isAdmin: false,
@@ -781,8 +781,8 @@ async function autoConnect(saved, classes) {
     const newSession = saved.classe + saved.nom + saved.prenom + new Date().toDateString();
     if (localStorage.getItem('sessionId') !== newSession) {
       localStorage.setItem('sessionId', newSession);
-      localStorage.setItem('compteurSeance', '0');
-      state.compteurSeance = 0;
+      localStorage.setItem('compteurAteliersSeance', '0');
+      state.compteurAteliersSeance = 0;
       state.serieLocale = {};
     }
     $('tb-prenom').textContent = saved.prenom;
@@ -882,8 +882,8 @@ $('btn-login').addEventListener('click', async () => {
     const newSession = cls + eInfo.nom + eInfo.prenom + new Date().toDateString();
     if (localStorage.getItem('sessionId') !== newSession) {
       localStorage.setItem('sessionId', newSession);
-      localStorage.setItem('compteurSeance', '0');
-      state.compteurSeance = 0;
+      localStorage.setItem('compteurAteliersSeance', '0');
+      state.compteurAteliersSeance = 0;
       state.serieLocale = {};
     }
 
@@ -930,7 +930,7 @@ $('btn-logout').addEventListener('click', () => {
   localStorage.removeItem('muscu_login');
   $('screen-app').classList.remove('active');
   $('screen-login').classList.add('active');
-  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurSeance:parseInt(localStorage.getItem('compteurSeance')||'0'),sessionId:localStorage.getItem('sessionId')||'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0};
+  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurAteliersSeance:parseInt(localStorage.getItem('compteurAteliersSeance')||'0'),sessionId:localStorage.getItem('sessionId')||'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0};
   $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
   $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
 });
@@ -1378,14 +1378,14 @@ function buildSeance() {
   if (!state.intensite) state.intensite = p.intensites[0];
   if (!state.suggestionEnAttente) state.suggestionEnAttente = {};
 
-  const count = state.compteurSeance;
-  const pct = Math.min((count/20)*100,100).toFixed(0);
+  const count = state.compteurAteliersSeance;
+  const pct = Math.min((count/5)*100,100).toFixed(0);
   const readonlyBanner = !isEditable() ? `<div class="lock-msg" style="margin-bottom:1rem">🔒 Mode consultation — enregistrement disponible uniquement pendant le cours</div>` : '';
 
   let html = `${readonlyBanner}
     <!-- Barre de progression séance -->
     <div class="progress-bar-wrap">
-      <div class="progress-bar-label"><span>Nbr de série(s) cette séance</span><span>${count} / 20</span></div>
+      <div class="progress-bar-label"><span>Ateliers validés cette séance</span><span>${count} / 5</span></div>
       <div class="progress-bar-track"><div class="progress-bar-fill" id="seance-bar" style="width:${pct}%"></div></div>
       <div class="progress-msg" id="seance-msg">${progressMsg(count)}</div>
     </div>
@@ -1412,8 +1412,9 @@ function buildSeance() {
       html += `<div class="section-title">${a.groupe==='haut'?'🏋️ Haut du corps':'🦵 Bas du corps'}</div>`;
     }
     const maxi = parseFloat(state.maxis[a.nom])||0;
-    const seriesFaites = parseInt(state.series[a.nom]||0);
-    const validated = seriesFaites >= 4;
+    const validations = parseInt(state.series[a.nom]||0);
+    const totalSeries = validations * 4;
+    const validated = validations >= 1;
     const localSeries = state.serieLocale[a.nom] || [];
 
     html += `<div class="seance-atelier ${validated?'validated-atelier':''}" id="sa-${a.nom.replace(/[^a-zA-Z]/g,'_')}">
@@ -1421,7 +1422,7 @@ function buildSeance() {
         <div class="atelier-icon ${a.groupe==='haut'?'icon-haut':'icon-bas'}">${a.icon}</div>
         <div class="seance-atelier-title">
           <div class="atelier-name">${a.nom}${validated?' ✓':''}</div>
-          <div class="atelier-maxi">Maxi : ${getAtelierType(a.nom)!=='standard' ? formatMaxiSeance(a) : `${maxi||'—'} ${a.unite}`} · ${seriesFaites} série${seriesFaites!==1?'s':''} au total</div>
+          <div class="atelier-maxi">Maxi : ${getAtelierType(a.nom)!=='standard' ? formatMaxiSeance(a) : `${maxi||'—'} ${a.unite}`} · ${totalSeries} série${totalSeries!==1?'s':''} au total</div>
         </div>
         <div class="seance-atelier-chevron">▼</div>
       </div>
@@ -1507,13 +1508,6 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
   if (!state.serieLocale[nomAtelier]) state.serieLocale[nomAtelier] = [];
   state.serieLocale[nomAtelier][serieIndex] = {resultat, special: true};
 
-  state.compteurSeance++;
-  localStorage.setItem('compteurSeance', state.compteurSeance);
-  const pct = Math.min((state.compteurSeance/20)*100,100).toFixed(0);
-  const bar = $('seance-bar'), msg = $('seance-msg');
-  if (bar) bar.style.width = pct+'%';
-  if (msg) msg.textContent = progressMsg(state.compteurSeance);
-
   const a = ATELIERS.find(x => x.nom === nomAtelier);
   const sgEl = document.getElementById('sg-'+key);
   if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, state.serieLocale[nomAtelier]);
@@ -1593,8 +1587,14 @@ async function validateAtelier(nomAtelier) {
   try {
     const res = await apiPost({action:'validateAtelier', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier});
     if (res && res.newCompteur !== undefined) state.compteur = res.newCompteur;
-    state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 4);
+    state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 1);
     delete state.serieLocale[nomAtelier];
+    state.compteurAteliersSeance++;
+    localStorage.setItem('compteurAteliersSeance', state.compteurAteliersSeance);
+    const pct = Math.min((state.compteurAteliersSeance/5)*100,100).toFixed(0);
+    const bar = $('seance-bar'), msg = $('seance-msg');
+    if (bar) bar.style.width = pct+'%';
+    if (msg) msg.textContent = progressMsg(state.compteurAteliersSeance);
   } catch(e) { console.error(e); }
 }
 
@@ -1635,17 +1635,6 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   // Enregistrer localement
   if (!state.serieLocale[nomAtelier]) state.serieLocale[nomAtelier] = [];
   state.serieLocale[nomAtelier][serieIndex] = {ressenti, charge, reps, unite, intensite: serieIntensite || state.intensite};
-
-  // Incrémenter compteur séance
-  state.compteurSeance++;
-  localStorage.setItem('compteurSeance', state.compteurSeance);
-
-  // Maj barre progression
-  const pct = Math.min((state.compteurSeance/20)*100,100).toFixed(0);
-  const bar = $('seance-bar');
-  const msg = $('seance-msg');
-  if (bar) { bar.style.width = pct+'%'; }
-  if (msg) { msg.textContent = progressMsg(state.compteurSeance); }
 
   const localSeries = state.serieLocale[nomAtelier];
   const seriesCount = localSeries.length;

@@ -281,7 +281,7 @@ function handleValidateAtelier(p) {
   const atelierIndex = ATELIERS.indexOf(p.atelier);
   if (atelierIndex >= 0) {
     const colSeries = COL_ATELIERS_START + atelierIndex * 2 + 1 + 1;
-    const newSeries = (parseInt(row[COL_ATELIERS_START + atelierIndex * 2 + 1]) || 0) + 4;
+    const newSeries = (parseInt(row[COL_ATELIERS_START + atelierIndex * 2 + 1]) || 0) + 1;
     sheet.getRange(rowIndex + 1, colSeries).setValue(newSeries);
   }
 

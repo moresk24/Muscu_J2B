@@ -67,10 +67,6 @@ Ce fichier trace les évolutions prévues et réalisées de l'application.
 
 
 
-_(Ajoute ici tes prochains briefs)_
-
----
-
 ~~📋 MODIFICATIONS PAGE SÉANCE — ATELIERS SPÉCIAUX~~ ✅ Implémenté
 🎯 CONTEXTE
 Trois ateliers ont une logique de séance différente : Banc à Lombaires, Abdo Sol et Gainage sol.
@@ -130,9 +126,7 @@ Ancienne intitulé : "Séries effectuées (cycle)"
 Nouvel intitulé : "Ateliers validés (cycle)"
 Cette colonne compte maintenant le nombre d'ateliers complétés (avec 4 séries), pas le nombre total de séries
 
-## 🔜 À venir — idées en attente
 
-À implémenter :
 
 💾 NOUVEAU SYSTÈME D'ENREGISTREMENT
 Phase 1 : Pendant la séance (localStorage)
@@ -212,3 +206,78 @@ Ou adapter incrementSerie pour enregistrer les 4 séries à la fois
  Tester : abandon d'un atelier à 3 séries → rien n'est enregistré
  Tester : 4 séries validées → tout enregistré, compteur incrémenté
  Adapter Code.gs pour gérer l'API de validation
+
+
+------
+
+À implémenter :
+
+
+📋 SYSTÈME DE COMPTAGE ATELIERS VALIDÉS — REFONTE AFFICHAGE
+🎯 CONTEXTE
+Simplifier le système de comptage en passant des "séries faites" aux "validations d'ateliers". L'affichage reste cohérent pour l'élève en multipliant par 4.
+
+📊 MODIFICATIONS GOOGLE SHEET (déjà faites manuellement)
+Changement de colonne pour chaque atelier :
+
+Ancienne intitulé : "Nom Atelier — Séries faites"
+Nouvel intitulé : "Nom Atelier — Validations"
+Cette colonne compte : nombre de fois où l'atelier a été validé (1, 2, 3, 4... validations)
+
+Exemple :
+
+L'élève valide Butterfly 3 fois → colonne affiche "3"
+L'élève n'a pas validé Développé Couché → colonne affiche "0" ou vide
+
+
+💾 NOUVELLE LOGIQUE D'ENREGISTREMENT
+Quand l'élève valide un atelier (4ème série) :
+
+Incrémenter la colonne "Nom Atelier — Validations" de +1
+✅ C'est tout ! (au lieu d'incrémenter de +4 avant)
+
+Affichage dans la page Séance :
+
+Sous le nom de l'atelier : "Maxi : 20 kg · X séries au total"
+Où X = (nombre de validations) × 4
+Exemple : 3 validations → 3 × 4 = 12 séries au total
+
+
+🔧 MODIFICATIONS TECHNIQUES
+Fonction handleValidateAtelier() dans Code.gs
+
+Au lieu d'incrémenter la colonne de +4
+Incrémenter de +1 (une validation = une fois qu'on a complété 4 séries)
+
+Affichage page Séance — en-tête atelier
+
+Récupérer le nombre de validations depuis le GS
+Calculer : validations × 4
+Afficher : "Maxi : X kg · ${validations * 4} séries au total"
+
+Exemple de code
+javascript// Dans buildSeance() ou buildSeriesHTML()
+const validations = parseInt(state.series[atelier.nom]) || 0;
+const totalSeries = validations * 4;
+const display = `Maxi : ${maxi} ${unite} · ${totalSeries} séries au total`;
+
+📊 BARRE DE PROGRESSION SÉANCE (déjà modifiée)
+
+Affiche : "X / 5 ateliers validés" (inchangé)
+Basée sur compteurAteliersSeance (inchangé)
+
+
+✅ CHECKLIST POUR CC
+
+ Modifier handleValidateAtelier() dans Code.gs → incrémenter de +1 au lieu de +4
+ Adapter affichage atelier en séance → calculer validations × 4
+ Vérifier que state.series[atelier.nom] contient bien le nombre de validations
+ Tester : 1 validation → affiche "4 séries", 3 validations → affiche "12 séries"
+ Tester : nouvel atelier → affiche "0 séries" jusqu'à première validation
+
+
+🎯 RÉSUMÉ
+
+GS stocke : nombre de validations (1, 2, 3...)
+App affiche : nombre de validations × 4 = nombre de séries
+Avantage : logique plus simple, données cohérentes, affichage naturel pour l'élève
