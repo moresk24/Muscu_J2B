@@ -1421,7 +1421,7 @@ function buildSeance() {
         <div class="atelier-icon ${a.groupe==='haut'?'icon-haut':'icon-bas'}">${a.icon}</div>
         <div class="seance-atelier-title">
           <div class="atelier-name">${a.nom}${validated?' ✓':''}</div>
-          <div class="atelier-maxi">Maxi : ${maxi||'—'} ${a.unite} · ${seriesFaites} série${seriesFaites!==1?'s':''} au total</div>
+          <div class="atelier-maxi">Maxi : ${getAtelierType(a.nom)!=='standard' ? formatMaxiSeance(a) : `${maxi||'—'} ${a.unite}`} · ${seriesFaites} série${seriesFaites!==1?'s':''} au total</div>
         </div>
         <div class="seance-atelier-chevron">▼</div>
       </div>
@@ -1429,7 +1429,7 @@ function buildSeance() {
         <div class="series-grid" id="sg-${a.nom.replace(/[^a-zA-Z]/g,'_')}">
           ${buildSeriesHTML(a, maxi, localSeries)}
         </div>
-        <div class="suggestion-box" id="sug-${a.nom.replace(/[^a-zA-Z]/g,'_')}"></div>
+        ${getAtelierType(a.nom)==='standard' ? `<div class="suggestion-box" id="sug-${a.nom.replace(/[^a-zA-Z]/g,'_')}"></div>` : ''}
         <div class="bravo-box" id="bravo-${a.nom.replace(/[^a-zA-Z]/g,'_')}">
           <div class="bravo-emoji">🎉</div>
           <div class="bravo-text">Bravo ! Atelier terminé !</div>
@@ -1460,7 +1460,79 @@ function buildSeance() {
   });
 }
 
+function formatMaxiSeance(a) {
+  const val = state.maxis[a.nom];
+  const type = getAtelierType(a.nom);
+  if (type === 'gainage')   return `Niveau ${val}`;
+  if (type === 'lombaires') return `30 reps en 1' + ${val} kg`;
+  return `${parseFloat(val)||0} ${a.unite}`;
+}
+
+function buildSeriesSpecialHTML(a, localSeries) {
+  const key = a.nom.replace(/[^a-zA-Z]/g,'_');
+  const doneSeries = localSeries.length;
+  const maxiLabel = formatMaxiSeance(a);
+  let html = `<div style="font-size:.82rem;color:var(--text);margin-bottom:.75rem">Réalisez cette série 4 fois :</div>`;
+
+  for (let s = 0; s < doneSeries; s++) {
+    const local = localSeries[s];
+    const isOk = local.resultat === 'ok';
+    html += `<div class="serie-row done" id="sr-${key}-${s}">
+      <div class="serie-num">${s+1}</div>
+      <div class="serie-info"><div class="serie-charge">${maxiLabel}</div></div>
+      <div style="font-size:.85rem;font-weight:700;color:${isOk?'var(--green)':'var(--red)'}">${isOk?'✓ Ok':'✗ Échec'}</div>
+    </div>`;
+  }
+
+  if (doneSeries < 4) {
+    const s = doneSeries;
+    const disabled = !isEditable() ? 'disabled' : '';
+    html += `<div class="serie-row active-serie" id="sr-${key}-${s}">
+      <div class="serie-num">${s+1}</div>
+      <div class="serie-info"><div class="serie-charge">${maxiLabel}</div></div>
+      <div style="display:flex;gap:.5rem;flex-shrink:0">
+        <button style="background:rgba(46,204,113,.15);border:1px solid var(--green);border-radius:8px;color:var(--green);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
+          ${isEditable()?`onclick="onSerieSpeciale('${a.nom}',${s},'ok')"`:disabled}>✓ Ok</button>
+        <button style="background:rgba(231,76,60,.1);border:1px solid var(--red);border-radius:8px;color:var(--red);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
+          ${isEditable()?`onclick="onSerieSpeciale('${a.nom}',${s},'echec')"`:disabled}>✗ Échec</button>
+      </div>
+    </div>`;
+  }
+
+  return html;
+}
+
+async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
+  const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
+  if (!state.serieLocale[nomAtelier]) state.serieLocale[nomAtelier] = [];
+  state.serieLocale[nomAtelier][serieIndex] = {resultat, special: true};
+
+  state.compteurSeance++;
+  localStorage.setItem('compteurSeance', state.compteurSeance);
+  const pct = Math.min((state.compteurSeance/20)*100,100).toFixed(0);
+  const bar = $('seance-bar'), msg = $('seance-msg');
+  if (bar) bar.style.width = pct+'%';
+  if (msg) msg.textContent = progressMsg(state.compteurSeance);
+
+  try {
+    await apiPost({action:'incrementSerie', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier});
+    state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 1);
+  } catch(e) { console.error(e); }
+
+  const a = ATELIERS.find(x => x.nom === nomAtelier);
+  const sgEl = document.getElementById('sg-'+key);
+  if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, state.serieLocale[nomAtelier]);
+
+  if (state.serieLocale[nomAtelier].length >= 4) {
+    const bravo = document.getElementById('bravo-'+key);
+    if (bravo) bravo.classList.add('visible');
+  }
+}
+
 function buildSeriesHTML(atelier, maxi, localSeries) {
+  if (getAtelierType(atelier.nom) !== 'standard') {
+    return buildSeriesSpecialHTML(atelier, localSeries);
+  }
   const intensite = state.intensite || PROJETS[state.projet].intensites[0];
   const charge = maxi ? Math.round(maxi * intensite / 100 * 2) / 2 : null;
   const reps = calcReps(state.projet, intensite);

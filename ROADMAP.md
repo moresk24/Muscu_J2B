@@ -52,4 +52,48 @@ Ce fichier trace les évolutions prévues et réalisées de l'application.
 
 ## 🔜 À venir — idées en attente
 
-_(Ajoute ici tes prochains briefs)_
+📋 MODIFICATIONS PAGE SÉANCE — ATELIERS SPÉCIAUX
+🎯 CONTEXTE
+Trois ateliers ont une logique de séance différente : Banc à Lombaires, Abdo Sol et Gainage sol.
+Au lieu du système standard (charge/reps variable avec ressenti F/D/TD/E), ces ateliers doivent simplement répéter 4 fois le maxi avec un bouton "Ok" ou "Échec" par série.
+
+📋 LOGIQUE POUR CES 3 ATELIERS
+Affichage
+
+Titre atelier + icône (comme les autres)
+Maxi affiché :
+
+Banc à Lombaires/Abdo Sol : "30 reps en 1' + X kg"
+Gainage : "Niveau X"
+
+
+Message : "Réalise cette série 4 fois"
+
+4 Séries
+Chaque série affiche :
+
+Numéro (1, 2, 3, 4)
+Le maxi à atteindre
+Deux boutons :
+
+"✓ Ok" → série réussie
+"✗ Échec" → série échouée
+
+
+
+Après validation d'une série
+
+Série marquée comme "faite" (grisée)
+Prochaine série apparaît (ou bravo si 4ème terminée)
+Pas de suggestion de progression, pas de ressenti
+
+Après 4 séries validées
+
+🎉 Bravo ! Atelier terminé !
+
+
+🔧 IMPLÉMENTATION
+
+Détecter si atelier ∈ ["Banc à Lombaires", "Abdo Sol", "Gainage sol"]
+Si oui → afficher interface spéciale (pas d'intensité, pas de charge/reps variables)
+Si non → garder la logique standard existante
