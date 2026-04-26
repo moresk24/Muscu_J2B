@@ -217,7 +217,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   margin-bottom:.2rem;
 }
 .projet-name{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em}
-.projet-desc{font-size:.78rem;color:var(--muted);margin-top:.25rem;line-height:1.4}
+.projet-desc{font-size:.88rem;color:var(--muted);margin-top:.25rem;line-height:1.4}
 .projet-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem}
 .tag{
   font-size:.65rem;font-weight:600;padding:.2rem .5rem;border-radius:20px;
@@ -237,7 +237,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   padding:1rem 1.25rem;
 }
 .fiche-header h2{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.05em;color:#fff}
-.fiche-header p{font-size:.8rem;color:rgba(255,255,255,.8);margin-top:.25rem}
+.fiche-header p{font-size:.9rem;color:rgba(255,255,255,.8);margin-top:.25rem}
 .fiche-body{padding:1rem 1.25rem}
 .fiche-row{display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--border)}
 .fiche-row:last-child{border-bottom:none}
@@ -914,6 +914,7 @@ function showPage(name) {
   document.querySelectorAll('.nav-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.page === name);
   });
+  updateNavLock();
   if (name==='maxis')     buildMaxis();
   if (name==='maxi-calc') buildMaxiCalc();
   if (name==='projet')    buildProjet();
@@ -979,7 +980,7 @@ function buildMaxis() {
     <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${(maxisFilled/total*100).toFixed(0)}%"></div></div>
   </div>`;
 
-  if (allFilled) {
+  if (allFilled && !state.projet) {
     html += `<div class="congrats-banner">
       <div class="congrats-banner-emoji">🎉</div>
       <div class="congrats-banner-title">Bravo ! Tous tes maxis sont renseignés !</div>
@@ -1072,8 +1073,8 @@ function buildMaxiCalc() {
             <input type="number" id="calc-charge" inputmode="decimal" step="0.5" min="0" placeholder="ex : 40">
           </div>
           <div class="field">
-            <label class="field-label">Nombre de répétitions (6 à 15)</label>
-            <input type="number" id="calc-reps" inputmode="numeric" step="1" min="6" max="15" placeholder="ex : 10">
+            <label class="field-label">Nombre de répétitions (5 à 15)</label>
+            <input type="number" id="calc-reps" inputmode="numeric" step="1" min="5" max="15" placeholder="ex : 10">
           </div>
           <button class="btn" id="btn-calc">Calculer mon maxi théorique</button>
           <div class="calc-result" id="calc-result"></div>
@@ -1169,12 +1170,12 @@ function buildMaxiCalc() {
         btnCalc.addEventListener('click', () => {
           const charge = parseFloat($('calc-charge').value);
           const reps   = parseInt($('calc-reps').value);
-          if (!charge || charge <= 0 || !reps || reps < 1 || reps > 15) {
-            toast('Indique une charge et un nombre de répétitions valides (6–15)', 'warn');
+          if (!charge || charge <= 0 || !reps || reps < 5 || reps > 15) {
+            toast('Indique une charge et un nombre de répétitions valides (5–15)', 'warn');
             return;
           }
           const rm = Math.round((charge / (1.0278 - 0.0278 * reps)) * 10) / 10;
-          result.textContent = `Ton maxi théorique au ${a.nom} : ${rm} kg`;
+          result.textContent = `${a.nom} : ton maxi théorique est ${rm} kg`;
           result.classList.add('visible');
           btnValid.style.display = 'block';
           btnValid.dataset.value = rm;
