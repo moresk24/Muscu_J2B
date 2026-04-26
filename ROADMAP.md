@@ -281,3 +281,14 @@ Basée sur compteurAteliersSeance (inchangé)
 GS stocke : nombre de validations (1, 2, 3...)
 App affiche : nombre de validations × 4 = nombre de séries
 Avantage : logique plus simple, données cohérentes, affichage naturel pour l'élève
+
+---
+
+## 🔜 À optimiser — Performance réseau
+
+**Bravo-box en attente de l'API**
+Actuellement la bravo-box n'apparaît qu'après le retour de l'appel `validateAtelier` (GS).
+Sur réseau lent, l'élève attend plusieurs secondes avant de voir le message de validation.
+
+Idée : afficher la bravo-box immédiatement, puis envoyer l'appel API en arrière-plan (fire & forget).
+Risque à évaluer : si l'appel échoue silencieusement, la validation n'est pas enregistrée dans le GS.

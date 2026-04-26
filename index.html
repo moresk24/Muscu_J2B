@@ -1437,8 +1437,9 @@ function buildSeance() {
           <div class="bravo-text">Bravo ! Atelier Validé !</div>
           <div class="bravo-sub">4 séries effectuées sur cet atelier</div>
           <div id="bravo-maxi-${a.nom.replace(/[^a-zA-Z]/g,'_')}" style="display:none;margin-top:.75rem;padding:.6rem .8rem;background:rgba(230,126,34,.12);border:1px solid var(--yellow);border-radius:8px;text-align:left">
-            <div style="font-size:.78rem;font-weight:700;color:var(--yellow);margin-bottom:.3rem">⚠️ Pensez à corriger votre maxi sur cet atelier !</div>
-            <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000;font-size:.78rem;padding:.4rem .8rem;margin-top:.3rem" onclick="allerAuxMaxis('${a.nom}')">📊 Corriger mon maxi</button>
+            <div style="font-size:.78rem;font-weight:700;color:var(--yellow);margin-bottom:.3rem">⚠️ Votre maxi sur cet atelier a été réinitialisé.</div>
+            <div style="font-size:.75rem;color:var(--text);margin-bottom:.5rem">Vous devez le recalculer avant de pouvoir continuer votre séance.</div>
+            <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000;font-size:.78rem;padding:.4rem .8rem" onclick="allerAuxMaxis('${a.nom}')">📊 Recalculer mon maxi</button>
           </div>
         </div>
       </div>
@@ -1524,6 +1525,7 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
     if (state.maxiARevoir[nomAtelier]) {
       const bravoMaxi = document.getElementById('bravo-maxi-'+key);
       if (bravoMaxi) bravoMaxi.style.display = 'block';
+      clearMaxiForAtelier(nomAtelier);
     }
   }
 }
@@ -1590,6 +1592,16 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
   }
 
   return html;
+}
+
+async function clearMaxiForAtelier(nomAtelier) {
+  state.maxis[nomAtelier] = '';
+  updateNavLock();
+  try {
+    const m = {};
+    m[nomAtelier] = '';
+    await apiPost({action:'saveMaxis', classe:state.classe, nom:state.nom, prenom:state.prenom, maxis: JSON.stringify(m)});
+  } catch(e) { console.error(e); }
 }
 
 async function validateAtelier(nomAtelier) {
@@ -1679,6 +1691,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
     if (state.maxiARevoir[nomAtelier]) {
       const bravoMaxi = document.getElementById('bravo-maxi-'+key);
       if (bravoMaxi) bravoMaxi.style.display = 'block';
+      clearMaxiForAtelier(nomAtelier);
     }
     return;
   }
