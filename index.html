@@ -930,7 +930,7 @@ $('btn-logout').addEventListener('click', () => {
   localStorage.removeItem('muscu_login');
   $('screen-app').classList.remove('active');
   $('screen-login').classList.add('active');
-  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurAteliersSeance:parseInt(localStorage.getItem('compteurAteliersSeance')||'0'),sessionId:localStorage.getItem('sessionId')||'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0};
+  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},maxiARevoir:{},compteurAteliersSeance:parseInt(localStorage.getItem('compteurAteliersSeance')||'0'),sessionId:localStorage.getItem('sessionId')||'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0};
   $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
   $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
 });
@@ -1433,8 +1433,12 @@ function buildSeance() {
         ${getAtelierType(a.nom)==='standard' ? `<div class="suggestion-box" id="sug-${a.nom.replace(/[^a-zA-Z]/g,'_')}"></div>` : ''}
         <div class="bravo-box" id="bravo-${a.nom.replace(/[^a-zA-Z]/g,'_')}">
           <div class="bravo-emoji">🎉</div>
-          <div class="bravo-text">Bravo ! Atelier terminé !</div>
+          <div class="bravo-text">Bravo ! Atelier Validé !</div>
           <div class="bravo-sub">4 séries effectuées sur cet atelier</div>
+          <div id="bravo-maxi-${a.nom.replace(/[^a-zA-Z]/g,'_')}" style="display:none;margin-top:.75rem;padding:.6rem .8rem;background:rgba(230,126,34,.12);border:1px solid var(--yellow);border-radius:8px;text-align:left">
+            <div style="font-size:.78rem;font-weight:700;color:var(--yellow);margin-bottom:.3rem">⚠️ Pensez à corriger votre maxi sur cet atelier !</div>
+            <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000;font-size:.78rem;padding:.4rem .8rem;margin-top:.3rem" onclick="allerAuxMaxis('${a.nom}')">📊 Corriger mon maxi</button>
+          </div>
         </div>
       </div>
     </div>`;
@@ -1516,6 +1520,10 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
     await validateAtelier(nomAtelier);
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
+    if (state.maxiARevoir[nomAtelier]) {
+      const bravoMaxi = document.getElementById('bravo-maxi-'+key);
+      if (bravoMaxi) bravoMaxi.style.display = 'block';
+    }
   }
 }
 
@@ -1657,6 +1665,10 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
     if (bravo) bravo.classList.add('visible');
     const sug = document.getElementById('sug-'+key);
     if (sug) sug.classList.remove('visible');
+    if (state.maxiARevoir[nomAtelier]) {
+      const bravoMaxi = document.getElementById('bravo-maxi-'+key);
+      if (bravoMaxi) bravoMaxi.style.display = 'block';
+    }
     return;
   }
 
@@ -1720,16 +1732,23 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
   if (atMaxIntensite) {
     // Seule option : augmenter les reps
     if (currentReps >= p.repsMax) {
+      state.maxiARevoir[nomAtelier] = true;
       sugBox.innerHTML = `
         <div class="suggestion-title" style="color:var(--yellow)">⚠️ Maxi à revoir !</div>
         <div class="suggestion-text" style="margin-bottom:.6rem">
           Votre maxi sur cet atelier <strong>ne correspond pas à vos capacités réelles</strong>.<br>
           Vous êtes capable de faire plus ! Il faut le corriger.
         </div>
-        <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
-          onclick="allerAuxMaxis('${nomAtelier}')">
-          📊 Corriger mon maxi
-        </button>`;
+        <div class="suggestion-actions">
+          <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
+            onclick="allerAuxMaxis('${nomAtelier}')">
+            📊 Corriger mon maxi
+          </button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)"
+            onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${currentReps})">
+            Continuer quand même
+          </button>
+        </div>`;
     } else {
       const mult = ressenti === 'F' ? 1.30 : 1.15;
       const newReps = Math.min(Math.ceil(currentReps * mult), p.repsMax);
