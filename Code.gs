@@ -48,7 +48,8 @@ function doGet(e) {
     if (action === "setPassword")    return jsonResponse(handleSetPassword(p));
     if (action === "saveMaxis")      return jsonResponse(handleSaveMaxis(p));
     if (action === "saveProjet")     return jsonResponse(handleSaveProjet(p));
-    if (action === "incrementSerie") return jsonResponse(handleIncrementSerie(p));
+    if (action === "incrementSerie")  return jsonResponse(handleIncrementSerie(p));
+    if (action === "validateAtelier") return jsonResponse(handleValidateAtelier(p));
     return jsonResponse({ error: "Action inconnue : " + action });
   } catch(err) {
     return jsonResponse({ error: err.toString() });
@@ -263,6 +264,29 @@ function findEleve(classe, nom, prenom) {
     }
   }
   return { sheet: null };
+}
+
+// ── Valider un atelier (4 séries complètes) ─────────────────
+function handleValidateAtelier(p) {
+  const { sheet, rowIndex, data } = findEleve(p.classe, p.nom, p.prenom);
+  if (!sheet) return { error: "Élève introuvable." };
+
+  const row = data[rowIndex];
+
+  // Incrémenter le compteur d'ateliers validés
+  const newCompteur = (parseInt(row[COL_COMPTEUR]) || 0) + 1;
+  sheet.getRange(rowIndex + 1, COL_COMPTEUR + 1).setValue(newCompteur);
+
+  // Ajouter 4 aux séries de l'atelier
+  const atelierIndex = ATELIERS.indexOf(p.atelier);
+  if (atelierIndex >= 0) {
+    const colSeries = COL_ATELIERS_START + atelierIndex * 2 + 1 + 1;
+    const newSeries = (parseInt(row[COL_ATELIERS_START + atelierIndex * 2 + 1]) || 0) + 4;
+    sheet.getRange(rowIndex + 1, colSeries).setValue(newSeries);
+  }
+
+  updateLastCo(sheet, rowIndex);
+  return { success: true, newCompteur };
 }
 
 function updateLastCo(sheet, rowIndex) {

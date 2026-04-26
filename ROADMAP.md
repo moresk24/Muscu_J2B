@@ -50,9 +50,28 @@ Ce fichier trace les évolutions prévues et réalisées de l'application.
 
 ---
 
-## 🔜 À venir — idées en attente
+---
 
-📋 MODIFICATIONS PAGE SÉANCE — ATELIERS SPÉCIAUX
+## ✅ Session du 26/04/2025 (suite 2) — Séance & polish
+
+- Page Séance : % du maxi affiché après la charge dans chaque série
+- Footer : "Séance" → "Séances"
+- Calcul maxi : arrondi à l'entier supérieur (Math.ceil)
+- Encadré Brzycki : reformulation pédagogique
+- Page Séance : compteur "Nbr de série(s) cette séance / 20"
+- Page Séance : intensité sur 3 lignes (nom projet / fourchette / guide)
+- Page Mon projet : description complète affichée
+- Ateliers spéciaux (Banc à Lombaires, Abdo Sol, Gainage sol) : interface Ok/Échec sans charge/reps/ressenti
+
+---
+
+
+
+_(Ajoute ici tes prochains briefs)_
+
+---
+
+~~📋 MODIFICATIONS PAGE SÉANCE — ATELIERS SPÉCIAUX~~ ✅ Implémenté
 🎯 CONTEXTE
 Trois ateliers ont une logique de séance différente : Banc à Lombaires, Abdo Sol et Gainage sol.
 Au lieu du système standard (charge/reps variable avec ressenti F/D/TD/E), ces ateliers doivent simplement répéter 4 fois le maxi avec un bouton "Ok" ou "Échec" par série.
@@ -97,3 +116,99 @@ Après 4 séries validées
 Détecter si atelier ∈ ["Banc à Lombaires", "Abdo Sol", "Gainage sol"]
 Si oui → afficher interface spéciale (pas d'intensité, pas de charge/reps variables)
 Si non → garder la logique standard existante
+
+
+📋 SYSTÈME DE VALIDATION DES ATELIERS — REFONTE
+🎯 RÈGLE FONDAMENTALE
+Un atelier est validé si et seulement si 4 séries y sont effectuées.
+Si l'élève effectue 1, 2 ou 3 séries sur un atelier puis change d'atelier, les séries sont annulées et rien n'est enregistré.
+
+📊 MODIFICATION GOOGLE SHEET
+Changement de colonne (déjà fait manuellement) :
+
+Ancienne intitulé : "Séries effectuées (cycle)"
+Nouvel intitulé : "Ateliers validés (cycle)"
+Cette colonne compte maintenant le nombre d'ateliers complétés (avec 4 séries), pas le nombre total de séries
+
+## 🔜 À venir — idées en attente
+
+À implémenter :
+
+💾 NOUVEAU SYSTÈME D'ENREGISTREMENT
+Phase 1 : Pendant la séance (localStorage)
+
+Les séries sont stockées uniquement en localStorage dans state.serieLocale[nomAtelier]
+Pas d'enregistrement immédiat dans le GS
+Si l'élève change d'atelier avant 4 séries → les données localStorage sont effacées
+
+Phase 2 : À la 4ème série validée
+Dès que l'élève valide sa 4ème série :
+
+Afficher 🎉 Bravo ! Atelier validé !
+Enregistrer dans le GS :
+
+Appel API pour enregistrer les 4 séries de cet atelier
+Incrémenter "Ateliers validés (cycle)" de 1
+Mettre à jour la colonne "Séries faites" pour cet atelier (+4)
+
+
+Effacer les données localStorage pour cet atelier
+Élève peut passer à un autre atelier
+
+
+🔄 FLUX D'UN ATELIER
+Atelier ouvert
+  ↓
+Série 1 : Ok → stockée en localStorage
+  ↓
+Série 2 : Ok → stockée en localStorage
+  ↓
+Série 3 : Ok → stockée en localStorage
+  ↓
+Série 4 : Ok → 🎉 VALIDATION !
+  ├─ Enregistrement massif dans GS
+  ├─ Incrémentation "Ateliers validés (cycle)"
+  └─ Effacement localStorage
+  ↓
+Élève peut passer à autre atelier
+OU (si abandon) :
+Atelier A ouvert
+  ↓
+Série 1 : Ok → stockée en localStorage
+Série 2 : Ok → stockée en localStorage
+Série 3 : Ok → stockée en localStorage
+  ↓
+Élève change d'atelier (clique autre atelier ou autre page)
+  ↓
+❌ Données localStorage de A effacées
+❌ Rien enregistré dans le GS
+
+🔧 MODIFICATIONS TECHNIQUES
+Code à modifier
+
+onRessenti() : ne doit plus appeler incrementSerie immédiatement
+Créer une nouvelle fonction validateAtelier() qui :
+
+Vérifie que 4 séries sont présentes
+Enregistre tout dans le GS en une seule requête
+Efface les données localStorage
+
+
+buildSeance() : afficher bravo dès la 4ème série validée
+Gestion du changement d'atelier : effacer les données incomplètes
+
+API à adapter ou créer
+
+Possibilité de créer une nouvelle action validateAtelier qui enregistre les 4 séries + incrémente compteur
+Ou adapter incrementSerie pour enregistrer les 4 séries à la fois
+
+
+✅ CHECKLIST
+
+ Modifier onRessenti() → ne pas enregistrer immédiatement
+ Créer validateAtelier() → enregistrement massif à 4 séries
+ Afficher bravo 🎉 automatiquement à la 4ème série
+ Effacer localStorage si changement d'atelier avant 4 séries
+ Tester : abandon d'un atelier à 3 séries → rien n'est enregistré
+ Tester : 4 séries validées → tout enregistré, compteur incrémenté
+ Adapter Code.gs pour gérer l'API de validation

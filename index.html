@@ -1514,16 +1514,12 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
   if (bar) bar.style.width = pct+'%';
   if (msg) msg.textContent = progressMsg(state.compteurSeance);
 
-  try {
-    await apiPost({action:'incrementSerie', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier});
-    state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 1);
-  } catch(e) { console.error(e); }
-
   const a = ATELIERS.find(x => x.nom === nomAtelier);
   const sgEl = document.getElementById('sg-'+key);
   if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, state.serieLocale[nomAtelier]);
 
   if (state.serieLocale[nomAtelier].length >= 4) {
+    await validateAtelier(nomAtelier);
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
   }
@@ -1593,8 +1589,43 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
   return html;
 }
 
+async function validateAtelier(nomAtelier) {
+  try {
+    const res = await apiPost({action:'validateAtelier', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier});
+    if (res && res.newCompteur !== undefined) state.compteur = res.newCompteur;
+    state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 4);
+    delete state.serieLocale[nomAtelier];
+  } catch(e) { console.error(e); }
+}
+
+function clearAtelierIncomplet(nomAtelier) {
+  const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
+  const local = state.serieLocale[nomAtelier] || [];
+  if (local.length > 0 && local.length < 4) {
+    delete state.serieLocale[nomAtelier];
+    const a = ATELIERS.find(x => x.nom === nomAtelier);
+    const sgEl = document.getElementById('sg-'+key);
+    if (sgEl && a) {
+      const maxi = parseFloat(state.maxis[nomAtelier]) || 0;
+      sgEl.innerHTML = buildSeriesHTML(a, maxi, []);
+    }
+  }
+}
+
 function toggleAtelier(key) {
   const el = document.getElementById('sa-'+key);
+  const isOpening = !el.classList.contains('open');
+
+  if (isOpening) {
+    // Effacer les séries incomplètes des autres ateliers ouverts
+    document.querySelectorAll('.seance-atelier.open').forEach(other => {
+      const otherKey = other.id.replace('sa-','');
+      const otherNom = ATELIERS.find(a => a.nom.replace(/[^a-zA-Z]/g,'_') === otherKey)?.nom;
+      if (otherNom) clearAtelierIncomplet(otherNom);
+      other.classList.remove('open');
+    });
+  }
+
   el.classList.toggle('open');
 }
 
@@ -1616,12 +1647,6 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   if (bar) { bar.style.width = pct+'%'; }
   if (msg) { msg.textContent = progressMsg(state.compteurSeance); }
 
-  // Incrémenter GS
-  try {
-    await apiPost({action:'incrementSerie', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier});
-    state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 1);
-  } catch(e) { console.error(e); }
-
   const localSeries = state.serieLocale[nomAtelier];
   const seriesCount = localSeries.length;
 
@@ -1636,8 +1661,9 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
     sgEl.innerHTML = buildSeriesHTML(a, maxi, state.serieLocale[nomAtelier]);
   }
 
-  // Bravo après série 4
+  // Bravo après série 4 — enregistrement dans le GS
   if (seriesCount >= 4) {
+    await validateAtelier(nomAtelier);
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
     const sug = document.getElementById('sug-'+key);
