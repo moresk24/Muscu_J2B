@@ -365,6 +365,54 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .bravo-sub{font-size:.78rem;color:var(--muted);margin-top:.2rem}
 
 /* ═══════════════════════════════════════════
+   PAGE CALCULER MON MAXI
+═══════════════════════════════════════════ */
+.calc-back-btn{
+  background:none;border:1px solid var(--border);border-radius:10px;
+  color:var(--muted);padding:.45rem .7rem;cursor:pointer;font-size:.9rem;
+  transition:all .2s;flex-shrink:0;line-height:1;font-family:'DM Sans',sans-serif;
+}
+.calc-back-btn:hover{border-color:var(--accent);color:var(--accent)}
+.calc-header{
+  display:flex;align-items:center;gap:.75rem;
+  padding-bottom:.85rem;margin-bottom:1rem;
+  border-bottom:1px solid var(--border);
+}
+.calc-atelier-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;flex:1}
+.calc-mode-tabs{display:flex;gap:.5rem;margin-bottom:1.25rem}
+.calc-mode-tab{
+  flex:1;padding:.55rem;border-radius:10px;border:1px solid var(--border);
+  background:none;color:var(--muted);font-family:'DM Sans',sans-serif;
+  font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;
+}
+.calc-mode-tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+.calc-result{
+  background:rgba(255,107,43,.08);border:1px solid rgba(255,107,43,.25);
+  border-radius:12px;padding:.9rem 1rem;margin:1rem 0;
+  font-size:1rem;font-weight:600;text-align:center;color:var(--text);display:none;
+}
+.calc-result.visible{display:block}
+/* Ateliers maxis — lecture seule + cliquable */
+.atelier-card.clickable{cursor:pointer;transition:border-color .2s,background .2s}
+.atelier-card.clickable:hover{border-color:var(--accent);background:rgba(255,107,43,.04)}
+.maxi-ro{
+  font-family:'Bebas Neue',sans-serif;font-size:1.35rem;color:var(--accent);
+  white-space:nowrap;text-align:right;flex-shrink:0;
+}
+.maxi-ro .maxi-unit{font-size:.7rem;color:var(--muted);font-family:'DM Sans',sans-serif;margin-left:2px}
+.maxi-ro-empty{color:var(--muted);font-size:.8rem;font-family:'DM Sans',sans-serif;flex-shrink:0}
+/* Nav verrouillée */
+.nav-btn:disabled{opacity:.28;cursor:not-allowed}
+/* Bannière félicitations */
+.congrats-banner{
+  background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3);
+  border-radius:14px;padding:1rem 1.1rem;text-align:center;margin-bottom:1rem;
+}
+.congrats-banner-emoji{font-size:1.8rem;margin-bottom:.2rem}
+.congrats-banner-title{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.05em;color:var(--green)}
+.congrats-banner-sub{font-size:.78rem;color:var(--muted);margin-top:.2rem;line-height:1.45}
+
+/* ═══════════════════════════════════════════
    TOAST
 ═══════════════════════════════════════════ */
 .toast{
@@ -457,6 +505,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 
   <!-- Pages -->
   <div id="page-maxis" class="scroll" style="display:none"></div>
+  <div id="page-maxi-calc" class="scroll" style="display:none"></div>
   <div id="page-projet" class="scroll" style="display:none"></div>
   <div id="page-fiche" class="scroll" style="display:none"></div>
   <div id="page-seance" class="scroll" style="display:none"></div>
@@ -466,13 +515,13 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     <button class="nav-btn active" data-page="maxis">
       <span class="nav-icon">📊</span>Maxis
     </button>
-    <button class="nav-btn" data-page="projet">
-      <span class="nav-icon">🎯</span>Projet
+    <button class="nav-btn" data-page="projet" disabled>
+      <span class="nav-icon">🎯</span>Les Projets
     </button>
-    <button class="nav-btn" data-page="fiche">
+    <button class="nav-btn" data-page="fiche" disabled>
       <span class="nav-icon">📋</span>Mon projet
     </button>
-    <button class="nav-btn" data-page="seance">
+    <button class="nav-btn" data-page="seance" disabled>
       <span class="nav-icon">🏋️</span>Séance
     </button>
   </div>
@@ -611,7 +660,9 @@ let state = {
   // Config
   isAdmin: false,
   isActive: false,
-  sessionNumber: 0
+  sessionNumber: 0,
+  // Calc maxi
+  currentCalcAtelier: 0
 };
 
 // ═══════════════════════════════════════════════════
@@ -855,7 +906,7 @@ $('btn-login').addEventListener('click', async () => {
 // ═══════════════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════════════
-const PAGES = ['maxis','projet','fiche','seance'];
+const PAGES = ['maxis','maxi-calc','projet','fiche','seance'];
 function showPage(name) {
   PAGES.forEach(p => {
     $('page-'+p).style.display = p===name ? 'block' : 'none';
@@ -863,13 +914,11 @@ function showPage(name) {
   document.querySelectorAll('.nav-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.page === name);
   });
-  // Cacher la save-bar sur toutes les pages sauf maxis
-  const saveBar = document.querySelector('.save-bar');
-  if (saveBar) saveBar.style.display = name === 'maxis' ? 'flex' : 'none';
-  if (name==='maxis')  buildMaxis();
-  if (name==='projet') buildProjet();
-  if (name==='fiche')  buildFiche();
-  if (name==='seance') buildSeance();
+  if (name==='maxis')     buildMaxis();
+  if (name==='maxi-calc') buildMaxiCalc();
+  if (name==='projet')    buildProjet();
+  if (name==='fiche')     buildFiche();
+  if (name==='seance')    buildSeance();
 }
 document.querySelectorAll('.nav-btn').forEach(b => {
   b.addEventListener('click', ()=>showPage(b.dataset.page));
@@ -879,7 +928,7 @@ $('btn-logout').addEventListener('click', () => {
   localStorage.removeItem('muscu_login');
   $('screen-app').classList.remove('active');
   $('screen-login').classList.add('active');
-  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurSeance:parseInt(localStorage.getItem('compteurSeance')||'0'),sessionId:localStorage.getItem('sessionId')||''};
+  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurSeance:parseInt(localStorage.getItem('compteurSeance')||'0'),sessionId:localStorage.getItem('sessionId')||'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0};
   $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
   $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
 });
@@ -887,10 +936,41 @@ $('btn-logout').addEventListener('click', () => {
 // ═══════════════════════════════════════════════════
 //  PAGE MAXIS
 // ═══════════════════════════════════════════════════
+function getAtelierType(nom) {
+  if (nom === 'Gainage sol') return 'gainage';
+  if (nom === 'Banc à Lombaires' || nom === 'Abdo Sol') return 'lombaires';
+  return 'standard';
+}
+
+function isMaxiValid(a, val) {
+  if (val === '' || val === undefined || val === null) return false;
+  if (getAtelierType(a.nom) === 'standard') return parseFloat(val) > 0;
+  return true; // 0 kg additionnel et niveau 1 sont valides
+}
+
+function formatMaxiDisplay(a, val) {
+  const type = getAtelierType(a.nom);
+  if (type === 'gainage') return `${val} <span class="maxi-unit">niv.</span>`;
+  return `${val} <span class="maxi-unit">kg</span>`;
+}
+
+function updateNavLock() {
+  const locked = !maxisAllFilled();
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    if (b.dataset.page !== 'maxis') b.disabled = locked;
+  });
+}
+
 function buildMaxis() {
   const pg = $('page-maxis');
-  const maxisFilled = ATELIERS.filter(a => state.maxis[a.nom] !== '' && state.maxis[a.nom] !== undefined && state.maxis[a.nom] !== null).length;
+
+  // Supprimer l'ancienne save-bar si elle existe
+  const oldSaveBar = document.querySelector('.save-bar');
+  if (oldSaveBar) oldSaveBar.remove();
+
   const total = ATELIERS.length;
+  const maxisFilled = ATELIERS.filter(a => isMaxiValid(a, state.maxis[a.nom])).length;
+  const allFilled = maxisFilled === total;
 
   let html = `<div style="margin-bottom:.75rem">
     <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.35rem">
@@ -899,67 +979,45 @@ function buildMaxis() {
     <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${(maxisFilled/total*100).toFixed(0)}%"></div></div>
   </div>`;
 
-  if (maxisFilled < total) {
-    html += `<div class="lock-msg">📝 Remplis tous tes maxis pour débloquer le choix du projet !</div>`;
+  if (allFilled) {
+    html += `<div class="congrats-banner">
+      <div class="congrats-banner-emoji">🎉</div>
+      <div class="congrats-banner-title">Bravo ! Tous tes maxis sont renseignés !</div>
+      <div class="congrats-banner-sub">Tu peux maintenant choisir ton projet personnel de travail pour les prochaines séances.</div>
+    </div>`;
+  } else {
+    html += `<div class="lock-msg">📝 Clique sur un atelier pour renseigner ton maxi — débloques les autres pages une fois tous remplis.</div>`;
   }
 
   let lastGroupe = null;
-  ATELIERS.forEach(a => {
+  ATELIERS.forEach((a, i) => {
     if (a.groupe !== lastGroupe) {
       lastGroupe = a.groupe;
       html += `<div class="section-title">${a.groupe==='haut'?'🏋️ Haut du corps':'🦵 Bas du corps'}</div>`;
     }
-    const val = state.maxis[a.nom] || '';
-    const seriesFaites = parseInt(state.series[a.nom]||0);
-    const validated = seriesFaites >= 4;
-    html += `<div class="atelier-card ${validated?'validated':''}">
+    const val = state.maxis[a.nom];
+    const hasMaxi = isMaxiValid(a, val);
+    const maxiHtml = hasMaxi
+      ? `<div class="maxi-ro">${formatMaxiDisplay(a, val)}</div>`
+      : `<div class="maxi-ro-empty">+ maxi</div>`;
+
+    html += `<div class="atelier-card ${hasMaxi?'validated':''} clickable" data-idx="${i}">
       <div class="atelier-icon ${a.groupe==='haut'?'icon-haut':'icon-bas'}">${a.icon}</div>
       <div class="atelier-info">
         <div class="atelier-name">${a.nom}</div>
         <div class="atelier-muscles">${a.muscles}${a.note?` · <em>${a.note}</em>`:''}</div>
-        ${seriesFaites>0?`<div class="atelier-series-count">✓ ${seriesFaites} série${seriesFaites>1?'s':''} effectuée${seriesFaites>1?'s':''}</div>`:''}
       </div>
-      <div class="maxi-wrap">
-        <input class="maxi-input" type="number" min="0" step="0.5" inputmode="decimal"
-          data-atelier="${a.nom}" value="${val}" placeholder="—" ${isEditable()?'':'disabled'}>
-        <span class="maxi-unit">${a.unite}</span>
-      </div>
+      ${maxiHtml}
     </div>`;
   });
 
-  pg.innerHTML = html + '<div style="height:5rem"></div>';
+  pg.innerHTML = html + '<div style="height:2rem"></div>';
 
-  // Save bar — masquée en mode lecture seule
-  let saveBar = document.querySelector('.save-bar');
-  if (!saveBar) {
-    saveBar = document.createElement('div');
-    saveBar.className = 'save-bar';
-    saveBar.innerHTML = `<div class="progress-maxis">Maxis : <span id="save-count">${maxisFilled}/${total}</span></div>
-      <button class="btn" id="btn-save-maxis" style="flex:1;padding:.7rem">Enregistrer les maxis</button>`;
-    $('screen-app').insertBefore(saveBar, document.querySelector('.bottom-nav'));
-  }
-  $('save-count').textContent = `${maxisFilled}/${total}`;
-  saveBar.style.display = isEditable() ? 'flex' : 'none';
+  pg.querySelectorAll('.atelier-card.clickable').forEach(card => {
+    card.addEventListener('click', () => goToMaxiCalc(parseInt(card.dataset.idx)));
+  });
 
-  if (isEditable()) {
-    const allInputs = Array.from(document.querySelectorAll('.maxi-input'));
-    allInputs.forEach((inp, idx) => {
-      inp.addEventListener('input', () => {
-        state.maxis[inp.dataset.atelier] = inp.value;
-        const filled = ATELIERS.filter(a=>state.maxis[a.nom]!==''&&state.maxis[a.nom]!==undefined&&state.maxis[a.nom]!==null).length;
-        $('save-count').textContent = `${filled}/${total}`;
-      });
-      inp.addEventListener('keydown', ev => {
-        if (ev.key === 'Enter') {
-          ev.preventDefault();
-          const next = allInputs[idx + 1];
-          if (next) next.focus();
-          else inp.blur();
-        }
-      });
-    });
-    document.getElementById('btn-save-maxis').onclick = saveMaxis;
-  }
+  updateNavLock();
 }
 
 async function saveMaxis() {
@@ -982,10 +1040,196 @@ async function saveMaxis() {
 
 // ── Helper : tous les maxis sont-ils remplis ? ─────────────
 function maxisAllFilled() {
-  return ATELIERS.every(a => {
-    const v = state.maxis[a.nom];
-    return v !== '' && v !== undefined && v !== null && v !== 0 && v !== '0';
-  });
+  return ATELIERS.every(a => isMaxiValid(a, state.maxis[a.nom]));
+}
+
+// ── Navigation vers la page calcul maxi ────────────────────
+let _calcMode = 1;
+function goToMaxiCalc(idx) {
+  state.currentCalcAtelier = idx;
+  _calcMode = 1;
+  showPage('maxi-calc');
+}
+
+// ═══════════════════════════════════════════════════
+//  PAGE CALCULER MON MAXI
+// ═══════════════════════════════════════════════════
+function buildMaxiCalc() {
+  const idx = state.currentCalcAtelier || 0;
+  const a = ATELIERS[idx];
+  const type = getAtelierType(a.nom);
+  const pg = $('page-maxi-calc');
+
+  function render() {
+    let formHtml = '';
+
+    if (_calcMode === 1) {
+      // ── Mode Calcul ──
+      if (type === 'standard') {
+        formHtml = `
+          <div class="field">
+            <label class="field-label">Charge soulevée (kg)</label>
+            <input type="number" id="calc-charge" inputmode="decimal" step="0.5" min="0" placeholder="ex : 40">
+          </div>
+          <div class="field">
+            <label class="field-label">Nombre de répétitions (6 à 15)</label>
+            <input type="number" id="calc-reps" inputmode="numeric" step="1" min="6" max="15" placeholder="ex : 10">
+          </div>
+          <button class="btn" id="btn-calc">Calculer mon maxi théorique</button>
+          <div class="calc-result" id="calc-result"></div>
+          <button class="btn" id="btn-valid-calc" style="display:none;margin-top:.5rem">Valider ce maxi</button>`;
+      } else if (type === 'lombaires') {
+        formHtml = `
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.5">
+            Le maxi pour cet atelier est de <strong style="color:var(--text)">30 répétitions en 1 minute</strong>.
+            Indique le poids additionnel que tu tiens contre la poitrine.
+          </p>
+          <div class="field">
+            <label class="field-label">Poids additionnel contre la poitrine</label>
+            <select id="calc-poids-add">
+              <option value="0">0 kg (sans lest)</option>
+              <option value="2">2 kg</option>
+              <option value="5">5 kg</option>
+              <option value="10">10 kg</option>
+            </select>
+          </div>
+          <div class="calc-result visible" id="calc-result"></div>
+          <button class="btn" id="btn-valid-calc" style="margin-top:.5rem">Valider ce maxi</button>`;
+      } else {
+        formHtml = `
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.5">
+            Le maxi au Gainage sol correspond au <strong style="color:var(--text)">niveau d'exécution</strong> que tu es capable de maintenir.
+          </p>
+          <div class="field">
+            <label class="field-label">Niveau atteint</label>
+            <select id="calc-niveau">
+              <option value="1">Niveau 1</option>
+              <option value="2">Niveau 2</option>
+              <option value="3">Niveau 3</option>
+              <option value="4">Niveau 4</option>
+            </select>
+          </div>
+          <div class="calc-result visible" id="calc-result"></div>
+          <button class="btn" id="btn-valid-calc" style="margin-top:.5rem">Valider ce maxi</button>`;
+      }
+    } else {
+      // ── Mode Saisie directe ──
+      if (type === 'standard') {
+        formHtml = `
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.5">
+            Entre directement la valeur de ton maxi si tu la connais déjà.
+          </p>
+          <div class="field">
+            <label class="field-label">Mon maxi (kg)</label>
+            <input type="number" id="direct-val" inputmode="decimal" step="0.5" min="0" placeholder="ex : 62.5">
+          </div>
+          <button class="btn" id="btn-valid-direct">Valider ce maxi</button>`;
+      } else if (type === 'lombaires') {
+        formHtml = `
+          <div class="field">
+            <label class="field-label">Poids additionnel (kg)</label>
+            <input type="number" id="direct-val" inputmode="numeric" step="1" min="0" max="30" placeholder="ex : 5">
+          </div>
+          <button class="btn" id="btn-valid-direct">Valider ce maxi</button>`;
+      } else {
+        formHtml = `
+          <div class="field">
+            <label class="field-label">Niveau (1 à 4)</label>
+            <input type="number" id="direct-val" inputmode="numeric" step="1" min="1" max="4" placeholder="ex : 2">
+          </div>
+          <button class="btn" id="btn-valid-direct">Valider ce maxi</button>`;
+      }
+    }
+
+    pg.innerHTML = `
+      <div class="calc-header">
+        <button class="calc-back-btn" id="calc-back">← Retour</button>
+        <div class="calc-atelier-title">${a.icon} ${a.nom}</div>
+      </div>
+      <div class="calc-mode-tabs">
+        <button class="calc-mode-tab ${_calcMode===1?'active':''}" id="tab-calc">Calculer mon maxi</button>
+        <button class="calc-mode-tab ${_calcMode===2?'active':''}" id="tab-direct">Saisie directe</button>
+      </div>
+      ${formHtml}
+      <div style="height:2rem"></div>`;
+
+    attachListeners();
+  }
+
+  function attachListeners() {
+    $('calc-back').addEventListener('click', () => showPage('maxis'));
+    $('tab-calc').addEventListener('click',   () => { _calcMode = 1; render(); });
+    $('tab-direct').addEventListener('click', () => { _calcMode = 2; render(); });
+
+    if (_calcMode === 1) {
+      if (type === 'standard') {
+        const btnCalc  = $('btn-calc');
+        const btnValid = $('btn-valid-calc');
+        const result   = $('calc-result');
+        btnCalc.addEventListener('click', () => {
+          const charge = parseFloat($('calc-charge').value);
+          const reps   = parseInt($('calc-reps').value);
+          if (!charge || charge <= 0 || !reps || reps < 1 || reps > 15) {
+            toast('Indique une charge et un nombre de répétitions valides (6–15)', 'warn');
+            return;
+          }
+          const rm = Math.round((charge / (1.0278 - 0.0278 * reps)) * 10) / 10;
+          result.textContent = `Ton maxi théorique au ${a.nom} : ${rm} kg`;
+          result.classList.add('visible');
+          btnValid.style.display = 'block';
+          btnValid.dataset.value = rm;
+        });
+        btnValid.addEventListener('click', () => {
+          const v = btnValid.dataset.value;
+          if (v) saveSingleMaxi(a.nom, v);
+        });
+
+      } else if (type === 'lombaires') {
+        const sel = $('calc-poids-add');
+        const result = $('calc-result');
+        function updateLombRes() {
+          result.textContent = `Ton maxi au ${a.nom} : 30 reps en 1' + ${sel.value} kg`;
+        }
+        updateLombRes();
+        sel.addEventListener('change', updateLombRes);
+        $('btn-valid-calc').addEventListener('click', () => saveSingleMaxi(a.nom, sel.value));
+
+      } else {
+        const sel = $('calc-niveau');
+        const result = $('calc-result');
+        function updateGainRes() {
+          result.textContent = `Ton maxi au Gainage sol : Niveau ${sel.value}`;
+        }
+        updateGainRes();
+        sel.addEventListener('change', updateGainRes);
+        $('btn-valid-calc').addEventListener('click', () => saveSingleMaxi(a.nom, sel.value));
+      }
+
+    } else {
+      $('btn-valid-direct').addEventListener('click', () => {
+        const v = $('direct-val').value;
+        if (v === '' || v === undefined) { toast('Saisis une valeur', 'warn'); return; }
+        if (type === 'standard' && parseFloat(v) <= 0) { toast('La valeur doit être supérieure à 0', 'warn'); return; }
+        if (type === 'gainage' && (parseInt(v) < 1 || parseInt(v) > 4)) { toast('Le niveau doit être entre 1 et 4', 'warn'); return; }
+        saveSingleMaxi(a.nom, v);
+      });
+    }
+  }
+
+  render();
+}
+
+async function saveSingleMaxi(atelierNom, value) {
+  if (!isEditable()) { toast('Mode consultation — modifications non autorisées', 'warn'); return; }
+  loading(true);
+  try {
+    state.maxis[atelierNom] = value;
+    const d = await apiPost({action:'saveMaxis', classe:state.classe, nom:state.nom, prenom:state.prenom, maxis:state.maxis});
+    if (d.error) throw new Error(d.error);
+    toast('Maxi enregistré ✓');
+    showPage('maxis');
+  } catch(e) { toast('Erreur enregistrement', 'error'); }
+  loading(false);
 }
 
 // ═══════════════════════════════════════════════════
