@@ -1384,15 +1384,16 @@ function buildSeance() {
   let html = `${readonlyBanner}
     <!-- Barre de progression séance -->
     <div class="progress-bar-wrap">
-      <div class="progress-bar-label"><span>Séries cette séance</span><span>${count} / 16-20</span></div>
+      <div class="progress-bar-label"><span>Nbr de série(s) cette séance</span><span>${count} / 20</span></div>
       <div class="progress-bar-track"><div class="progress-bar-fill" id="seance-bar" style="width:${pct}%"></div></div>
       <div class="progress-msg" id="seance-msg">${progressMsg(count)}</div>
     </div>
 
     <!-- Choix intensité -->
     <div class="seance-header">
-      <div class="field-label">Intensité de travail (Projet ${p.nom} : ${p.intensites[0]}–${p.intensites[p.intensites.length-1]}% du maxi)</div>
-      <div style="font-size:.82rem;color:var(--muted);margin:.5rem 0 .25rem">Choisissez votre intensité pour votre 1ère série :</div>
+      <div class="field-label">Intensité du travail du projet ${p.nom} :</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;color:var(--accent);margin:.3rem 0">${p.intensites[0]}–${p.intensites[p.intensites.length-1]}% du MAXI</div>
+      <div style="font-size:.82rem;color:var(--text);margin-bottom:.25rem">Choisissez l'intensité de votre première série :</div>
       <div class="intensite-row">
         <select id="sel-intensite">
           ${p.intensites.map(i=>`<option value="${i}" ${i===state.intensite?'selected':''}>${i}% du maxi</option>`).join('')}
