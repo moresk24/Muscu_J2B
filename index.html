@@ -640,7 +640,8 @@ function progressMsg(count) {
   if (count === 2) return "Bon rythme, continuez ! 🔥";
   if (count === 3) return "À mi-chemin ! ⚡";
   if (count === 4) return "Plus qu'un atelier ! 💪";
-  if (count >= 5) return "Objectif atteint, bravo ! 🏆";
+  if (count === 5) return "Objectif atteint, bravo ! 🏆";
+  if (count > 5)  return `Bravo, ${count} ateliers validés ! Vous dépassez même nos attentes ! 🥇`;
   return "";
 }
 
