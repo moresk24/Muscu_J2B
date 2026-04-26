@@ -1244,16 +1244,28 @@ function buildProjet() {
   if (!allFilled) {
     html += `<div class="lock-msg">🔒 Remplis tous tes maxis pour débloquer le choix du projet !</div>`;
   }
+
   if (state.projet) {
-    html += `<div style="background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);border-radius:12px;padding:.85rem;text-align:center;font-size:.85rem;color:var(--green);margin-bottom:1rem">
-      ✓ Projet actuel : <strong>${PROJETS[state.projet]?.nom}</strong>
-    </div>`;
+    const p = PROJETS[state.projet];
+    html += `<div style="background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.3);border-radius:14px;padding:1rem 1.1rem;margin-bottom:1.25rem">
+      <div style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Projet actuel</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.05em;color:var(--green)">Tu travailles sur le projet : ${p.nom}</div>
+      <div style="font-size:.88rem;color:var(--muted);margin:.4rem 0 .75rem;line-height:1.4">${p.desc}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.3rem">
+        <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">💪 ${p.intensites[0]}–${p.intensites[p.intensites.length-1]}% maxi</span>
+        <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">📊 ${p.repsMin}–${p.repsMax} reps</span>
+        <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">🔁 ${p.seriesMin}–${p.seriesMax} séries</span>
+        <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">⚡ ${p.vitesse}</span>
+        <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">⏱ ${p.recup}</span>
+      </div>
+    </div>
+    <div class="section-title">Changer de projet</div>`;
   }
 
   Object.values(PROJETS).forEach(p => {
-    const sel = state.projet === p.num;
+    if (state.projet === p.num) return; // masquer le projet déjà choisi
     const locked = !allFilled || !isEditable();
-    html += `<div class="projet-card ${sel?'selected':''} ${locked?'locked':''}" data-projet="${p.num}">
+    html += `<div class="projet-card ${locked?'locked':''}" data-projet="${p.num}">
       <div class="projet-num">${p.num}</div>
       <div class="projet-name">${p.nom}</div>
       <div class="projet-desc">${p.desc}</div>
