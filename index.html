@@ -538,7 +538,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 <div class="modal-bg hidden" id="modal-bg">
   <div class="modal">
     <h3>Changer de projet ?</h3>
-    <p>Tu as déjà choisi un projet. Es-tu sûr de vouloir en changer ? Ton nouveau choix remplacera l'ancien.</p>
+    <p>Vous avez déjà choisi un projet. Êtes-vous sûr de vouloir en changer ? Votre nouveau choix remplacera l'ancien.</p>
     <div class="modal-actions">
       <button class="btn btn-outline" id="modal-cancel">Annuler</button>
       <button class="btn" id="modal-confirm">Oui, changer</button>
@@ -637,7 +637,7 @@ function calcReps(projet, intensite) {
 function progressMsg(count) {
   if (count === 0) return "";
   if (count < 4)  return "C'est parti ! 💥";
-  if (count < 8)  return "Bon début, continue ! 🔥";
+  if (count < 8)  return "Bon début, continuez ! 🔥";
   if (count < 12) return "Tu es dans le rythme ! ⚡";
   if (count < 16) return "Plus que quelques séries ! 💪";
   if (count < 20) return "Objectif atteint, tu cartonne ! 🏆";
@@ -829,7 +829,7 @@ $('sel-eleve').addEventListener('change', function() {
     $('mdp-rules').style.display = 'none';
     $('zone-mdp2').style.display = 'none';
   } else {
-    $('mdp-label').textContent = 'Crée ton mot de passe';
+    $('mdp-label').textContent = 'Créez votre mot de passe';
     $('mdp-rules').style.display = 'block';
     $('zone-mdp2').style.display = 'block';
   }
@@ -974,7 +974,8 @@ function buildMaxis() {
   const maxisFilled = ATELIERS.filter(a => isMaxiValid(a, state.maxis[a.nom])).length;
   const allFilled = maxisFilled === total;
 
-  let html = `<div style="margin-bottom:.75rem">
+  let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.75rem">Vos Maxis <span style="color:var(--accent)">(1RM)</span></div>
+  <div style="margin-bottom:.75rem">
     <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.35rem">
       <span>Maxis renseignés</span><span style="color:var(--text);font-weight:700">${maxisFilled} / ${total}</span>
     </div>
@@ -984,11 +985,11 @@ function buildMaxis() {
   if (allFilled && !state.projet) {
     html += `<div class="congrats-banner">
       <div class="congrats-banner-emoji">🎉</div>
-      <div class="congrats-banner-title">Bravo ! Tous tes maxis sont renseignés !</div>
-      <div class="congrats-banner-sub">Tu peux maintenant choisir ton projet personnel de travail pour les prochaines séances.</div>
+      <div class="congrats-banner-title">Bravo ! Tous vos maxis sont renseignés !</div>
+      <div class="congrats-banner-sub">Vous pouvez maintenant choisir votre projet personnel de travail pour les prochaines séances.</div>
     </div>`;
   } else {
-    html += `<div class="lock-msg">📝 Clique sur un atelier pour renseigner ton maxi — débloques les autres pages une fois tous remplis.</div>`;
+    html += `<div class="lock-msg">👆 Cliquez sur un atelier pour renseigner ou modifier votre maxi.</div>`;
   }
 
   let lastGroupe = null;
@@ -1030,7 +1031,7 @@ async function saveMaxis() {
     if (d.error) throw new Error(d.error);
     const allFilled = maxisAllFilled();
     if (allFilled) {
-      toast('Tous les maxis enregistrés ! 🎉 Choisis ton projet !');
+      toast('Tous les maxis enregistrés ! 🎉 Choisissez votre projet !');
       showPage('projet');
     } else {
       toast('Maxis enregistrés ✓');
@@ -1093,7 +1094,7 @@ function buildMaxiCalc() {
         formHtml = `
           <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.5">
             Le maxi pour cet atelier est de <strong style="color:var(--text)">30 répétitions en 1 minute</strong>.
-            Indique le poids additionnel que tu tiens contre la poitrine.
+            Indiquez le poids additionnel que vous tenez contre la poitrine.
           </p>
           <div class="field">
             <label class="field-label">Poids additionnel contre la poitrine</label>
@@ -1128,7 +1129,7 @@ function buildMaxiCalc() {
       if (type === 'standard') {
         formHtml = `
           <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.5">
-            Entre directement la valeur de ton maxi si tu la connais déjà.
+            Entrez directement la valeur de votre maxi si vous la connaissez déjà.
           </p>
           <div class="field">
             <label class="field-label">Mon maxi (kg)</label>
@@ -1185,7 +1186,7 @@ function buildMaxiCalc() {
             return;
           }
           const rm = Math.round((charge / (1.0278 - 0.0278 * reps)) * 10) / 10;
-          result.textContent = `${a.nom} : ton maxi théorique est ${rm} kg`;
+          result.textContent = `${a.nom} : votre maxi théorique est ${rm} kg`;
           result.classList.add('visible');
           btnValid.style.display = 'block';
           btnValid.dataset.value = rm;
@@ -1199,7 +1200,7 @@ function buildMaxiCalc() {
         const sel = $('calc-poids-add');
         const result = $('calc-result');
         function updateLombRes() {
-          result.textContent = `Ton maxi au ${a.nom} : 30 reps en 1' + ${sel.value} kg`;
+          result.textContent = `Votre maxi au ${a.nom} : 30 reps en 1' + ${sel.value} kg`;
         }
         updateLombRes();
         sel.addEventListener('change', updateLombRes);
@@ -1209,7 +1210,7 @@ function buildMaxiCalc() {
         const sel = $('calc-niveau');
         const result = $('calc-result');
         function updateGainRes() {
-          result.textContent = `Ton maxi au Gainage sol : Niveau ${sel.value}`;
+          result.textContent = `Votre maxi au Gainage sol : Niveau ${sel.value}`;
         }
         updateGainRes();
         sel.addEventListener('change', updateGainRes);
@@ -1252,7 +1253,7 @@ function buildProjet() {
 
   let html = '';
   if (!allFilled) {
-    html += `<div class="lock-msg">🔒 Remplis tous tes maxis pour débloquer le choix du projet !</div>`;
+    html += `<div class="lock-msg">🔒 Renseignez tous vos maxis pour débloquer le choix du projet !</div>`;
   }
 
   if (state.projet) {
