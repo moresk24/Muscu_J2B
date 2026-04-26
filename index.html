@@ -379,6 +379,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   border-bottom:1px solid var(--border);
 }
 .calc-atelier-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;flex:1}
+#page-maxi-calc .field-label{color:var(--text)}
 .calc-mode-tabs{display:flex;gap:.5rem;margin-bottom:1.25rem}
 .calc-mode-tab{
   flex:1;padding:.55rem;border-radius:10px;border:1px solid var(--border);
@@ -1078,7 +1079,16 @@ function buildMaxiCalc() {
           </div>
           <button class="btn" id="btn-calc">Calculer mon maxi théorique</button>
           <div class="calc-result" id="calc-result"></div>
-          <button class="btn" id="btn-valid-calc" style="display:none;margin-top:.5rem">Valider ce maxi</button>`;
+          <button class="btn" id="btn-valid-calc" style="display:none;margin-top:.5rem">Valider ce maxi</button>
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;margin-top:1.25rem">
+            <div style="font-size:.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">📐 Formule utilisée — Brzycki</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;color:var(--text);margin-bottom:.5rem">1RM = Poids ÷ (1,0278 − 0,0278 × Reps)</div>
+            <div style="font-size:.78rem;color:var(--muted);line-height:1.5">
+              <strong style="color:var(--text)">1RM</strong> = charge maximale que tu peux soulever en une seule répétition.<br>
+              <strong style="color:var(--text)">Poids</strong> = charge soulevée lors du test (kg).<br>
+              <strong style="color:var(--text)">Reps</strong> = nombre de répétitions réalisées (5 à 15).
+            </div>
+          </div>`;
       } else if (type === 'lombaires') {
         formHtml = `
           <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.5">
@@ -1380,7 +1390,8 @@ function buildSeance() {
 
     <!-- Choix intensité -->
     <div class="seance-header">
-      <div class="field-label">Intensité de travail (${p.nom})</div>
+      <div class="field-label">Intensité de travail (Projet ${p.nom} : ${p.intensites[0]}–${p.intensites[p.intensites.length-1]}% du maxi)</div>
+      <div style="font-size:.82rem;color:var(--muted);margin:.5rem 0 .25rem">Choisissez votre intensité pour votre 1ère série :</div>
       <div class="intensite-row">
         <select id="sel-intensite">
           ${p.intensites.map(i=>`<option value="${i}" ${i===state.intensite?'selected':''}>${i}% du maxi</option>`).join('')}
