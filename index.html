@@ -1185,7 +1185,7 @@ function buildMaxiCalc() {
             toast('Indiquez une charge et un nombre de répétitions valides (5–15)', 'warn');
             return;
           }
-          const rm = Math.round((charge / (1.0278 - 0.0278 * reps)) * 10) / 10;
+          const rm = Math.ceil(charge / (1.0278 - 0.0278 * reps));
           result.textContent = `${a.nom} : votre maxi théorique est ${rm} kg`;
           result.classList.add('visible');
           btnValid.style.display = 'block';
