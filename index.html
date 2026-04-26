@@ -1340,6 +1340,7 @@ function buildFiche() {
         <h2>Projet ${p.num} — ${p.nom}</h2>
         <p>${p.mobile}</p>
       </div>
+      <div style="padding:.85rem 1.25rem;border-bottom:1px solid var(--border);font-size:.88rem;color:var(--muted);line-height:1.5">${p.desc}</div>
       <div class="fiche-body">
         <div class="fiche-row"><span class="fiche-key">Intensité (% maxi)</span><span class="fiche-val">${p.intensites.join(' · ')}%</span></div>
         <div class="fiche-row"><span class="fiche-key">Nombre de séries</span><span class="fiche-val">${p.seriesMin} à ${p.seriesMax}</span></div>
