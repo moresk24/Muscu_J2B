@@ -27,11 +27,12 @@ const ATELIERS = [
 // ── Colonnes fixes (avant les ateliers) ─────────────────────
 const COL_NOM            = 0;
 const COL_PRENOM         = 1;
-const COL_MDP            = 2;
-const COL_PROJET         = 3;
-const COL_COMPTEUR       = 4;  // compteur global de séries (cycle entier)
-const COL_LAST_CO        = 5;  // dernière connexion
-const COL_ATELIERS_START = 6;  // à partir de là : maxi + séries faites (par paires)
+const COL_CLASSE         = 2;  // classe de l'élève (ajouté)
+const COL_MDP            = 3;
+const COL_PROJET         = 4;
+const COL_COMPTEUR       = 5;  // compteur global de séries (cycle entier)
+const COL_LAST_CO        = 6;  // dernière connexion
+const COL_ATELIERS_START = 7;  // à partir de là : maxi + séries faites (par paires)
 
 // ════════════════════════════════════════════════════════════
 //  WEB APP — TOUT EN GET (évite les problèmes CORS)
