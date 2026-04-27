@@ -56,12 +56,42 @@ Si l'élève change d'atelier avant 4 séries → séries annulées, rien enregi
 
 ---
 
-## 🔜 À tester — Verrouillage après maxi à revoir
+## ✅ Session du 27/04/2026 — Corrections et nouvelles détections
 
-Après commit/push du 27/04 et mise à jour du service worker :
-- Vérifier que le maxi est bien effacé dans le GS après la bravo-box
-- Vérifier que la navigation est bien verrouillée (Projets / Mon Projet / Séances)
-- Tester en mode élève normal (pas admin)
+### Correctifs
+
+**Colonne "Classe" dans le Google Sheet**
+- Ajout de `COL_CLASSE = 2` dans `Code.gs`, décalage de toutes les constantes `COL_*` de +1
+
+**Admin : bypass du verrou de navigation**
+- `maxisAllFilled()` retourne `true` si `state.isAdmin`, évitant le blocage sur page Maxis
+
+**Détection maxi sous-évalué (refonte)**
+- Ancienne détection dans `showSuggestion()` sur les reps suggérées → bug : ne se déclenchait pas correctement
+- Nouvelle détection dans `onRessenti()` juste après enregistrement, sur les valeurs réelles de `state.serieLocale[nomAtelier][serieIndex]`
+- Garde ajoutée contre `state.projet` vide (admin sans projet) qui causait un freeze après série 4
+
+**Redirect forcé après invalidation du maxi**
+- `clearMaxiForAtelier()` appelle `showPage('maxis')` avec un délai de 2,5s pour forcer le retour à la page Maxis même si l'élève n'interagit pas avec le warning
+
+**Bouton "Recalculer mon maxi" → page de calcul directe**
+- `allerAuxMaxis(nomAtelier)` appelle désormais `goToMaxiCalc(idx)` → atterrit sur `page-maxi-calc` pré-chargée pour l'atelier concerné, au lieu de `page-maxis`
+
+### Nouvelle fonctionnalité — Détection maxi surévalué
+
+**Pendant la séance (warnings intermédiaires)**
+- 2 E consécutifs → warning jaune ⚠️ "Maxi peut-être surévalué" + "Continuer quand même" / "Recalculer mon maxi"
+- 3 E consécutifs → warning rouge 🚨, ton plus insistant
+
+**À la validation (4 séries)**
+- ≥ 2 E sur les 4 séries → `state.maxiARevoir[nomAtelier] = true`
+- Bravo-box : message spécifique "surévalué" (distinct du message "sous-évalué")
+- Maxi effacé dans le GS → navigation verrouillée jusqu'à recalcul
+
+### Assets
+
+- Nouveaux favicons (6 fichiers) remplacent les anciens
+- `sw.js` : ASSETS mis à jour, cache bumped `muscu-j2b-v2` → `muscu-j2b-v3`
 
 ---
 
@@ -81,3 +111,99 @@ Risque à évaluer : si l'appel échoue silencieusement, la validation n'est pas
 Quand le maxi est détecté comme sous-évalué (warning "Maxi à revoir"), faut-il comptabiliser
 la validation de l'atelier ou l'annuler ? Les 4 séries ont été faites avec une charge trop faible
 pour être vraiment valides pédagogiquement. Décision en attente.
+
+
+## 🔜 Évolution — Page dédiée par atelier (amélioration UX + contenu pédagogique)
+
+### Vision
+Actuellement, tous les ateliers sont affichés en accordéons sur une seule page "Séances".
+L'idée est de créer **une page dédiée pour chaque atelier** quand l'élève clique dessus.
+
+### Avantages
+- **Plus d'espace** pour afficher des informations pédagogiques riches
+- **Meilleure lisibilité** (focus sur un atelier à la fois)
+- **Moins de scroll** sur la page Séances
+- **Évolutif** : possibilité d'ajouter des schémas anatomiques, vidéos, consignes de sécurité
+
+### Workflow proposé
+
+**Page Séances (simplifiée) :**
+- Liste cliquable des ateliers (plus d'accordéons)
+- Chaque carte affiche : nom, maxi, nombre de séries au total
+- Clic sur une carte → ouvre la page dédiée de l'atelier
+
+**Page Atelier Detail (nouvelle) :**
+┌─────────────────────────────────────┐
+│ ← Retour     [Nom Atelier]    🏋️   │
+├─────────────────────────────────────┤
+│ 📊 Maxi : 75 kg · 12 séries totales │
+├─────────────────────────────────────┤
+│ 🎯 Muscles ciblés                   │
+│ [Schéma anatomique - optionnel]    │
+├─────────────────────────────────────┤
+│ ⚠️ Consignes de sécurité            │
+│ • Point 1                           │
+│ • Point 2                           │
+├─────────────────────────────────────┤
+│ [Grille des 4 séries]               │
+│ [Suggestion box]                    │
+│ [Bravo box]                         │
+└─────────────────────────────────────┘
+
+### Implémentation par phases
+
+**Phase 1 : Structure de base (prioritaire)**
+- Créer la page `page-atelier-detail`
+- Fonction `buildAtelierDetail(atelierNom)`
+- Modifier `buildSeance()` pour rendre les cartes cliquables
+- Navigation retour vers Séances
+- **Effort estimé :** ~200 lignes de code
+
+**Phase 2 : Contenu pédagogique basique**
+- Ajouter des consignes de sécurité en texte (par atelier)
+- Ajouter les muscles ciblés en détail
+- **Effort estimé :** ~50 lignes par atelier (16 ateliers = ~800 lignes de contenu)
+
+**Phase 3 : Schémas anatomiques (optionnel)**
+- Ajouter des schémas montrant l'exécution du mouvement
+- Ajouter des schémas anatomiques (muscles sollicités)
+- Sources possibles :
+  - Images libres de droits (Wikimedia Commons, Unsplash)
+  - Génération IA (DALL-E, Midjourney)
+  - Création custom (Canva, Figma)
+- **Effort estimé :** Temps de recherche/création d'images (variable)
+
+### Données à ajouter dans ATELIERS
+
+```javascript
+const ATELIERS = [
+  {
+    nom: "Développé Couché",
+    muscles: "Grands Pectoraux · Triceps · Deltoïde ANT.",
+    icon: "🏋️",
+    groupe: "haut",
+    unite: "kg",
+    
+    // Phase 2
+    consignes: [
+      "Garder les pieds au sol",
+      "Descendre la barre jusqu'aux pectoraux",
+      "Ne pas bloquer la respiration"
+    ],
+    securite: [
+      "Utiliser un pareur si charge lourde",
+      "Ne jamais verrouiller les coudes en position haute"
+    ],
+    
+    // Phase 3
+    schema: "url_ou_base64_image.jpg"
+  },
+  // ...
+]
+```
+
+### Décision
+À implémenter **après** les bugs majeurs actuels (détection maxi sous/surévalué).
+Commencer par **Phase 1** pour améliorer l'UX, puis ajouter le contenu pédagogique progressivement.
+
+---
