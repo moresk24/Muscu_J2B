@@ -1685,6 +1685,11 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
 
   // Bravo après série 4 — enregistrement dans le GS
   if (seriesCount >= 4) {
+    // Compter les échecs AVANT que validateAtelier efface serieLocale
+    const totalEchecs = localSeries.filter(s => s && s.ressenti === 'E').length;
+    const isSurEvalue = totalEchecs >= 2 && !state.maxiARevoir[nomAtelier];
+    if (totalEchecs >= 2) state.maxiARevoir[nomAtelier] = true;
+
     await validateAtelier(nomAtelier);
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
@@ -1692,7 +1697,15 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
     if (sug) sug.classList.remove('visible');
     if (state.maxiARevoir[nomAtelier]) {
       const bravoMaxi = document.getElementById('bravo-maxi-'+key);
-      if (bravoMaxi) bravoMaxi.style.display = 'block';
+      if (bravoMaxi) {
+        if (isSurEvalue) {
+          bravoMaxi.innerHTML = `
+            <div style="font-size:.78rem;font-weight:700;color:var(--yellow);margin-bottom:.3rem">⚠️ Atelier validé, mais attention !</div>
+            <div style="font-size:.75rem;color:var(--text);margin-bottom:.5rem">Vous avez fait plusieurs échecs. Votre maxi est probablement surévalué. Il faut le recalculer avant de continuer votre séance.</div>
+            <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000;font-size:.78rem;padding:.4rem .8rem" onclick="allerAuxMaxis('${nomAtelier}')">📊 Corriger mon maxi maintenant</button>`;
+        }
+        bravoMaxi.style.display = 'block';
+      }
       clearMaxiForAtelier(nomAtelier);
     }
     return;
@@ -1731,11 +1744,59 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
 
   // ── E : diminuer l'effort ───────────────────────────────────
   if (ressenti === 'E') {
+    // Compter les échecs consécutifs (la série courante est déjà dans serieLocale)
+    const localE = state.serieLocale[nomAtelier] || [];
+    let consecutiveE = 0;
+    for (let i = localE.length - 1; i >= 0; i--) {
+      if (localE[i] && localE[i].ressenti === 'E') consecutiveE++;
+      else break;
+    }
+    // Suggestion réduite pour le bouton "Continuer quand même"
+    const contReps = Math.max(p.repsMin, Math.ceil(currentReps * 0.85));
+
+    if (consecutiveE >= 3) {
+      sugBox.innerHTML = `
+        <div class="suggestion-title" style="color:#e74c3c">🚨 3 échecs d'affilée !</div>
+        <div class="suggestion-text" style="margin-bottom:.6rem">
+          Votre maxi ne correspond vraiment pas à vos capacités. Nous vous conseillons fortement de le recalculer.
+        </div>
+        <div class="suggestion-actions">
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)"
+            onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${contReps})">
+            Continuer quand même
+          </button>
+          <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
+            onclick="allerAuxMaxis('${nomAtelier}')">
+            📊 Recalculer mon maxi
+          </button>
+        </div>`;
+      return;
+    }
+
+    if (consecutiveE >= 2) {
+      sugBox.innerHTML = `
+        <div class="suggestion-title" style="color:var(--yellow)">⚠️ 2 échecs d'affilée</div>
+        <div class="suggestion-text" style="margin-bottom:.6rem">
+          Vous n'arrivez pas à faire les séries proposées. Votre maxi est peut-être surévalué.
+        </div>
+        <div class="suggestion-actions">
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)"
+            onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${contReps})">
+            ✓ Continuer quand même
+          </button>
+          <button class="btn btn-outline" style="border-color:var(--yellow);color:var(--yellow)"
+            onclick="allerAuxMaxis('${nomAtelier}')">
+            📊 Recalculer mon maxi
+          </button>
+        </div>`;
+      return;
+    }
+
     if (atMinIntensite) {
       const newReps = Math.max(p.repsMin, Math.ceil(currentReps * 0.85));
       sugBox.innerHTML = `
         <div class="suggestion-title">⚠️ Série ${nextSerie + 1}</div>
-        <div class="suggestion-text">Intensité déjà au minimum — réduis les répétitions.<br>
+        <div class="suggestion-text">Intensité déjà au minimum — réduisez les répétitions.<br>
           Série conseillée : <strong>${newReps} reps <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
@@ -1745,7 +1806,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     } else {
       sugBox.innerHTML = `
         <div class="suggestion-title">⚠️ Série ${nextSerie + 1} — Diminuer l'effort</div>
-        <div class="suggestion-text">Comment veux-tu ajuster ?</div>
+        <div class="suggestion-text">Comment souhaitez-vous ajuster ?</div>
         <div class="suggestion-actions" style="margin-top:.6rem">
           <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">↓ La charge</button>
           <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">↓ Les reps</button>
