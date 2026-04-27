@@ -1598,6 +1598,7 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
 async function clearMaxiForAtelier(nomAtelier) {
   state.maxis[nomAtelier] = '';
   updateNavLock();
+  setTimeout(() => showPage('maxis'), 2500);
   try {
     const m = {};
     m[nomAtelier] = '';
