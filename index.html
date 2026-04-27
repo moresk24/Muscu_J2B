@@ -1598,7 +1598,6 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
 async function clearMaxiForAtelier(nomAtelier) {
   state.maxis[nomAtelier] = '';
   updateNavLock();
-  setTimeout(() => showPage('maxis'), 2500);
   try {
     const m = {};
     m[nomAtelier] = '';
@@ -1619,7 +1618,7 @@ async function validateAtelier(nomAtelier) {
     if (bar) bar.style.width = pct+'%';
     if (msg) msg.textContent = progressMsg(state.compteurAteliersSeance);
     if (state.maxiARevoir && state.maxiARevoir[nomAtelier]) {
-      await clearMaxiForAtelier(nomAtelier);
+      clearMaxiForAtelier(nomAtelier); // fire & forget : état sync immédiat, API en arrière-plan
     }
   } catch(e) { console.error(e); }
 }
@@ -1709,6 +1708,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
         }
         bravoMaxi.style.display = 'block';
       }
+      setTimeout(() => showPage('maxis'), 2500);
     }
     return;
   }
