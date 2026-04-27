@@ -1859,24 +1859,12 @@ function appliquerChoixReps(nomAtelier, key, unite, ressenti, currentCharge, cur
 }
 
 function allerAuxMaxis(nomAtelier) {
-  showPage('maxis');
-  // Scroller jusqu'à l'atelier concerné après un court délai
-  setTimeout(() => {
-    const inputs = document.querySelectorAll('.maxi-input');
-    inputs.forEach(inp => {
-      if (inp.dataset.atelier === nomAtelier) {
-        inp.scrollIntoView({behavior:'smooth', block:'center'});
-        inp.focus();
-        // Mettre en surbrillance
-        inp.style.borderColor = 'var(--yellow)';
-        inp.style.boxShadow = '0 0 0 3px rgba(241,196,15,.3)';
-        setTimeout(() => {
-          inp.style.borderColor = '';
-          inp.style.boxShadow = '';
-        }, 3000);
-      }
-    });
-  }, 300);
+  const idx = ATELIERS.findIndex(a => a.nom === nomAtelier);
+  if (idx !== -1) {
+    goToMaxiCalc(idx);
+  } else {
+    showPage('maxis');
+  }
 }
 
 function applySuggestion(nomAtelier, newIntensite, newCharge, newReps) {
