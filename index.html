@@ -1658,6 +1658,16 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   if (!state.serieLocale[nomAtelier]) state.serieLocale[nomAtelier] = [];
   state.serieLocale[nomAtelier][serieIndex] = {ressenti, charge, reps, unite, intensite: serieIntensite || state.intensite};
 
+  // Détecter maxi à revoir sur les valeurs réelles de la série qui vient d'être faite
+  const pDetect = state.projet ? PROJETS[state.projet] : null;
+  if (pDetect) {
+    const s = state.serieLocale[nomAtelier][serieIndex];
+    const atMaxInt = pDetect.intensites.indexOf(s.intensite) >= pDetect.intensites.length - 1;
+    if ((s.ressenti === 'F' || s.ressenti === 'D') && atMaxInt && s.reps >= pDetect.repsMax) {
+      state.maxiARevoir[nomAtelier] = true;
+    }
+  }
+
   const localSeries = state.serieLocale[nomAtelier];
   const seriesCount = localSeries.length;
 
@@ -1674,16 +1684,6 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
 
   // Bravo après série 4 — enregistrement dans le GS
   if (seriesCount >= 4) {
-    // Détecter si le maxi est à revoir (F ou D à intensité max + reps max)
-    const pCheck = PROJETS[state.projet];
-    const intsCheck = pCheck.intensites;
-    const allLocal = state.serieLocale[nomAtelier] || [];
-    const needsReview = allLocal.some(s => {
-      const idx = intsCheck.indexOf(s.intensite);
-      return (s.ressenti === 'F' || s.ressenti === 'D') && idx >= intsCheck.length - 1 && s.reps >= pCheck.repsMax;
-    });
-    if (needsReview) state.maxiARevoir[nomAtelier] = true;
-
     await validateAtelier(nomAtelier);
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
@@ -1756,8 +1756,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
   // ── F ou D : augmenter l'effort ────────────────────────────
   if (atMaxIntensite) {
     // Seule option : augmenter les reps
-    if (currentReps >= p.repsMax) {
-      state.maxiARevoir[nomAtelier] = true;
+    if (state.maxiARevoir[nomAtelier]) {
       sugBox.innerHTML = `
         <div class="suggestion-title" style="color:var(--yellow)">⚠️ Maxi à revoir !</div>
         <div class="suggestion-text" style="margin-bottom:.6rem">
