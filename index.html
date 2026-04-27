@@ -1618,6 +1618,9 @@ async function validateAtelier(nomAtelier) {
     const bar = $('seance-bar'), msg = $('seance-msg');
     if (bar) bar.style.width = pct+'%';
     if (msg) msg.textContent = progressMsg(state.compteurAteliersSeance);
+    if (state.maxiARevoir && state.maxiARevoir[nomAtelier]) {
+      await clearMaxiForAtelier(nomAtelier);
+    }
   } catch(e) { console.error(e); }
 }
 
@@ -1706,7 +1709,6 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
         }
         bravoMaxi.style.display = 'block';
       }
-      clearMaxiForAtelier(nomAtelier);
     }
     return;
   }
