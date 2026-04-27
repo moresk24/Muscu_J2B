@@ -1044,6 +1044,7 @@ async function saveMaxis() {
 
 // ── Helper : tous les maxis sont-ils remplis ? ─────────────
 function maxisAllFilled() {
+  if (state.isAdmin) return true;
   return ATELIERS.every(a => isMaxiValid(a, state.maxis[a.nom]));
 }
 
