@@ -1442,6 +1442,15 @@ function buildSeance() {
             <div style="font-size:.75rem;color:var(--text);margin-bottom:.5rem">Vous devez le recalculer avant de pouvoir continuer votre séance.</div>
             <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000;font-size:.78rem;padding:.4rem .8rem" onclick="allerAuxMaxis('${a.nom}')">📊 Recalculer mon maxi</button>
           </div>
+          ${a.nom === 'Gainage sol' ? `
+          <div id="bravo-niveau-${a.nom.replace(/[^a-zA-Z]/g,'_')}" style="display:none;margin-top:.75rem;padding:.75rem;background:rgba(46,204,113,.08);border:1px solid var(--green);border-radius:10px;text-align:left">
+            <div style="font-size:.85rem;font-weight:700;color:var(--green);margin-bottom:.5rem">💪 Excellent travail !</div>
+            <div id="bravo-niveau-text-${a.nom.replace(/[^a-zA-Z]/g,'_')}" style="font-size:.8rem;color:var(--text);margin-bottom:.6rem"></div>
+            <div style="display:flex;gap:.5rem">
+              <button class="btn" style="flex:1;font-size:.8rem;padding:.5rem" onclick="accepterNiveauSup('${a.nom}')">✓ Oui</button>
+              <button class="btn btn-outline" style="flex:1;font-size:.8rem;padding:.5rem" onclick="refuserNiveauSup('${a.nom}')">✗ Non</button>
+            </div>
+          </div>` : ''}
         </div>
       </div>
     </div>`;
@@ -1528,6 +1537,15 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
       if (bravoMaxi) bravoMaxi.style.display = 'block';
       clearMaxiForAtelier(nomAtelier);
     }
+    if (state.propositionNiveauSup && state.propositionNiveauSup.atelier === nomAtelier) {
+      const prop = state.propositionNiveauSup;
+      const bloc = document.getElementById('bravo-niveau-'+key);
+      const text = document.getElementById('bravo-niveau-text-'+key);
+      if (bloc && text) {
+        text.textContent = `Vous avez parfaitement géré le niveau ${prop.niveauActuel} ! Vous vous sentez prêt(e) à tenter le niveau ${prop.niveauSuivant} la prochaine fois ?`;
+        bloc.style.display = 'block';
+      }
+    }
   }
 }
 
@@ -1607,6 +1625,10 @@ async function clearMaxiForAtelier(nomAtelier) {
 
 async function validateAtelier(nomAtelier) {
   try {
+    // Sauvegarder les series AVANT le delete (pour détection niveau sup)
+    const localAvantDelete = state.serieLocale[nomAtelier] || [];
+    const nbOk = localAvantDelete.filter(s => s && s.resultat === 'ok').length;
+
     const res = await apiPost({action:'validateAtelier', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier});
     if (res && res.newCompteur !== undefined) state.compteur = res.newCompteur;
     state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 1);
@@ -1619,6 +1641,13 @@ async function validateAtelier(nomAtelier) {
     if (msg) msg.textContent = progressMsg(state.compteurAteliersSeance);
     if (state.maxiARevoir && state.maxiARevoir[nomAtelier]) {
       clearMaxiForAtelier(nomAtelier); // fire & forget : état sync immédiat, API en arrière-plan
+    }
+    // Proposition niveau supérieur (Gainage sol uniquement, 4×ok, niveau < 4)
+    if (nomAtelier === 'Gainage sol' && nbOk === 4) {
+      const niveauActuel = parseInt(state.maxis[nomAtelier]) || 1;
+      if (niveauActuel < 4) {
+        state.propositionNiveauSup = {atelier: nomAtelier, niveauActuel, niveauSuivant: niveauActuel + 1};
+      }
     }
   } catch(e) { console.error(e); }
 }
@@ -1928,6 +1957,30 @@ function allerAuxMaxis(nomAtelier) {
   } else {
     showPage('maxis');
   }
+}
+
+async function accepterNiveauSup(nomAtelier) {
+  const prop = state.propositionNiveauSup;
+  if (!prop) return;
+  const newMaxi = prop.niveauSuivant;
+  state.maxis[nomAtelier] = String(newMaxi);
+  delete state.propositionNiveauSup;
+  const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
+  const bloc = document.getElementById('bravo-niveau-'+key);
+  if (bloc) bloc.style.display = 'none';
+  try {
+    const m = {};
+    m[nomAtelier] = String(newMaxi);
+    await apiPost({action:'saveMaxis', classe:state.classe, nom:state.nom, prenom:state.prenom, maxis: JSON.stringify(m)});
+    toast('Nouveau maxi enregistré : Niveau ' + newMaxi + ' ! 💪');
+  } catch(e) { toast('Erreur lors de l\'enregistrement', 'error'); }
+}
+
+function refuserNiveauSup(nomAtelier) {
+  delete state.propositionNiveauSup;
+  const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
+  const bloc = document.getElementById('bravo-niveau-'+key);
+  if (bloc) bloc.style.display = 'none';
 }
 
 function applySuggestion(nomAtelier, newIntensite, newCharge, newReps) {

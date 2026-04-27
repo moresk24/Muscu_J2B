@@ -95,6 +95,55 @@ Si l'élève change d'atelier avant 4 séries → séries annulées, rien enregi
 
 ---
 
+## 🔜 Refactor — Centraliser la logique de suggestion
+
+### Constat
+La logique de suggestion (que faire après une série) est aujourd'hui éclatée entre `onRessenti()` et `showSuggestion()`, avec des branches imbriquées sur :
+- Ressenti (F / D / TD / E)
+- Intensité (max / min / intermédiaire)
+- Reps (max / min / intermédiaire)
+- Échecs consécutifs (2 / 3+)
+- Maxi à revoir (sous-évalué F+maxInt+maxReps / surévalué 2+E)
+- État de la suggestion (`suggestionEnCours`, `suggestionEnAttente`)
+
+Ajouter une règle implique de toucher plusieurs fonctions et de gérer le state à plusieurs endroits.
+
+### Proposition
+
+**Fonction pure de décision** : `decideSuggestion(serie, projet, historique) → {type, params}`
+- Toutes les règles métier centralisées dans un seul switch lisible
+- Renvoie un objet décision : `{type:'increase-reps'|'decrease-charge'|'maxi-sous-eval'|'maxi-sur-eval'|'continue-same'|...}` + params
+
+**Dispatcher de rendu** : `showSuggestion()` devient un mapping `type → template HTML`, sans logique métier.
+
+### Avantages
+- Règles auditables d'un coup d'œil
+- Ajouter une règle = un cas de plus dans le décideur
+- Testable en isolation (entrée → sortie)
+
+### Prérequis
+À faire **maintenant que toutes les conditions sont stables**. Si les règles bougent encore beaucoup après le refactor, on devra refaire l'architecture du switch.
+
+### Impact
+- `onRessenti()` simplifié (juste enregistrement + appel décideur + rendu)
+- `showSuggestion()` réduit à un dispatcher
+- Possibilité plus tard d'ajouter une couche d'historique (séances passées) sans réécrire la logique
+
+### Tests à écrire en complément
+Une fois `decideSuggestion()` extraite (fonction pure, sans DOM), créer un fichier `tests.js` exécutable via `node tests.js`, sans dépendances. Cas à couvrir :
+- F + intensité max + reps max → décision "maxi-sous-eval"
+- 2 E consécutifs → décision "warning-2-echecs"
+- 3 E consécutifs → décision "warning-3-echecs"
+- 4 E sur 4 séries → décision "maxi-sur-eval" à la validation
+- Gainage sol + 4×ok + niveau<4 → proposition niveau sup
+- F à intensité intermédiaire → suggérer intensité supérieure
+- E à intensité min → suggérer reps réduites
+- TD → maintenir mêmes paramètres
+
+Claude peut exécuter `node tests.js` à chaque modification et signaler les régressions, sans rien ajouter au runtime de l'app (zéro dépendance, zéro build).
+
+---
+
 ## 🔜 À optimiser — Performance réseau
 
 **Bravo-box en attente de l'API**
