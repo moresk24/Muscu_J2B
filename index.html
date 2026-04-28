@@ -806,7 +806,7 @@ async function autoConnect(saved, classes) {
     await loadConfig();
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
-    showPage(maxisAllFilled() ? (state.projet ? 'fiche' : 'projet') : 'maxis');
+    showPage('maxis');
   } catch(e) { console.error(e); }
   loading(false);
 }
@@ -918,7 +918,7 @@ $('btn-login').addEventListener('click', async () => {
     $('screen-app').classList.add('active');
 
     // Si tous les maxis remplis et projet choisi → aller sur Mon projet
-    showPage(maxisAllFilled() ? (state.projet ? 'fiche' : 'projet') : 'maxis');
+    showPage('maxis');
 
   } catch(e) { toast('Erreur réseau','error'); console.error(e); }
   loading(false);
