@@ -522,9 +522,6 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     <button class="nav-btn" data-page="projet" disabled>
       <span class="nav-icon">🎯</span>Les Projets
     </button>
-    <button class="nav-btn" data-page="fiche" disabled>
-      <span class="nav-icon">📋</span>Mon projet
-    </button>
     <button class="nav-btn" data-page="seance" disabled>
       <span class="nav-icon">🏋️</span>Séances
     </button>
@@ -1297,6 +1294,9 @@ function buildProjet() {
         <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">🔁 ${p.seriesMin}–${p.seriesMax} séries</span>
         <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">⚡ ${p.vitesse}</span>
         <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">⏱ ${p.recup}</span>
+      </div>
+      <div style="text-align:right;margin-top:.75rem">
+        <button class="btn-sm" onclick="showPage('fiche')" style="border:1px solid rgba(46,204,113,.4);color:var(--green);background:none;padding:.35rem .75rem;border-radius:8px;cursor:pointer;font-size:.82rem">📋 Voir le détail →</button>
       </div>
     </div>
     <div class="section-title">Changer de projet</div>`;
