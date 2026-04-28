@@ -1593,7 +1593,7 @@ function buildSeance() {
   let html = `${readonlyBanner}
     <!-- Barre de progression séance -->
     <div class="progress-bar-wrap">
-      <div class="progress-bar-label"><span>Ateliers validés cette séance</span><span>${count} / 5</span></div>
+      <div class="progress-bar-label"><span>Ateliers validés cette séance</span><span id="seance-count">${count} / 5</span></div>
       <div class="progress-bar-track"><div class="progress-bar-fill" id="seance-bar" style="width:${pct}%"></div></div>
       <div class="progress-msg" id="seance-msg">${progressMsg(count)}</div>
     </div>
@@ -1852,9 +1852,10 @@ async function validateAtelier(nomAtelier) {
   state.compteurAteliersSeance++;
   localStorage.setItem('compteurAteliersSeance', state.compteurAteliersSeance);
   const pct = Math.min((state.compteurAteliersSeance/5)*100,100).toFixed(0);
-  const bar = $('seance-bar'), msg = $('seance-msg');
+  const bar = $('seance-bar'), msg = $('seance-msg'), cnt = $('seance-count');
   if (bar) bar.style.width = pct+'%';
   if (msg) msg.textContent = progressMsg(state.compteurAteliersSeance);
+  if (cnt) cnt.textContent = state.compteurAteliersSeance + ' / 5';
 
   try {
     const res = await apiPost({action:'validateAtelier', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier});
