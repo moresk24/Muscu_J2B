@@ -95,63 +95,50 @@ Si l'élève change d'atelier avant 4 séries → séries annulées, rien enregi
 
 ---
 
-## 🔜 Refactor — Centraliser la logique de suggestion
+## ✅ Session du 28/04/2026 — Refactor decideSuggestion + corrections
 
-### Constat
-La logique de suggestion (que faire après une série) est aujourd'hui éclatée entre `onRessenti()` et `showSuggestion()`, avec des branches imbriquées sur :
-- Ressenti (F / D / TD / E)
-- Intensité (max / min / intermédiaire)
-- Reps (max / min / intermédiaire)
-- Échecs consécutifs (2 / 3+)
-- Maxi à revoir (sous-évalué F+maxInt+maxReps / surévalué 2+E)
-- État de la suggestion (`suggestionEnCours`, `suggestionEnAttente`)
+### Refactor — Centralisation de la logique de suggestion
 
-Ajouter une règle implique de toucher plusieurs fonctions et de gérer le state à plusieurs endroits.
+**Trois fonctions pures extraites** (sans DOM, sans state, testables via `node tests.js`) :
 
-### Proposition
+| Fonction | Rôle |
+|---|---|
+| `decideSuggestion(serie, projet, historique, maxiARevoir)` | Décide quoi suggérer après une série → `{type, params}` |
+| `decideValidation(serieLocale, maxiSousEvalue)` | Décide du résultat à la 4e série (surévalué / sous-évalué) |
+| `decideNiveauSup(nomAtelier, nbOk, niveauActuel)` | Propose le niveau suivant pour le Gainage sol |
 
-**Fonction pure de décision** : `decideSuggestion(serie, projet, historique) → {type, params}`
-- Toutes les règles métier centralisées dans un seul switch lisible
-- Renvoie un objet décision : `{type:'increase-reps'|'decrease-charge'|'maxi-sous-eval'|'maxi-sur-eval'|'continue-same'|...}` + params
+**Types retournés par `decideSuggestion`** : `td-parfait`, `warning-2-echecs`, `warning-3-echecs`, `maxi-sous-eval`, `e-min-intensite`, `e-choix`, `fd-max-intensite`, `fd-force-charge`, `fd-choix`
 
-**Dispatcher de rendu** : `showSuggestion()` devient un mapping `type → template HTML`, sans logique métier.
+**`showSuggestion`** réduit à un `switch(type)` pur — aucune logique métier.
 
-### Avantages
-- Règles auditables d'un coup d'œil
-- Ajouter une règle = un cas de plus dans le décideur
-- Testable en isolation (entrée → sortie)
+**`onRessenti`** et **`validateAtelier`** simplifiés pour utiliser ces décideurs.
 
-### Prérequis
-À faire **maintenant que toutes les conditions sont stables**. Si les règles bougent encore beaucoup après le refactor, on devra refaire l'architecture du switch.
+**Fichier `tests.js`** créé à la racine : 19 tests couvrant tous les cas métier. Exécutable via `node tests.js` (Node.js à installer si besoin : `brew install node`).
 
-### Impact
-- `onRessenti()` simplifié (juste enregistrement + appel décideur + rendu)
-- `showSuggestion()` réduit à un dispatcher
-- Possibilité plus tard d'ajouter une couche d'historique (séances passées) sans réécrire la logique
+### Corrections
 
-### Tests à écrire en complément
-Une fois `decideSuggestion()` extraite (fonction pure, sans DOM), créer un fichier `tests.js` exécutable via `node tests.js`, sans dépendances. Cas à couvrir :
-- F + intensité max + reps max → décision "maxi-sous-eval"
-- 2 E consécutifs → décision "warning-2-echecs"
-- 3 E consécutifs → décision "warning-3-echecs"
-- 4 E sur 4 séries → décision "maxi-sur-eval" à la validation
-- Gainage sol + 4×ok + niveau<4 → proposition niveau sup
-- F à intensité intermédiaire → suggérer intensité supérieure
-- E à intensité min → suggérer reps réduites
-- TD → maintenir mêmes paramètres
+**Bravo-box figée (réseau lent)**
+- `validateAtelier` est maintenant appelé en fire & forget dans `onRessenti` et `onSerieSpeciale`
+- La bravo-box s'affiche **immédiatement** sans attendre la réponse de l'API GS
+- `clearMaxiForAtelier` est appelé directement par les appelants (indépendant du succès/échec de l'API)
 
-Claude peut exécuter `node tests.js` à chaque modification et signaler les régressions, sans rien ajouter au runtime de l'app (zéro dépendance, zéro build).
+**Maxi non effacé après 3 E + 1 TD**
+- `clearMaxiForAtelier` était dans `validateAtelier` (donc pas appelé si l'API échouait)
+- Désormais appelé dans `onRessenti` avant le fire & forget → effacement garanti
 
----
+**Timer bravo-box** : 2 500 ms → 5 000 ms (plus de temps pour lire le message)
 
-## 🔜 À optimiser — Performance réseau
+**Vouvoiement** : corrigé "Continue comme ça" → "Continuez", "Tu veux" → "Vous souhaitez", "augmente" → "augmentez"
 
-**Bravo-box en attente de l'API**
-Actuellement la bravo-box n'apparaît qu'après le retour de l'appel `validateAtelier` (GS).
-Sur réseau lent, l'élève attend plusieurs secondes avant de voir le message de validation.
+### 3 E consécutifs → abandon forcé
 
-Idée : afficher la bravo-box immédiatement, puis envoyer l'appel API en arrière-plan (fire & forget).
-Risque à évaluer : si l'appel échoue silencieusement, la validation n'est pas enregistrée dans le GS.
+- Plus de bouton "Continuer quand même" : un seul bouton "📊 Rechercher mon maxi"
+- Texte mis à jour : "Vous devez faire une nouvelle recherche de maxi pour cet atelier !"
+- Maxi effacé immédiatement dans le GS et le state
+- Séries en cours annulées (atelier non validé)
+- Grille réinitialisée à "? × ?" avec boutons bloqués
+
+**Boutons désactivés** : `.ressenti-btn[disabled]` → opacité 30%, curseur `default`
 
 ---
 
@@ -161,6 +148,7 @@ Quand le maxi est détecté comme sous-évalué (warning "Maxi à revoir"), faut
 la validation de l'atelier ou l'annuler ? Les 4 séries ont été faites avec une charge trop faible
 pour être vraiment valides pédagogiquement. Décision en attente.
 
+---
 
 ## 🔜 Évolution — Page dédiée par atelier (amélioration UX + contenu pédagogique)
 

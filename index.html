@@ -312,6 +312,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .ressenti-btn.selected-D{background:#27ae60;border-color:#27ae60;color:#fff}
 .ressenti-btn.selected-TD{background:#f39c12;border-color:#f39c12;color:#fff}
 .ressenti-btn.selected-E{background:#c0392b;border-color:#c0392b;color:#fff}
+.ressenti-btn[disabled]{opacity:.3;cursor:default}
 .serie-row.done{opacity:.7}
   .serie-row.active-serie{border-color:var(--accent);background:rgba(255,107,43,.05)}
 
@@ -1529,14 +1530,23 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
   if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, state.serieLocale[nomAtelier]);
 
   if (state.serieLocale[nomAtelier].length >= 4) {
-    await validateAtelier(nomAtelier);
+    // Décider du niveau sup avant le fire & forget (besoin des données locales)
+    const localAvantFire = state.serieLocale[nomAtelier] || [];
+    const nbOkFire = localAvantFire.filter(s => s && s.resultat === 'ok').length;
+    const niveauActuelFire = parseInt(state.maxis[nomAtelier]) || 1;
+    const niveauDecisionFire = decideNiveauSup(nomAtelier, nbOkFire, niveauActuelFire);
+    if (niveauDecisionFire.proposer) {
+      state.propositionNiveauSup = {atelier: nomAtelier, niveauActuel: niveauActuelFire, niveauSuivant: niveauDecisionFire.niveauSuivant};
+    }
+
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
     if (state.maxiARevoir[nomAtelier]) {
       const bravoMaxi = document.getElementById('bravo-maxi-'+key);
       if (bravoMaxi) bravoMaxi.style.display = 'block';
-      clearMaxiForAtelier(nomAtelier);
+      clearMaxiForAtelier(nomAtelier); // état sync immédiat, API en arrière-plan
     }
+    validateAtelier(nomAtelier); // fire & forget
     if (state.propositionNiveauSup && state.propositionNiveauSup.atelier === nomAtelier) {
       const prop = state.propositionNiveauSup;
       const bloc = document.getElementById('bravo-niveau-'+key);
@@ -1625,10 +1635,6 @@ async function clearMaxiForAtelier(nomAtelier) {
 
 async function validateAtelier(nomAtelier) {
   try {
-    // Sauvegarder les series AVANT le delete (pour détection niveau sup)
-    const localAvantDelete = state.serieLocale[nomAtelier] || [];
-    const nbOk = localAvantDelete.filter(s => s && s.resultat === 'ok').length;
-
     const res = await apiPost({action:'validateAtelier', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier});
     if (res && res.newCompteur !== undefined) state.compteur = res.newCompteur;
     state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 1);
@@ -1639,14 +1645,6 @@ async function validateAtelier(nomAtelier) {
     const bar = $('seance-bar'), msg = $('seance-msg');
     if (bar) bar.style.width = pct+'%';
     if (msg) msg.textContent = progressMsg(state.compteurAteliersSeance);
-    if (state.maxiARevoir && state.maxiARevoir[nomAtelier]) {
-      clearMaxiForAtelier(nomAtelier); // fire & forget : état sync immédiat, API en arrière-plan
-    }
-    const niveauActuel = parseInt(state.maxis[nomAtelier]) || 1;
-    const niveauDecision = decideNiveauSup(nomAtelier, nbOk, niveauActuel);
-    if (niveauDecision.proposer) {
-      state.propositionNiveauSup = {atelier: nomAtelier, niveauActuel, niveauSuivant: niveauDecision.niveauSuivant};
-    }
   } catch(e) { console.error(e); }
 }
 
@@ -1712,13 +1710,13 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
     sgEl.innerHTML = buildSeriesHTML(a, maxi, state.serieLocale[nomAtelier]);
   }
 
-  // Bravo après série 4 — enregistrement dans le GS
+  // Bravo après série 4 — affichage immédiat, API en arrière-plan
   if (seriesCount >= 4) {
     const maxiSousEvalue = !!(state.maxiARevoir && state.maxiARevoir[nomAtelier]);
     const validation = decideValidation(localSeries, maxiSousEvalue);
     if (validation.maxiARevoir) state.maxiARevoir[nomAtelier] = true;
 
-    await validateAtelier(nomAtelier);
+    // Afficher le bravo sans attendre l'API (évite l'app figée sur réseau lent)
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
     const sug = document.getElementById('sug-'+key);
@@ -1734,8 +1732,10 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
         }
         bravoMaxi.style.display = 'block';
       }
+      clearMaxiForAtelier(nomAtelier); // état sync immédiat, API en arrière-plan
       setTimeout(() => showPage('maxis'), 5000);
     }
+    validateAtelier(nomAtelier); // fire & forget : compteur + séries dans le GS
     return;
   }
 
@@ -1864,23 +1864,28 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
         </div>`;
       break;
 
-    case 'warning-3-echecs':
+    case 'warning-3-echecs': {
+      // Abandon forcé : maxi effacé immédiatement, séries annulées
+      clearMaxiForAtelier(nomAtelier);
+      delete state.serieLocale[nomAtelier];
+      if (state.suggestionEnAttente) delete state.suggestionEnAttente[nomAtelier];
+      // suggestionEnCours reste true → série 1 reste "? × ?" avec boutons désactivés
+      const sgEl3 = document.getElementById('sg-' + key);
+      const atelierObj3 = ATELIERS.find(x => x.nom === nomAtelier);
+      if (sgEl3 && atelierObj3) sgEl3.innerHTML = buildSeriesHTML(atelierObj3, 0, []);
       sugBox.innerHTML = `
         <div class="suggestion-title" style="color:#e74c3c">🚨 3 échecs d'affilée !</div>
         <div class="suggestion-text" style="margin-bottom:.6rem">
-          Votre maxi ne correspond vraiment pas à vos capacités. Nous vous conseillons fortement de le recalculer.
+          Votre maxi ne correspond vraiment pas à vos capacités. Vous devez faire une nouvelle recherche de maxi pour cet atelier !
         </div>
         <div class="suggestion-actions">
-          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)"
-            onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.contReps})">
-            Continuer quand même
-          </button>
           <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
             onclick="allerAuxMaxis('${nomAtelier}')">
-            📊 Recalculer mon maxi
+            📊 Rechercher mon maxi
           </button>
         </div>`;
       break;
+    }
 
     case 'warning-2-echecs':
       sugBox.innerHTML = `
