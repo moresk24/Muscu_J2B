@@ -808,7 +808,7 @@ async function autoConnect(saved, classes) {
     await loadConfig();
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
-    showPage('maxis');
+    showPageAfterLogin();
   } catch(e) { console.error(e); }
   loading(false);
 }
@@ -919,9 +919,7 @@ $('btn-login').addEventListener('click', async () => {
     await loadConfig();
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
-
-    // Si tous les maxis remplis et projet choisi → aller sur Mon projet
-    showPage('maxis');
+    showPageAfterLogin();
 
   } catch(e) { toast('Erreur réseau','error'); console.error(e); }
   loading(false);
@@ -983,6 +981,12 @@ function formatMaxiDisplay(a, val) {
   const type = getAtelierType(a.nom);
   if (type === 'gainage') return `${val} <span class="maxi-unit">niv.</span>`;
   return `${val} <span class="maxi-unit">kg</span>`;
+}
+
+function showPageAfterLogin() {
+  if (!maxisAllFilled()) showPage('maxis');
+  else if (!state.projet)  showPage('projet');
+  else                     showPage('seance');
 }
 
 function updateNavLock() {
