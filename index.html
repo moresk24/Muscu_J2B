@@ -1542,7 +1542,7 @@ function buildMesBadges() {
             }
           </div>
           ${b.compt === 0 ? `<div style="font-weight:600;margin-bottom:.1rem">${b.nom}</div>` : ''}
-          <div style="color:var(--muted);font-size:.85rem">${b.compt} obtenu(s)</div>
+          <div style="color:var(--muted);font-size:.85rem">${b.compt} obtenu${b.compt > 1 ? 's' : ''}</div>
         </div>`).join('')}
         ${total > 0 ? `
         <div style="margin-top:1rem;text-align:center;color:var(--muted);font-size:.9rem">
