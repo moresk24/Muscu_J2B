@@ -1949,7 +1949,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
         bravoMaxi.style.display = 'block';
       }
       clearMaxiForAtelier(nomAtelier); // état sync immédiat, API en arrière-plan
-      setTimeout(() => showPage('maxis'), 5000);
+      setTimeout(() => showPage('maxis'), 8000);
     }
     validateAtelier(nomAtelier); // fire & forget : compteur + séries dans le GS
     return;
