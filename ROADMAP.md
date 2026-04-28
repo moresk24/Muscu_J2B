@@ -142,6 +142,53 @@ Si l'élève change d'atelier avant 4 séries → séries annulées, rien enregi
 
 ---
 
+## ✅ Session du 28/04/2026 (soir) — Système de badges & fin de séance
+
+### Système de badges
+
+**Hiérarchie des badges**
+- `calculateBadge(nbAteliers)` : Bronze (< 5), Argent (5), Or (≥ 6)
+- Images présentes en big (200 px) et small (96 px) : Bronze, Argent, Or
+- Images Carton et Papier ajoutées en fichiers mais **non intégrées dans le code** (préparées pour une hiérarchie étendue future)
+
+**Flux fin de séance**
+- Bouton "✅ Terminer ma séance" visible dès 4 ateliers validés dans la page Séance
+- `saveBadge()` : incrémente les compteurs locaux, appel API `saveBadge`, remet `compteurAteliersSeance` à 0, redirige vers `page-bilan-badge`
+- `saveBadgeQuietly()` : save silencieuse déclenchée si l'élève se déconnecte sans avoir utilisé "Fin de Séance" (toast avertissement)
+
+**Nouvelles pages**
+- `page-bilan-badge` : badge obtenu en grand format, nombre d'ateliers validés, récap des badges passés
+- `page-mes-badges` : dernier badge + historique complet Bronze / Argent / Or
+
+**Navigation**
+- Bouton 🏅 "Badges" ajouté dans le footer (verrouillé tant que maxis non renseignés, via `updateNavLock()`)
+
+### Code.gs — nouvelles colonnes
+
+5 colonnes ajoutées, `COL_ATELIERS_START` décalé à 11 :
+
+| Constante | Colonne | Contenu |
+|---|---|---|
+| `COL_DERNIER_BADGE` | 7 | `"Bronze"` \| `"Argent"` \| `"Or"` \| `""` |
+| `COL_COMPTEUR_BRONZE` | 8 | nb de badges Bronze |
+| `COL_COMPTEUR_ARGENT` | 9 | nb de badges Argent |
+| `COL_COMPTEUR_OR` | 10 | nb de badges Or |
+
+Nouveau handler `handleSaveBadge()` ; `loadEleve` renvoie maintenant `dernierBadge`, `comptBronze`, `comptArgent`, `comptOr`.
+
+### Fix barre de progression instantanée
+
+- `validateAtelier()` : mise à jour UI optimiste (barre + message) **avant** l'appel API
+- Avant ce fix, la barre ne bougeait qu'après la réponse réseau → latence perceptible
+
+### Contenu pédagogique
+
+- `DESCRIPTIONS_PROJETS.md` créé : descriptions détaillées des 4 projets
+- `PDF-Projets/` : PDFs des 4 projets déplacés dans leur dossier dédié
+- Texte fiche projet : "En pratique (4 séries par atelier)" → "En pratique : 4 séries par atelier durant les séances d'EPS"
+
+---
+
 ## 🔜 À réfléchir — Validation atelier avec maxi sous-évalué
 
 Quand le maxi est détecté comme sous-évalué (warning "Maxi à revoir"), faut-il comptabiliser

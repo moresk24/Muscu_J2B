@@ -671,6 +671,7 @@ let state = {
   currentCalcAtelier: 0,
   // Badges
   dernierBadge: "",
+  comptCarton: 0,
   comptBronze: 0,
   comptArgent: 0,
   comptOr: 0,
@@ -791,6 +792,7 @@ async function autoConnect(saved, classes) {
     state.maxis        = d.maxis  || {};
     state.series       = d.series || {};
     state.dernierBadge = d.dernierBadge || '';
+    state.comptCarton  = d.comptCarton  || 0;
     state.comptBronze  = d.comptBronze  || 0;
     state.comptArgent  = d.comptArgent  || 0;
     state.comptOr      = d.comptOr      || 0;
@@ -894,6 +896,7 @@ $('btn-login').addEventListener('click', async () => {
     state.series       = d.series || {};
     state.isFirstLogin = !eInfo.hasMdp;
     state.dernierBadge = d.dernierBadge || '';
+    state.comptCarton  = d.comptCarton  || 0;
     state.comptBronze  = d.comptBronze  || 0;
     state.comptArgent  = d.comptArgent  || 0;
     state.comptOr      = d.comptOr      || 0;
@@ -955,7 +958,7 @@ $('btn-logout').addEventListener('click', async () => {
   localStorage.removeItem('muscu_login');
   $('screen-app').classList.remove('active');
   $('screen-login').classList.add('active');
-  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},maxiARevoir:{},compteurAteliersSeance:0,sessionId:'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0,dernierBadge:'',comptBronze:0,comptArgent:0,comptOr:0,badgeCourant:'',badgeCourantNbAteliers:0};
+  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},maxiARevoir:{},compteurAteliersSeance:0,sessionId:'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0,dernierBadge:'',comptCarton:0,comptBronze:0,comptArgent:0,comptOr:0,badgeCourant:'',badgeCourantNbAteliers:0};
   localStorage.setItem('compteurAteliersSeance', '0');
   $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
   $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
@@ -1409,13 +1412,15 @@ function buildFiche() {
 function calculateBadge(nbAteliers) {
   if (nbAteliers >= 6) return 'Or';
   if (nbAteliers >= 5) return 'Argent';
-  return 'Bronze';
+  if (nbAteliers >= 4) return 'Bronze';
+  return 'Carton';
 }
 
 async function saveBadge() {
   const nbAteliers = state.compteurAteliersSeance;
   const badge = calculateBadge(nbAteliers);
-  if (badge === 'Bronze') state.comptBronze++;
+  if (badge === 'Carton') state.comptCarton++;
+  else if (badge === 'Bronze') state.comptBronze++;
   else if (badge === 'Argent') state.comptArgent++;
   else state.comptOr++;
   state.dernierBadge = badge;
@@ -1429,6 +1434,7 @@ async function saveBadge() {
       nom: state.nom,
       prenom: state.prenom,
       badge,
+      comptCarton: state.comptCarton,
       comptBronze: state.comptBronze,
       comptArgent: state.comptArgent,
       comptOr: state.comptOr
@@ -1445,7 +1451,8 @@ async function saveBadge() {
 
 function saveBadgeQuietly() {
   const badge = calculateBadge(state.compteurAteliersSeance);
-  if (badge === 'Bronze') state.comptBronze++;
+  if (badge === 'Carton') state.comptCarton++;
+  else if (badge === 'Bronze') state.comptBronze++;
   else if (badge === 'Argent') state.comptArgent++;
   else state.comptOr++;
   state.dernierBadge = badge;
@@ -1456,6 +1463,7 @@ function saveBadgeQuietly() {
     nom: state.nom,
     prenom: state.prenom,
     badge,
+    comptCarton: state.comptCarton,
     comptBronze: state.comptBronze,
     comptArgent: state.comptArgent,
     comptOr: state.comptOr
@@ -1463,12 +1471,12 @@ function saveBadgeQuietly() {
 }
 
 function badgeImgBig(badge) {
-  const map = {Bronze:'badge-bronze-big.png', Argent:'badge-argent-big.png', Or:'badge-or-big.png'};
+  const map = {Carton:'badge-carton-big.png', Bronze:'badge-bronze-big.png', Argent:'badge-argent-big.png', Or:'badge-or-big.png'};
   return map[badge] || '';
 }
 
 function badgeImgSmall(badge) {
-  const map = {Bronze:'badge-bronze-small.png', Argent:'badge-argent-small.png', Or:'badge-or-small.png'};
+  const map = {Carton:'badge-carton-small.png', Bronze:'badge-bronze-small.png', Argent:'badge-argent-small.png', Or:'badge-or-small.png'};
   return map[badge] || '';
 }
 
@@ -1476,9 +1484,10 @@ function buildBilanBadge() {
   const pg = $('page-bilan-badge');
   const badge = state.badgeCourant || state.dernierBadge;
   const today = new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
-  const total = state.comptBronze + state.comptArgent + state.comptOr;
+  const total = state.comptCarton + state.comptBronze + state.comptArgent + state.comptOr;
 
   const badgesOrder = [
+    {nom:'Carton', compt: state.comptCarton},
     {nom:'Bronze', compt: state.comptBronze},
     {nom:'Argent', compt: state.comptArgent},
     {nom:'Or',     compt: state.comptOr}
@@ -1510,7 +1519,7 @@ function buildBilanBadge() {
       </div>
 
       <div style="border-top:1px solid var(--border);padding-top:1rem;margin-bottom:1rem">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.8rem">Historique de tes badges (cycle actuel)</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.8rem">Historique de vos badges (cycle actuel)</div>
         <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;padding:.5rem 0">
           ${historiqueHTML || '<span style="color:var(--muted);font-size:.9rem">Aucun badge pour l\'instant</span>'}
         </div>
@@ -1524,7 +1533,7 @@ function buildBilanBadge() {
 function buildMesBadges() {
   const pg = $('page-mes-badges');
   const badge = state.dernierBadge;
-  const total = state.comptBronze + state.comptArgent + state.comptOr;
+  const total = state.comptCarton + state.comptBronze + state.comptArgent + state.comptOr;
   const totalSeances = total;
 
   pg.innerHTML = `
@@ -1541,7 +1550,7 @@ function buildMesBadges() {
 
       <div style="border-top:1px solid var(--border);padding-top:1rem">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:1rem">Récapitulatif du cycle</div>
-        ${[{nom:'Bronze',compt:state.comptBronze},{nom:'Argent',compt:state.comptArgent},{nom:'Or',compt:state.comptOr}].map((b,idx,arr) => `
+        ${[{nom:'Carton',compt:state.comptCarton},{nom:'Bronze',compt:state.comptBronze},{nom:'Argent',compt:state.comptArgent},{nom:'Or',compt:state.comptOr}].map((b,idx,arr) => `
         <div style="padding:.8rem 0;${idx < arr.length-1 ? 'border-bottom:1px solid var(--border);' : ''}">
           <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
             ${b.compt === 0
@@ -1601,7 +1610,7 @@ function buildSeance() {
         <button class="btn" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em" onclick="saveBadge()">
           ✅ Terminer ma séance
         </button>
-        <div style="text-align:center;font-size:.75rem;color:var(--muted);margin-top:.35rem">Ne clique pas si tu veux continuer ta séance</div>
+        <div style="text-align:center;font-size:.75rem;color:var(--muted);margin-top:.35rem">Ne cliquez pas si vous souhaitez continuer votre séance</div>
       </div>` : ''}
     </div>
   `;

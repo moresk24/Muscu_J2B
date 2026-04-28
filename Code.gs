@@ -32,11 +32,12 @@ const COL_MDP              = 3;
 const COL_PROJET           = 4;
 const COL_COMPTEUR         = 5;  // compteur global d'ateliers validés (cycle entier)
 const COL_LAST_CO          = 6;  // dernière connexion
-const COL_DERNIER_BADGE    = 7;  // "Bronze" | "Argent" | "Or" | ""
-const COL_COMPTEUR_BRONZE  = 8;
-const COL_COMPTEUR_ARGENT  = 9;
-const COL_COMPTEUR_OR      = 10;
-const COL_ATELIERS_START   = 11; // à partir de là : maxi + séries faites (par paires)
+const COL_DERNIER_BADGE    = 7;  // "Carton" | "Bronze" | "Argent" | "Or" | ""
+const COL_COMPTEUR_CARTON  = 8;
+const COL_COMPTEUR_BRONZE  = 9;
+const COL_COMPTEUR_ARGENT  = 10;
+const COL_COMPTEUR_OR      = 11;
+const COL_ATELIERS_START   = 12; // à partir de là : maxi + séries faites (par paires)
 
 // ════════════════════════════════════════════════════════════
 //  WEB APP — TOUT EN GET (évite les problèmes CORS)
@@ -120,6 +121,7 @@ function handleLoadEleve(classe, nom, prenom) {
     compteur:      row[COL_COMPTEUR]        || 0,
     lastCo:        row[COL_LAST_CO]         || "",
     dernierBadge:  row[COL_DERNIER_BADGE]   || "",
+    comptCarton:   parseInt(row[COL_COMPTEUR_CARTON]) || 0,
     comptBronze:   parseInt(row[COL_COMPTEUR_BRONZE]) || 0,
     comptArgent:   parseInt(row[COL_COMPTEUR_ARGENT]) || 0,
     comptOr:       parseInt(row[COL_COMPTEUR_OR])     || 0,
@@ -304,15 +306,17 @@ function handleSaveBadge(p) {
   const { sheet, rowIndex } = findEleve(p.classe, p.nom, p.prenom);
   if (!sheet) return { error: "Élève introuvable." };
 
-  sheet.getRange(rowIndex + 1, COL_DERNIER_BADGE   + 1).setValue(p.badge       || "");
-  sheet.getRange(rowIndex + 1, COL_COMPTEUR_BRONZE + 1).setValue(parseInt(p.comptBronze) || 0);
-  sheet.getRange(rowIndex + 1, COL_COMPTEUR_ARGENT + 1).setValue(parseInt(p.comptArgent) || 0);
-  sheet.getRange(rowIndex + 1, COL_COMPTEUR_OR     + 1).setValue(parseInt(p.comptOr)     || 0);
+  sheet.getRange(rowIndex + 1, COL_DERNIER_BADGE    + 1).setValue(p.badge        || "");
+  sheet.getRange(rowIndex + 1, COL_COMPTEUR_CARTON  + 1).setValue(parseInt(p.comptCarton) || 0);
+  sheet.getRange(rowIndex + 1, COL_COMPTEUR_BRONZE  + 1).setValue(parseInt(p.comptBronze) || 0);
+  sheet.getRange(rowIndex + 1, COL_COMPTEUR_ARGENT  + 1).setValue(parseInt(p.comptArgent) || 0);
+  sheet.getRange(rowIndex + 1, COL_COMPTEUR_OR      + 1).setValue(parseInt(p.comptOr)     || 0);
 
   updateLastCo(sheet, rowIndex);
   return {
     success:      true,
     dernierBadge: p.badge,
+    comptCarton:  parseInt(p.comptCarton) || 0,
     comptBronze:  parseInt(p.comptBronze) || 0,
     comptArgent:  parseInt(p.comptArgent) || 0,
     comptOr:      parseInt(p.comptOr)     || 0
