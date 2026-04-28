@@ -25,14 +25,18 @@ const ATELIERS = [
 ];
 
 // ── Colonnes fixes (avant les ateliers) ─────────────────────
-const COL_NOM            = 0;
-const COL_PRENOM         = 1;
-const COL_CLASSE         = 2;  // classe de l'élève (ajouté)
-const COL_MDP            = 3;
-const COL_PROJET         = 4;
-const COL_COMPTEUR       = 5;  // compteur global de séries (cycle entier)
-const COL_LAST_CO        = 6;  // dernière connexion
-const COL_ATELIERS_START = 7;  // à partir de là : maxi + séries faites (par paires)
+const COL_NOM              = 0;
+const COL_PRENOM           = 1;
+const COL_CLASSE           = 2;  // classe de l'élève
+const COL_MDP              = 3;
+const COL_PROJET           = 4;
+const COL_COMPTEUR         = 5;  // compteur global d'ateliers validés (cycle entier)
+const COL_LAST_CO          = 6;  // dernière connexion
+const COL_DERNIER_BADGE    = 7;  // "Bronze" | "Argent" | "Or" | ""
+const COL_COMPTEUR_BRONZE  = 8;
+const COL_COMPTEUR_ARGENT  = 9;
+const COL_COMPTEUR_OR      = 10;
+const COL_ATELIERS_START   = 11; // à partir de là : maxi + séries faites (par paires)
 
 // ════════════════════════════════════════════════════════════
 //  WEB APP — TOUT EN GET (évite les problèmes CORS)
@@ -51,6 +55,7 @@ function doGet(e) {
     if (action === "saveProjet")     return jsonResponse(handleSaveProjet(p));
     if (action === "incrementSerie")  return jsonResponse(handleIncrementSerie(p));
     if (action === "validateAtelier") return jsonResponse(handleValidateAtelier(p));
+    if (action === "saveBadge")       return jsonResponse(handleSaveBadge(p));
     return jsonResponse({ error: "Action inconnue : " + action });
   } catch(err) {
     return jsonResponse({ error: err.toString() });
@@ -109,11 +114,15 @@ function handleLoadEleve(classe, nom, prenom) {
   });
 
   return {
-    success:  true,
-    mdp:      row[COL_MDP]      || "",
-    projet:   row[COL_PROJET]   || "",
-    compteur: row[COL_COMPTEUR] || 0,
-    lastCo:   row[COL_LAST_CO]  || "",
+    success:       true,
+    mdp:           row[COL_MDP]             || "",
+    projet:        row[COL_PROJET]          || "",
+    compteur:      row[COL_COMPTEUR]        || 0,
+    lastCo:        row[COL_LAST_CO]         || "",
+    dernierBadge:  row[COL_DERNIER_BADGE]   || "",
+    comptBronze:   parseInt(row[COL_COMPTEUR_BRONZE]) || 0,
+    comptArgent:   parseInt(row[COL_COMPTEUR_ARGENT]) || 0,
+    comptOr:       parseInt(row[COL_COMPTEUR_OR])     || 0,
     maxis,
     series
   };
@@ -288,6 +297,26 @@ function handleValidateAtelier(p) {
 
   updateLastCo(sheet, rowIndex);
   return { success: true, newCompteur };
+}
+
+// ── Enregistrer le badge de fin de séance ───────────────────
+function handleSaveBadge(p) {
+  const { sheet, rowIndex } = findEleve(p.classe, p.nom, p.prenom);
+  if (!sheet) return { error: "Élève introuvable." };
+
+  sheet.getRange(rowIndex + 1, COL_DERNIER_BADGE   + 1).setValue(p.badge       || "");
+  sheet.getRange(rowIndex + 1, COL_COMPTEUR_BRONZE + 1).setValue(parseInt(p.comptBronze) || 0);
+  sheet.getRange(rowIndex + 1, COL_COMPTEUR_ARGENT + 1).setValue(parseInt(p.comptArgent) || 0);
+  sheet.getRange(rowIndex + 1, COL_COMPTEUR_OR     + 1).setValue(parseInt(p.comptOr)     || 0);
+
+  updateLastCo(sheet, rowIndex);
+  return {
+    success:      true,
+    dernierBadge: p.badge,
+    comptBronze:  parseInt(p.comptBronze) || 0,
+    comptArgent:  parseInt(p.comptArgent) || 0,
+    comptOr:      parseInt(p.comptOr)     || 0
+  };
 }
 
 function updateLastCo(sheet, rowIndex) {

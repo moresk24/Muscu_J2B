@@ -511,6 +511,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   <div id="page-projet" class="scroll" style="display:none"></div>
   <div id="page-fiche" class="scroll" style="display:none"></div>
   <div id="page-seance" class="scroll" style="display:none"></div>
+  <div id="page-bilan-badge" class="scroll" style="display:none"></div>
+  <div id="page-mes-badges" class="scroll" style="display:none"></div>
 
   <!-- Bottom nav -->
   <div class="bottom-nav">
@@ -525,6 +527,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     </button>
     <button class="nav-btn" data-page="seance" disabled>
       <span class="nav-icon">🏋️</span>Séances
+    </button>
+    <button class="nav-btn" data-page="mes-badges" disabled>
+      <span class="nav-icon">🏅</span>Badges
     </button>
   </div>
 </div>
@@ -665,7 +670,14 @@ let state = {
   isActive: false,
   sessionNumber: 0,
   // Calc maxi
-  currentCalcAtelier: 0
+  currentCalcAtelier: 0,
+  // Badges
+  dernierBadge: "",
+  comptBronze: 0,
+  comptArgent: 0,
+  comptOr: 0,
+  badgeCourant: "",
+  badgeCourantNbAteliers: 0
 };
 
 // ═══════════════════════════════════════════════════
@@ -773,13 +785,17 @@ async function autoConnect(saved, classes) {
       return;
     }
     // Connecter directement
-    state.classe  = saved.classe;
-    state.nom     = saved.nom;
-    state.prenom  = saved.prenom;
-    state.mdp     = saved.mdp;
-    state.projet  = d.projet || '';
-    state.maxis   = d.maxis  || {};
-    state.series  = d.series || {};
+    state.classe       = saved.classe;
+    state.nom          = saved.nom;
+    state.prenom       = saved.prenom;
+    state.mdp          = saved.mdp;
+    state.projet       = d.projet || '';
+    state.maxis        = d.maxis  || {};
+    state.series       = d.series || {};
+    state.dernierBadge = d.dernierBadge || '';
+    state.comptBronze  = d.comptBronze  || 0;
+    state.comptArgent  = d.comptArgent  || 0;
+    state.comptOr      = d.comptOr      || 0;
     const newSession = saved.classe + saved.nom + saved.prenom + new Date().toDateString();
     if (localStorage.getItem('sessionId') !== newSession) {
       localStorage.setItem('sessionId', newSession);
@@ -871,14 +887,18 @@ $('btn-login').addEventListener('click', async () => {
     }
 
     // Remplir state
-    state.classe  = cls;
-    state.nom     = eInfo.nom;
-    state.prenom  = eInfo.prenom;
-    state.mdp     = mdp;
-    state.projet  = d.projet || '';
-    state.maxis   = d.maxis  || {};
-    state.series  = d.series || {};
+    state.classe       = cls;
+    state.nom          = eInfo.nom;
+    state.prenom       = eInfo.prenom;
+    state.mdp          = mdp;
+    state.projet       = d.projet || '';
+    state.maxis        = d.maxis  || {};
+    state.series       = d.series || {};
     state.isFirstLogin = !eInfo.hasMdp;
+    state.dernierBadge = d.dernierBadge || '';
+    state.comptBronze  = d.comptBronze  || 0;
+    state.comptArgent  = d.comptArgent  || 0;
+    state.comptOr      = d.comptOr      || 0;
 
     // Nouvelle session → reset compteur local
     const newSession = cls + eInfo.nom + eInfo.prenom + new Date().toDateString();
@@ -909,7 +929,7 @@ $('btn-login').addEventListener('click', async () => {
 // ═══════════════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════════════
-const PAGES = ['maxis','maxi-calc','projet','fiche','seance'];
+const PAGES = ['maxis','maxi-calc','projet','fiche','seance','bilan-badge','mes-badges'];
 function showPage(name) {
   PAGES.forEach(p => {
     $('page-'+p).style.display = p===name ? 'block' : 'none';
@@ -918,21 +938,27 @@ function showPage(name) {
     b.classList.toggle('active', b.dataset.page === name);
   });
   updateNavLock();
-  if (name==='maxis')     buildMaxis();
-  if (name==='maxi-calc') buildMaxiCalc();
-  if (name==='projet')    buildProjet();
-  if (name==='fiche')     buildFiche();
-  if (name==='seance')    buildSeance();
+  if (name==='maxis')       buildMaxis();
+  if (name==='maxi-calc')   buildMaxiCalc();
+  if (name==='projet')      buildProjet();
+  if (name==='fiche')       buildFiche();
+  if (name==='seance')      buildSeance();
+  if (name==='bilan-badge') buildBilanBadge();
+  if (name==='mes-badges')  buildMesBadges();
 }
 document.querySelectorAll('.nav-btn').forEach(b => {
   b.addEventListener('click', ()=>showPage(b.dataset.page));
 });
-$('btn-logout').addEventListener('click', () => {
-  // Effacer login sauvegardé → permettre à un autre élève de se connecter
+$('btn-logout').addEventListener('click', async () => {
+  if (state.compteurAteliersSeance > 0 && isEditable()) {
+    saveBadgeQuietly();
+    toast('⚠️ Votre travail a été enregistré sans attribution de badge. Utilisez "Fin de Séance" pour valider votre bilan.', 'warn');
+  }
   localStorage.removeItem('muscu_login');
   $('screen-app').classList.remove('active');
   $('screen-login').classList.add('active');
-  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},maxiARevoir:{},compteurAteliersSeance:parseInt(localStorage.getItem('compteurAteliersSeance')||'0'),sessionId:localStorage.getItem('sessionId')||'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0};
+  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},maxiARevoir:{},compteurAteliersSeance:0,sessionId:'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0,dernierBadge:'',comptBronze:0,comptArgent:0,comptOr:0,badgeCourant:'',badgeCourantNbAteliers:0};
+  localStorage.setItem('compteurAteliersSeance', '0');
   $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
   $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
 });
@@ -1369,6 +1395,161 @@ function buildFiche() {
 }
 
 // ═══════════════════════════════════════════════════
+//  SYSTÈME DE BADGES
+// ═══════════════════════════════════════════════════
+
+function calculateBadge(nbAteliers) {
+  if (nbAteliers >= 6) return 'Or';
+  if (nbAteliers >= 5) return 'Argent';
+  return 'Bronze';
+}
+
+async function saveBadge() {
+  const nbAteliers = state.compteurAteliersSeance;
+  const badge = calculateBadge(nbAteliers);
+  if (badge === 'Bronze') state.comptBronze++;
+  else if (badge === 'Argent') state.comptArgent++;
+  else state.comptOr++;
+  state.dernierBadge = badge;
+  state.badgeCourant = badge;
+  state.badgeCourantNbAteliers = nbAteliers;
+
+  try {
+    await apiPost({
+      action: 'saveBadge',
+      classe: state.classe,
+      nom: state.nom,
+      prenom: state.prenom,
+      badge,
+      comptBronze: state.comptBronze,
+      comptArgent: state.comptArgent,
+      comptOr: state.comptOr
+    });
+  } catch(e) { console.error('saveBadge error', e); }
+
+  state.compteurAteliersSeance = 0;
+  localStorage.setItem('compteurAteliersSeance', '0');
+  state.serieLocale = {};
+  state.maxiARevoir = {};
+
+  showPage('bilan-badge');
+}
+
+function saveBadgeQuietly() {
+  const badge = calculateBadge(state.compteurAteliersSeance);
+  if (badge === 'Bronze') state.comptBronze++;
+  else if (badge === 'Argent') state.comptArgent++;
+  else state.comptOr++;
+  state.dernierBadge = badge;
+
+  apiPost({
+    action: 'saveBadge',
+    classe: state.classe,
+    nom: state.nom,
+    prenom: state.prenom,
+    badge,
+    comptBronze: state.comptBronze,
+    comptArgent: state.comptArgent,
+    comptOr: state.comptOr
+  }).catch(e => console.error('saveBadgeQuietly error', e));
+}
+
+function badgeImgBig(badge) {
+  const map = {Bronze:'badge-bronze-big.png', Argent:'badge-argent-big.png', Or:'badge-or-big.png'};
+  return map[badge] || '';
+}
+
+function badgeImgSmall(badge) {
+  const map = {Bronze:'badge-bronze-small.png', Argent:'badge-argent-small.png', Or:'badge-or-small.png'};
+  return map[badge] || '';
+}
+
+function buildBilanBadge() {
+  const pg = $('page-bilan-badge');
+  const badge = state.badgeCourant || state.dernierBadge;
+  const today = new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
+  const total = state.comptBronze + state.comptArgent + state.comptOr;
+
+  const badgesOrder = [
+    {nom:'Bronze', compt: state.comptBronze},
+    {nom:'Argent', compt: state.comptArgent},
+    {nom:'Or',     compt: state.comptOr}
+  ].filter(b => b.compt > 0);
+
+  const historiqueHTML = badgesOrder.map(b => `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;min-width:80px">
+      <img src="${badgeImgSmall(b.nom)}" alt="${b.nom}" width="96" height="96" style="width:96px;height:96px;object-fit:contain">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em">${b.nom}</span>
+      <span style="color:var(--muted);font-size:.85rem">(${b.compt})</span>
+    </div>`).join('');
+
+  pg.innerHTML = `
+    <div style="padding:1rem">
+      <button class="btn-sm" onclick="showPage('seance')" style="margin-bottom:1rem;background:none;border:none;color:var(--accent);font-size:.95rem;cursor:pointer;padding:0">← Retour aux Séances</button>
+
+      <div style="text-align:center;margin:1.5rem 0 1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.06em;color:var(--accent)">Bravo ! Séance validée !</div>
+      </div>
+
+      <div style="text-align:center;padding:1rem 0 .5rem">
+        <img src="${badgeImgBig(badge)}" alt="${badge}" width="200" height="200" style="width:200px;height:200px;object-fit:contain">
+      </div>
+
+      <div style="text-align:center;margin-bottom:1.5rem;line-height:1.7">
+        <div style="color:var(--muted);font-size:.9rem">Séance du ${today}</div>
+        <div style="font-size:1rem">${state.badgeCourantNbAteliers} atelier${state.badgeCourantNbAteliers > 1 ? 's' : ''} validé${state.badgeCourantNbAteliers > 1 ? 's' : ''} ✓</div>
+        <div style="font-size:1rem;font-weight:600">Dernier badge obtenu : <span style="color:var(--accent)">${badge}</span></div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:1rem;margin-bottom:1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.8rem">Historique de tes badges (cycle actuel)</div>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;padding:.5rem 0">
+          ${historiqueHTML || '<span style="color:var(--muted);font-size:.9rem">Aucun badge pour l\'instant</span>'}
+        </div>
+        ${total > 0 ? `<div style="text-align:center;margin-top:1rem;color:var(--muted);font-size:.9rem">Total : ${total} badge${total>1?'s':''} gagné${total>1?'s':''}</div>` : ''}
+      </div>
+
+      <button class="btn" style="width:100%;margin-top:.5rem" onclick="showPage('seance')">← Retour aux Séances</button>
+    </div>`;
+}
+
+function buildMesBadges() {
+  const pg = $('page-mes-badges');
+  const badge = state.dernierBadge;
+  const total = state.comptBronze + state.comptArgent + state.comptOr;
+  const totalSeances = total;
+
+  pg.innerHTML = `
+    <div style="padding:1rem">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;margin-bottom:1.2rem">🏅 Mes Badges</div>
+
+      ${badge ? `
+      <div style="text-align:center;margin-bottom:1.5rem">
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:.5rem">Dernier badge obtenu :</div>
+        <img src="${badgeImgBig(badge)}" alt="${badge}" width="200" height="200" style="width:200px;height:200px;object-fit:contain">
+        <div style="margin-top:.5rem;font-size:1rem;font-weight:600">Badge : <span style="color:var(--accent)">${badge}</span> (Séance ${totalSeances})</div>
+      </div>` : `
+      <div style="text-align:center;margin-bottom:1.5rem;color:var(--muted)">Aucun badge obtenu pour l'instant.<br>Validez 4 ateliers pour gagner votre premier badge !</div>`}
+
+      <div style="border-top:1px solid var(--border);padding-top:1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:1rem">Récapitulatif du cycle</div>
+        ${[{nom:'Bronze',compt:state.comptBronze},{nom:'Argent',compt:state.comptArgent},{nom:'Or',compt:state.comptOr}].map(b => `
+        <div style="display:flex;align-items:center;gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--border)">
+          <img src="${badgeImgSmall(b.nom)}" alt="${b.nom}" width="64" height="64" style="width:64px;height:64px;object-fit:contain;flex-shrink:0">
+          <div>
+            <div style="font-weight:600">${b.nom}</div>
+            <div style="color:var(--muted);font-size:.85rem">${b.compt} obtenu${b.compt>1?'s':''}</div>
+          </div>
+        </div>`).join('')}
+        ${total > 0 ? `
+        <div style="margin-top:1rem;text-align:center;color:var(--muted);font-size:.9rem">
+          Total : ${total} badge${total>1?'s':''} gagné${total>1?'s':''} sur ${totalSeances} séance${totalSeances>1?'s':''} de travail
+        </div>` : ''}
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
 //  PAGE SÉANCE
 // ═══════════════════════════════════════════════════
 function buildSeance() {
@@ -1404,6 +1585,10 @@ function buildSeance() {
         </select>
         <div class="intensite-badge" id="badge-reps">${calcReps(state.projet,state.intensite)} reps</div>
       </div>
+      ${count >= 4 && isEditable() ? `
+      <button class="btn" style="width:100%;margin-top:.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em" onclick="saveBadge()">
+        ✅ Fin de Séance
+      </button>` : ''}
     </div>
   `;
 
