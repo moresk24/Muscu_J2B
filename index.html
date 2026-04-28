@@ -681,6 +681,31 @@ let state = {
 };
 
 // ═══════════════════════════════════════════════════
+//  VÉRIFICATION PÉRIODIQUE DE LA SESSION
+// ═══════════════════════════════════════════════════
+let sessionCheckInterval = null;
+
+function startSessionCheck() {
+  stopSessionCheck();
+  sessionCheckInterval = setInterval(async () => {
+    if (!state.classe || state.isAdmin) return;
+    try {
+      const d = await api({action:'getConfig', classe: state.classe});
+      const wasActive = state.isActive;
+      state.isActive = d.isActive;
+      if (wasActive && !state.isActive && state.compteurAteliersSeance > 0) {
+        saveBadgeQuietly();
+        toast('⏰ La séance est terminée. Votre badge a été enregistré automatiquement.', 'warn');
+      }
+    } catch(e) { console.error('sessionCheck error', e); }
+  }, 10 * 60 * 1000);
+}
+
+function stopSessionCheck() {
+  if (sessionCheckInterval) { clearInterval(sessionCheckInterval); sessionCheckInterval = null; }
+}
+
+// ═══════════════════════════════════════════════════
 //  CONFIG & MODE LECTURE SEULE
 // ═══════════════════════════════════════════════════
 async function loadConfig() {
@@ -809,6 +834,7 @@ async function autoConnect(saved, classes) {
     await loadConfig();
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
+    startSessionCheck();
     showPageAfterLogin();
   } catch(e) { console.error(e); }
   loading(false);
@@ -920,6 +946,7 @@ $('btn-login').addEventListener('click', async () => {
     await loadConfig();
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
+    startSessionCheck();
     showPageAfterLogin();
 
   } catch(e) { toast('Erreur réseau','error'); console.error(e); }
@@ -950,6 +977,7 @@ document.querySelectorAll('.nav-btn').forEach(b => {
   b.addEventListener('click', ()=>showPage(b.dataset.page));
 });
 $('btn-logout').addEventListener('click', async () => {
+  stopSessionCheck();
   if (state.compteurAteliersSeance > 0 && isEditable()) {
     saveBadgeQuietly();
     toast('⚠️ Votre travail a été enregistré sans attribution de badge. Utilisez "Fin de Séance" pour valider votre bilan.', 'warn');
@@ -1610,13 +1638,12 @@ function buildSeance() {
         </select>
         <div class="intensite-badge" id="badge-reps">${calcReps(state.projet,state.intensite)} reps</div>
       </div>
-      ${count >= 4 && (isEditable() || state.isAdmin) ? `
-      <div style="margin-top:.8rem">
+      <div id="fin-seance-btn" style="margin-top:.8rem;display:${count >= 4 && (isEditable() || state.isAdmin) ? 'block' : 'none'}">
         <button class="btn" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em" onclick="saveBadge()">
           ✅ Terminer ma séance
         </button>
-        <div style="text-align:center;font-size:.75rem;color:var(--muted);margin-top:.35rem">Ne cliquez pas si vous souhaitez continuer votre séance</div>
-      </div>` : ''}
+        <div style="text-align:center;font-size:.75rem;color:#fff;margin-top:.35rem">Ne cliquez pas si vous souhaitez continuer votre séance</div>
+      </div>
     </div>
   `;
 
@@ -1857,6 +1884,10 @@ async function validateAtelier(nomAtelier) {
   if (bar) bar.style.width = pct+'%';
   if (msg) msg.textContent = progressMsg(state.compteurAteliersSeance);
   if (cnt) cnt.textContent = state.compteurAteliersSeance + ' / 5';
+  if (state.compteurAteliersSeance >= 4 && (isEditable() || state.isAdmin)) {
+    const btn = $('fin-seance-btn');
+    if (btn) btn.style.display = 'block';
+  }
 
   try {
     const res = await apiPost({action:'validateAtelier', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier});
