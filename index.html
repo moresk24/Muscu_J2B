@@ -1533,17 +1533,20 @@ function buildMesBadges() {
 
       <div style="border-top:1px solid var(--border);padding-top:1rem">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:1rem">Récapitulatif du cycle</div>
-        ${[{nom:'Bronze',compt:state.comptBronze},{nom:'Argent',compt:state.comptArgent},{nom:'Or',compt:state.comptOr}].map(b => `
-        <div style="display:flex;align-items:center;gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--border)">
-          <img src="${badgeImgSmall(b.nom)}" alt="${b.nom}" width="64" height="64" style="width:64px;height:64px;object-fit:contain;flex-shrink:0">
-          <div>
-            <div style="font-weight:600">${b.nom}</div>
-            <div style="color:var(--muted);font-size:.85rem">${b.compt} obtenu${b.compt>1?'s':''}</div>
+        ${[{nom:'Bronze',compt:state.comptBronze},{nom:'Argent',compt:state.comptArgent},{nom:'Or',compt:state.comptOr}].map((b,idx,arr) => `
+        <div style="padding:.8rem 0;${idx < arr.length-1 ? 'border-bottom:1px solid var(--border);' : ''}">
+          <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
+            ${b.compt === 0
+              ? `<img src="${badgeImgSmall(b.nom)}" alt="${b.nom}" width="64" height="64" style="width:64px;height:64px;object-fit:contain;filter:grayscale(100%) opacity(0.35)">`
+              : Array.from({length: b.compt}).map(() => `<img src="${badgeImgSmall(b.nom)}" alt="${b.nom}" width="64" height="64" style="width:64px;height:64px;object-fit:contain">`).join('')
+            }
           </div>
+          ${b.compt === 0 ? `<div style="font-weight:600;margin-bottom:.1rem">${b.nom}</div>` : ''}
+          <div style="color:var(--muted);font-size:.85rem">${b.compt} obtenu(s)</div>
         </div>`).join('')}
         ${total > 0 ? `
         <div style="margin-top:1rem;text-align:center;color:var(--muted);font-size:.9rem">
-          Total : ${total} badge${total>1?'s':''} gagné${total>1?'s':''} sur ${totalSeances} séance${totalSeances>1?'s':''} de travail
+          Total : ${total} badge${total>1?'s':''} gagné${total>1?'s':''}
         </div>` : ''}
       </div>
     </div>`;
