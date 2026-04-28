@@ -1585,7 +1585,7 @@ function buildSeance() {
         </select>
         <div class="intensite-badge" id="badge-reps">${calcReps(state.projet,state.intensite)} reps</div>
       </div>
-      ${count >= 4 && isEditable() ? `
+      ${count >= 4 && (isEditable() || state.isAdmin) ? `
       <button class="btn" style="width:100%;margin-top:.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em" onclick="saveBadge()">
         ✅ Fin de Séance
       </button>` : ''}
