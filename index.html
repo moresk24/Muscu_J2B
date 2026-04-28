@@ -1283,6 +1283,13 @@ function buildProjet() {
     html += `<div class="lock-msg">🔒 Renseignez tous vos maxis pour débloquer le choix du projet !</div>`;
   }
 
+  if (!state.projet && allFilled) {
+    html += `<div style="background:rgba(255,149,0,.08);border:1px solid rgba(255,149,0,.3);border-radius:14px;padding:1rem 1.1rem;margin-bottom:1.25rem;text-align:center">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;color:var(--accent)">Choisissez à présent votre projet de travail</div>
+      <div style="font-size:.85rem;color:var(--muted);margin-top:.35rem">Sélectionnez un projet ci-dessous pour commencer vos séances</div>
+    </div>`;
+  }
+
   if (state.projet) {
     const p = PROJETS[state.projet];
     html += `<div style="background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.3);border-radius:14px;padding:1rem 1.1rem;margin-bottom:1.25rem">
