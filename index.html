@@ -1642,12 +1642,10 @@ async function validateAtelier(nomAtelier) {
     if (state.maxiARevoir && state.maxiARevoir[nomAtelier]) {
       clearMaxiForAtelier(nomAtelier); // fire & forget : état sync immédiat, API en arrière-plan
     }
-    // Proposition niveau supérieur (Gainage sol uniquement, 4×ok, niveau < 4)
-    if (nomAtelier === 'Gainage sol' && nbOk === 4) {
-      const niveauActuel = parseInt(state.maxis[nomAtelier]) || 1;
-      if (niveauActuel < 4) {
-        state.propositionNiveauSup = {atelier: nomAtelier, niveauActuel, niveauSuivant: niveauActuel + 1};
-      }
+    const niveauActuel = parseInt(state.maxis[nomAtelier]) || 1;
+    const niveauDecision = decideNiveauSup(nomAtelier, nbOk, niveauActuel);
+    if (niveauDecision.proposer) {
+      state.propositionNiveauSup = {atelier: nomAtelier, niveauActuel, niveauSuivant: niveauDecision.niveauSuivant};
     }
   } catch(e) { console.error(e); }
 }
@@ -1716,10 +1714,9 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
 
   // Bravo après série 4 — enregistrement dans le GS
   if (seriesCount >= 4) {
-    // Compter les échecs AVANT que validateAtelier efface serieLocale
-    const totalEchecs = localSeries.filter(s => s && s.ressenti === 'E').length;
-    const isSurEvalue = totalEchecs >= 2 && !state.maxiARevoir[nomAtelier];
-    if (totalEchecs >= 2) state.maxiARevoir[nomAtelier] = true;
+    const maxiSousEvalue = !!(state.maxiARevoir && state.maxiARevoir[nomAtelier]);
+    const validation = decideValidation(localSeries, maxiSousEvalue);
+    if (validation.maxiARevoir) state.maxiARevoir[nomAtelier] = true;
 
     await validateAtelier(nomAtelier);
     const bravo = document.getElementById('bravo-'+key);
@@ -1729,7 +1726,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
     if (state.maxiARevoir[nomAtelier]) {
       const bravoMaxi = document.getElementById('bravo-maxi-'+key);
       if (bravoMaxi) {
-        if (isSurEvalue) {
+        if (validation.isSurEvalue) {
           bravoMaxi.innerHTML = `
             <div style="font-size:.78rem;font-weight:700;color:var(--yellow);margin-bottom:.3rem">⚠️ Atelier validé, mais attention !</div>
             <div style="font-size:.75rem;color:var(--text);margin-bottom:.5rem">Vous avez fait plusieurs échecs. Votre maxi est probablement surévalué. Il faut le recalculer avant de continuer votre séance.</div>
@@ -1746,46 +1743,128 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   showSuggestion(nomAtelier, key, unite, ressenti, serieIndex+1, charge, reps, serieIntensite || state.intensite);
 }
 
-function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentCharge, currentReps, currentIntensite) {
-  const p = PROJETS[state.projet];
-  const ints = p.intensites;
-  // Utiliser l'intensité réelle de la série faite, pas state.intensite
-  const intensiteRef = currentIntensite || state.intensite;
-  const idxCurrent = ints.indexOf(intensiteRef);
+// ─────────────────────────────────────────────────────────────────────────────
+// Fonctions pures de décision (sans DOM, sans state — testables via node tests.js)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * decideSuggestion — décide quoi suggérer après une série.
+ *
+ * @param {{ressenti:string, charge:number, reps:number, intensite:number}} serie
+ * @param {{intensites:number[], repsMin:number, repsMax:number}} projet
+ * @param {Array<{ressenti:string}>} historique  toutes les séries de l'atelier (y.c. la courante)
+ * @param {boolean} maxiARevoir  flag sous-évalué déjà positionné
+ * @returns {{type:string, params:Object}}
+ */
+function decideSuggestion(serie, projet, historique, maxiARevoir) {
+  const {ressenti, charge, reps, intensite} = serie;
+  const ints = projet.intensites;
+  const idxCurrent = ints.indexOf(intensite);
   const atMaxIntensite = idxCurrent >= ints.length - 1;
   const atMinIntensite = idxCurrent <= 0;
+
+  if (ressenti === 'TD') {
+    return {type: 'td-parfait', params: {charge, reps, intensite}};
+  }
+
+  if (ressenti === 'E') {
+    let consecutiveE = 0;
+    for (let i = historique.length - 1; i >= 0; i--) {
+      if (historique[i] && historique[i].ressenti === 'E') consecutiveE++;
+      else break;
+    }
+    const contReps = Math.max(projet.repsMin, Math.ceil(reps * 0.85));
+    if (consecutiveE >= 3) return {type: 'warning-3-echecs', params: {contReps, charge, intensite}};
+    if (consecutiveE >= 2) return {type: 'warning-2-echecs', params: {contReps, charge, intensite}};
+    if (atMinIntensite) {
+      const newReps = Math.max(projet.repsMin, Math.ceil(reps * 0.85));
+      return {type: 'e-min-intensite', params: {newReps, charge, intensite}};
+    }
+    return {type: 'e-choix', params: {charge, reps, intensite}};
+  }
+
+  // F ou D
+  if (atMaxIntensite) {
+    if (maxiARevoir) return {type: 'maxi-sous-eval', params: {charge, reps, intensite}};
+    const mult = ressenti === 'F' ? 1.30 : 1.15;
+    const newReps = Math.min(Math.ceil(reps * mult), projet.repsMax);
+    return {type: 'fd-max-intensite', params: {newReps, charge, intensite}};
+  }
+
+  const atMaxReps = reps >= projet.repsMax;
+  if (atMaxReps) {
+    const newIdx = ressenti === 'F'
+      ? Math.min(idxCurrent + 2, ints.length - 1)
+      : Math.min(idxCurrent + 1, ints.length - 1);
+    const newIntensite = ints[newIdx];
+    return {type: 'fd-force-charge', params: {newIntensite, reps}};
+  }
+
+  return {type: 'fd-choix', params: {charge, reps, intensite}};
+}
+
+/**
+ * decideValidation — décide du résultat à la 4e série.
+ *
+ * @param {Array<{ressenti:string}>} serieLocale  les 4 séries complètes
+ * @param {boolean} maxiSousEvalue  flag sous-évalué déjà positionné avant la série 4
+ * @returns {{maxiARevoir:boolean, isSurEvalue:boolean, isSousEvalue:boolean}}
+ */
+function decideValidation(serieLocale, maxiSousEvalue) {
+  const totalEchecs = serieLocale.filter(s => s && s.ressenti === 'E').length;
+  const isSurEvalue = totalEchecs >= 2 && !maxiSousEvalue;
+  return {
+    maxiARevoir: isSurEvalue || maxiSousEvalue,
+    isSurEvalue,
+    isSousEvalue: maxiSousEvalue
+  };
+}
+
+/**
+ * decideNiveauSup — propose le niveau suivant pour le Gainage sol.
+ *
+ * @param {string} nomAtelier
+ * @param {number} nbOk  nombre de séries 'ok' sur les 4
+ * @param {number} niveauActuel
+ * @returns {{proposer:boolean, niveauSuivant:number|null}}
+ */
+function decideNiveauSup(nomAtelier, nbOk, niveauActuel) {
+  if (nomAtelier === 'Gainage sol' && nbOk === 4 && niveauActuel < 4) {
+    return {proposer: true, niveauSuivant: niveauActuel + 1};
+  }
+  return {proposer: false, niveauSuivant: null};
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentCharge, currentReps, currentIntensite) {
+  const p = PROJETS[state.projet];
+  const maxi = parseFloat(state.maxis[nomAtelier]) || 0;
+  const intensiteRef = currentIntensite || state.intensite;
+  const historique = state.serieLocale[nomAtelier] || [];
+  const maxiARevoir = !!(state.maxiARevoir && state.maxiARevoir[nomAtelier]);
+
+  const serie = {ressenti, charge: currentCharge, reps: currentReps, intensite: intensiteRef};
+  const {type, params} = decideSuggestion(serie, p, historique, maxiARevoir);
 
   const sugBox = document.getElementById('sug-' + key);
   if (!sugBox) return;
   sugBox.classList.add('visible');
 
-  // ── TD : parfait, on maintient ─────────────────────────────
-  if (ressenti === 'TD') {
-    sugBox.innerHTML = `
-      <div class="suggestion-title" style="color:var(--green)">🔥 Parfait !</div>
-      <div class="suggestion-text">C'est exactement l'objectif ! Continue comme ça.<br>
-        Série conseillée : <strong>${currentReps} reps <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
-      </div>
-      <div class="suggestion-actions">
-        <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${currentReps})">✓ On y va !</button>
-        <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${currentReps},${intensiteRef})">✏️ Modifier</button>
-      </div>`;
-    return;
-  }
+  switch (type) {
+    case 'td-parfait':
+      sugBox.innerHTML = `
+        <div class="suggestion-title" style="color:var(--green)">🔥 Parfait !</div>
+        <div class="suggestion-text">C'est exactement l'objectif ! Continuez comme ça.<br>
+          Série conseillée : <strong>${params.reps} reps <span style="color:var(--blue)">×</span> ${params.charge} ${unite}</strong>
+        </div>
+        <div class="suggestion-actions">
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.reps})">✓ On y va !</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${params.charge},${params.reps},${params.intensite})">✏️ Modifier</button>
+        </div>`;
+      break;
 
-  // ── E : diminuer l'effort ───────────────────────────────────
-  if (ressenti === 'E') {
-    // Compter les échecs consécutifs (la série courante est déjà dans serieLocale)
-    const localE = state.serieLocale[nomAtelier] || [];
-    let consecutiveE = 0;
-    for (let i = localE.length - 1; i >= 0; i--) {
-      if (localE[i] && localE[i].ressenti === 'E') consecutiveE++;
-      else break;
-    }
-    // Suggestion réduite pour le bouton "Continuer quand même"
-    const contReps = Math.max(p.repsMin, Math.ceil(currentReps * 0.85));
-
-    if (consecutiveE >= 3) {
+    case 'warning-3-echecs':
       sugBox.innerHTML = `
         <div class="suggestion-title" style="color:#e74c3c">🚨 3 échecs d'affilée !</div>
         <div class="suggestion-text" style="margin-bottom:.6rem">
@@ -1793,7 +1872,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
         </div>
         <div class="suggestion-actions">
           <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)"
-            onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${contReps})">
+            onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.contReps})">
             Continuer quand même
           </button>
           <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
@@ -1801,10 +1880,9 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
             📊 Recalculer mon maxi
           </button>
         </div>`;
-      return;
-    }
+      break;
 
-    if (consecutiveE >= 2) {
+    case 'warning-2-echecs':
       sugBox.innerHTML = `
         <div class="suggestion-title" style="color:var(--yellow)">⚠️ 2 échecs d'affilée</div>
         <div class="suggestion-text" style="margin-bottom:.6rem">
@@ -1812,7 +1890,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
         </div>
         <div class="suggestion-actions">
           <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)"
-            onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${contReps})">
+            onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.contReps})">
             ✓ Continuer quand même
           </button>
           <button class="btn btn-outline" style="border-color:var(--yellow);color:var(--yellow)"
@@ -1820,36 +1898,9 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
             📊 Recalculer mon maxi
           </button>
         </div>`;
-      return;
-    }
+      break;
 
-    if (atMinIntensite) {
-      const newReps = Math.max(p.repsMin, Math.ceil(currentReps * 0.85));
-      sugBox.innerHTML = `
-        <div class="suggestion-title">⚠️ Série ${nextSerie + 1}</div>
-        <div class="suggestion-text">Intensité déjà au minimum — réduisez les répétitions.<br>
-          Série conseillée : <strong>${newReps} reps <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
-        </div>
-        <div class="suggestion-actions">
-          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
-          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${intensiteRef})">✏️ Modifier</button>
-        </div>`;
-    } else {
-      sugBox.innerHTML = `
-        <div class="suggestion-title">⚠️ Série ${nextSerie + 1} — Diminuer l'effort</div>
-        <div class="suggestion-text">Comment souhaitez-vous ajuster ?</div>
-        <div class="suggestion-actions" style="margin-top:.6rem">
-          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">↓ La charge</button>
-          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">↓ Les reps</button>
-        </div>`;
-    }
-    return;
-  }
-
-  // ── F ou D : augmenter l'effort ────────────────────────────
-  if (atMaxIntensite) {
-    // Seule option : augmenter les reps
-    if (state.maxiARevoir[nomAtelier]) {
+    case 'maxi-sous-eval':
       sugBox.innerHTML = `
         <div class="suggestion-title" style="color:var(--yellow)">⚠️ Maxi à revoir !</div>
         <div class="suggestion-text" style="margin-bottom:.6rem">
@@ -1862,42 +1913,69 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
             📊 Corriger mon maxi
           </button>
           <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)"
-            onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${currentReps})">
+            onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.reps})">
             Continuer quand même
           </button>
         </div>`;
-    } else {
-      const mult = ressenti === 'F' ? 1.30 : 1.15;
-      const newReps = Math.min(Math.ceil(currentReps * mult), p.repsMax);
+      break;
+
+    case 'e-min-intensite':
       sugBox.innerHTML = `
-        <div class="suggestion-title">💡 Série ${nextSerie + 1}</div>
-        <div class="suggestion-text">Intensité au maximum — augmente les répétitions.<br>
-          Série conseillée : <strong>${newReps} reps <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
+        <div class="suggestion-title">⚠️ Série ${nextSerie + 1}</div>
+        <div class="suggestion-text">Intensité déjà au minimum — réduisez les répétitions.<br>
+          Série conseillée : <strong>${params.newReps} reps <span style="color:var(--blue)">×</span> ${params.charge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
-          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
-          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${intensiteRef})">✏️ Modifier</button>
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.newReps})">✓ Accepter</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${params.charge},${params.newReps},${params.intensite})">✏️ Modifier</button>
         </div>`;
-    }
-  } else {
-    const atMaxReps = currentReps >= p.repsMax;
-    const atMinReps = currentReps <= p.repsMin;
-    const canReps = ressenti === 'E' ? !atMinReps : !atMaxReps;
+      break;
 
-    if (!canReps) {
-      // Seule option : varier la charge
-      appliquerChoixCharge(nomAtelier, key, unite, ressenti, currentCharge, currentReps, intensiteRef);
-    } else {
-      const arrow = ressenti === 'E' ? '↓' : '↑';
-      const titre = ressenti === 'E' ? 'Diminuer l\'effort' : 'Augmenter l\'effort';
+    case 'e-choix':
       sugBox.innerHTML = `
-        <div class="suggestion-title">💡 Série ${nextSerie + 1} — ${titre}</div>
-        <div class="suggestion-text">Tu veux ${ressenti === 'E' ? 'ajuster' : 'augmenter l\'effort'} en faisant varier :</div>
+        <div class="suggestion-title">⚠️ Série ${nextSerie + 1} — Diminuer l'effort</div>
+        <div class="suggestion-text">Comment souhaitez-vous ajuster ?</div>
         <div class="suggestion-actions" style="margin-top:.6rem">
-          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">${arrow} La charge</button>
-          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${currentCharge},${currentReps},${intensiteRef})">${arrow} Les reps</button>
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↓ La charge</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↓ Les reps</button>
         </div>`;
+      break;
+
+    case 'fd-max-intensite':
+      sugBox.innerHTML = `
+        <div class="suggestion-title">💡 Série ${nextSerie + 1}</div>
+        <div class="suggestion-text">Intensité au maximum — augmentez les répétitions.<br>
+          Série conseillée : <strong>${params.newReps} reps <span style="color:var(--blue)">×</span> ${params.charge} ${unite}</strong>
+        </div>
+        <div class="suggestion-actions">
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.newReps})">✓ Accepter</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${params.charge},${params.newReps},${params.intensite})">✏️ Modifier</button>
+        </div>`;
+      break;
+
+    case 'fd-force-charge': {
+      const newCharge = maxi ? Math.round(maxi * params.newIntensite / 100 * 2) / 2 : currentCharge;
+      sugBox.innerHTML = `
+        <div class="suggestion-title">💡 Charge modifiée</div>
+        <div class="suggestion-text">↑ Intensité : ${intensiteRef}% → ${params.newIntensite}%<br>
+          Série conseillée : <strong>${params.reps} reps <span style="color:var(--blue)">×</span> ${newCharge} ${unite}</strong>
+        </div>
+        <div class="suggestion-actions">
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.newIntensite},${newCharge},${params.reps})">✓ Accepter</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${newCharge},${params.reps},${params.newIntensite})">✏️ Modifier</button>
+        </div>`;
+      break;
     }
+
+    case 'fd-choix':
+      sugBox.innerHTML = `
+        <div class="suggestion-title">💡 Série ${nextSerie + 1} — Augmenter l'effort</div>
+        <div class="suggestion-text">Vous souhaitez augmenter l'effort en faisant varier :</div>
+        <div class="suggestion-actions" style="margin-top:.6rem">
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↑ La charge</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↑ Les reps</button>
+        </div>`;
+      break;
   }
 }
 
