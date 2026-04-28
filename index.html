@@ -313,6 +313,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .ressenti-btn.selected-TD{background:#f39c12;border-color:#f39c12;color:#fff}
 .ressenti-btn.selected-E{background:#c0392b;border-color:#c0392b;color:#fff}
 .ressenti-btn[disabled]{opacity:.3;cursor:default}
+.ressenti-btn[disabled][class*="selected-"]{opacity:1;cursor:default}
 .serie-row.done{opacity:.7}
   .serie-row.active-serie{border-color:var(--accent);background:rgba(255,107,43,.05)}
 
@@ -1589,9 +1590,12 @@ function buildSeance() {
         <div class="intensite-badge" id="badge-reps">${calcReps(state.projet,state.intensite)} reps</div>
       </div>
       ${count >= 4 && (isEditable() || state.isAdmin) ? `
-      <button class="btn" style="width:100%;margin-top:.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em" onclick="saveBadge()">
-        ✅ Fin de Séance
-      </button>` : ''}
+      <div style="margin-top:.8rem">
+        <button class="btn" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em" onclick="saveBadge()">
+          ✅ Terminer ma séance
+        </button>
+        <div style="text-align:center;font-size:.75rem;color:var(--muted);margin-top:.35rem">Ne clique pas si tu veux continuer ta séance</div>
+      </div>` : ''}
     </div>
   `;
 
