@@ -2036,6 +2036,26 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
   const sgEl = document.getElementById('sg-'+key);
   if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, state.serieLocale[nomAtelier]);
 
+  // Interruption si 2 échecs cumulés (consécutifs ou non)
+  const nbEchecs = state.serieLocale[nomAtelier].filter(s => s && s.resultat === 'echec').length;
+  if (nbEchecs >= 2) {
+    delete state.serieLocale[nomAtelier];
+    clearMaxiForAtelier(nomAtelier);
+    if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, []);
+    const bravo = document.getElementById('bravo-'+key);
+    if (bravo) {
+      bravo.classList.add('visible');
+      const bravoEmoji = bravo.querySelector('.bravo-emoji');
+      const bravoText  = bravo.querySelector('.bravo-text');
+      const bravoSub   = bravo.querySelector('.bravo-sub');
+      if (bravoEmoji) bravoEmoji.textContent = '⬇️';
+      if (bravoText)  { bravoText.textContent = '2 Échecs !'; bravoText.style.color = 'var(--red)'; }
+      if (bravoSub)   bravoSub.textContent = 'Votre maxi est probablement surévalué. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.';
+    }
+    setTimeout(() => allerAuxMaxis(nomAtelier), 6000);
+    return;
+  }
+
   if (state.serieLocale[nomAtelier].length >= 4) {
     // Décider du niveau sup avant le fire & forget (besoin des données locales)
     const localAvantFire = state.serieLocale[nomAtelier] || [];
