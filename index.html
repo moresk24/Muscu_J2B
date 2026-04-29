@@ -1650,8 +1650,7 @@ function buildMesBadges() {
               : Array.from({length: b.compt}).map(() => `<img src="${badgeImgSmall(b.nom)}" alt="${b.nom}" width="64" height="64" style="width:64px;height:64px;object-fit:contain">`).join('')
             }
           </div>
-          ${b.compt === 0 ? `<div style="font-weight:600;margin-bottom:.1rem">${b.nom}</div>` : ''}
-          <div style="color:var(--muted);font-size:.85rem">${b.compt} obtenu${b.compt > 1 ? 's' : ''}</div>
+          ${b.compt === 0 ? `<div style="font-weight:600;margin-bottom:.1rem;color:var(--muted)">${b.nom}</div><div style="color:var(--muted);font-size:.85rem">0 obtenu</div>` : ''}
         </div>`).join('')}
         ${total > 0 ? `
         <div style="margin-top:1rem;text-align:center;color:var(--muted);font-size:.9rem">
