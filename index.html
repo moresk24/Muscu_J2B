@@ -516,6 +516,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   <div id="page-maxi-calc" class="scroll" style="display:none"></div>
   <div id="page-projet" class="scroll" style="display:none"></div>
   <div id="page-fiche" class="scroll" style="display:none"></div>
+  <div id="page-projet-detail" class="scroll" style="display:none"></div>
   <div id="page-seance" class="scroll" style="display:none"></div>
   <div id="page-bilan-badge" class="scroll" style="display:none"></div>
   <div id="page-mes-badges" class="scroll" style="display:none"></div>
@@ -641,6 +642,111 @@ const PROJETS = {
     vitesse:"Soutenue",
     recup:"Active · 30'' à 1'30",
     contractions:"Concentrique · Excentrique"
+  }
+};
+
+const PROJETS_CONTENT = {
+  "1": {
+    badge: "Projet 1",
+    titre: "Sportif",
+    sousTitre: "Puissance — Explosivité",
+    resume: "Développer la puissance musculaire : produire une force maximale dans un temps très court. La qualité physique qui fait la différence dans un sprint, un saut, un tir ou un changement de direction rapide.",
+    sensations: "Séries courtes et intenses, exécutées avec intention maximale. Récupération longue et semi-active — indispensable pour reconstituer les réserves nerveuses avant la série suivante. Concentration et engagement maximal.",
+    profils: [
+      "Football, rugby, handball, basketball",
+      "Athlétisme (sprint, sauts, lancers)",
+      "Arts martiaux, tennis, volleyball",
+      "Tout sport où l'explosivité fait la différence"
+    ],
+    gains: [
+      "Augmentation de la force maximale",
+      "Meilleure réactivité musculaire",
+      "Capacité à enchaîner des actions explosives",
+      "Bénéfices ressentis après 4 à 6 semaines"
+    ],
+    parametres: {
+      intensite: "80 à 90 % du maxi",
+      repetitions: "4 à 8",
+      series: "2 à 6",
+      recuperation: "3 à 6 minutes"
+    },
+    pdf: "PDF-Projets/projet1-sportif.pdf"
+  },
+  "2": {
+    badge: "Projet 2",
+    titre: "Esthétique",
+    sousTitre: "Volume musculaire — Hypertrophie",
+    resume: "Développer le volume musculaire visible et durable. Une masse musculaire bien développée améliore la posture, protège les articulations et augmente le métabolisme de base.",
+    sensations: "Séries lentes et contrôlées. Une brûlure musculaire en fin de série est bon signe. Récupération passive et relativement courte pour maintenir un niveau de fatigue métabolique suffisant entre les séries.",
+    profils: [
+      "Élèves qui souhaitent transformer leur physique",
+      "Débutants voulant poser des bases solides",
+      "Sports où la corpulence ou la puissance de contact est un avantage"
+    ],
+    gains: [
+      "Silhouette plus musclée et plus dessinée",
+      "Meilleure posture",
+      "Augmentation de la force générale",
+      "Premiers résultats visibles après 6 à 8 semaines"
+    ],
+    parametres: {
+      intensite: "65 à 80 % du maxi",
+      repetitions: "10 à 20",
+      series: "6 à 12",
+      recuperation: "1min30 à 2min30"
+    },
+    pdf: "PDF-Projets/projet2-esthetique.pdf"
+  },
+  "3A": {
+    badge: "Projet 3A",
+    titre: "Santé Endurance",
+    sousTitre: "Affinement de la silhouette — Dépense énergétique",
+    resume: "Utiliser la musculation comme outil de dépense énergétique. À faible charge et haute cadence, c'est l'une des méthodes les plus efficaces pour mobiliser les graisses tout en renforçant les muscles.",
+    sensations: "Rythme rapide et soutenu. Élévation nette du rythme cardiaque très rapidement. Fatigue musculaire diffuse sur toute la séance. Récupération courte et active — la fréquence cardiaque ne doit pas trop redescendre.",
+    profils: [
+      "Élèves souhaitant perdre du gras en tonifiant",
+      "Pratiquants de sports d'endurance (course, cyclisme, natation, triathlon)",
+      "Ceux qui veulent un renforcement sans prise de masse"
+    ],
+    gains: [
+      "Silhouette affinée et plus tonique",
+      "Meilleure endurance musculaire",
+      "Capacité cardio-vasculaire améliorée",
+      "Effets visibles après 4 à 6 semaines"
+    ],
+    parametres: {
+      intensite: "40 à 50 % du maxi",
+      repetitions: "25 à 35",
+      series: "3 à 6",
+      recuperation: "30s à 1 minute"
+    },
+    pdf: "PDF-Projets/projet3a-sante-endurance.pdf"
+  },
+  "3B": {
+    badge: "Projet 3B",
+    titre: "Santé Tonification",
+    sousTitre: "Entretien musculaire — Raffermissement — Prévention",
+    resume: "Le projet de l'équilibre et de la prévention. Maintenir les muscles fermes, réactifs et protecteurs pour les articulations — sans chercher à les faire grossir ni les épuiser.",
+    sensations: "Effort soutenu mais contrôlé, vitesse régulière. Récupération courte et active — rester en mouvement entre les séries sans atteindre l'épuisement.",
+    profils: [
+      "Reprise du sport après une période d'inactivité",
+      "Convalescence après une blessure légère",
+      "Sports techniques (danse, raquette, glisse, sports collectifs)",
+      "Entretien de la forme sans objectif de performance"
+    ],
+    gains: [
+      "Corps plus ferme et mieux équilibré",
+      "Meilleure stabilité articulaire (genoux, épaules, dos)",
+      "Réduction du risque de blessure",
+      "Meilleure posture et moins de douleurs dorsales"
+    ],
+    parametres: {
+      intensite: "50 à 65 % du maxi",
+      repetitions: "15 à 25",
+      series: "3 à 6",
+      recuperation: "30s à 1min30"
+    },
+    pdf: "PDF-Projets/projet3b-sante-tonification.pdf"
   }
 };
 
@@ -977,22 +1083,28 @@ $('btn-login').addEventListener('click', async () => {
 // ═══════════════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════════════
-const PAGES = ['maxis','maxi-calc','projet','fiche','seance','bilan-badge','mes-badges'];
+const PAGES = ['maxis','maxi-calc','projet','projet-detail','fiche','seance','bilan-badge','mes-badges'];
 function showPage(name) {
+  // Rediriger fiche vers projet-detail si un projet est sélectionné
+  if (name === 'fiche' && state.projet) {
+    currentProjetDetail = state.projet;
+    name = 'projet-detail';
+  }
   PAGES.forEach(p => {
     $('page-'+p).style.display = p===name ? 'block' : 'none';
   });
   document.querySelectorAll('.nav-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.page === name);
+    b.classList.toggle('active', b.dataset.page === name || (name==='projet-detail' && b.dataset.page==='projet'));
   });
   updateNavLock();
-  if (name==='maxis')       buildMaxis();
-  if (name==='maxi-calc')   buildMaxiCalc();
-  if (name==='projet')      buildProjet();
-  if (name==='fiche')       buildFiche();
-  if (name==='seance')      buildSeance();
-  if (name==='bilan-badge') buildBilanBadge();
-  if (name==='mes-badges')  buildMesBadges();
+  if (name==='maxis')          buildMaxis();
+  if (name==='maxi-calc')      buildMaxiCalc();
+  if (name==='projet')         buildProjet();
+  if (name==='projet-detail')  buildProjetDetail();
+  if (name==='fiche')          buildFiche();
+  if (name==='seance')         buildSeance();
+  if (name==='bilan-badge')    buildBilanBadge();
+  if (name==='mes-badges')     buildMesBadges();
 }
 document.querySelectorAll('.nav-btn').forEach(b => {
   b.addEventListener('click', ()=>showPage(b.dataset.page));
@@ -1366,55 +1478,115 @@ function buildProjet() {
 
   if (!state.projet && allFilled) {
     html += `<div style="background:rgba(255,149,0,.08);border:1px solid rgba(255,149,0,.3);border-radius:14px;padding:1rem 1.1rem;margin-bottom:1.25rem;text-align:center">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;color:var(--accent)">Choisissez à présent votre projet de travail</div>
-      <div style="font-size:.85rem;color:var(--muted);margin-top:.35rem">Sélectionnez un projet ci-dessous pour commencer vos séances</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;color:var(--accent)">Choisissez votre projet de travail</div>
+      <div style="font-size:.85rem;color:var(--muted);margin-top:.35rem">Consultez chaque projet, puis sélectionnez celui qui vous correspond</div>
     </div>`;
   }
 
   if (state.projet) {
-    const p = PROJETS[state.projet];
-    html += `<div style="background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.3);border-radius:14px;padding:1rem 1.1rem;margin-bottom:1.25rem">
-      <div style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Projet actuel</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.05em;color:var(--green)">Tu travailles sur le projet : ${p.nom}</div>
-      <div style="font-size:.88rem;color:var(--muted);margin:.4rem 0 .75rem;line-height:1.4">${p.desc}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:.3rem">
-        <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">💪 ${p.intensites[0]}–${p.intensites[p.intensites.length-1]}% maxi</span>
-        <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">📊 ${p.repsMin}–${p.repsMax} reps</span>
-        <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">🔁 ${p.seriesMin}–${p.seriesMax} séries</span>
-        <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">⚡ ${p.vitesse}</span>
-        <span class="tag" style="border-color:rgba(46,204,113,.3);color:var(--green)">⏱ ${p.recup}</span>
-      </div>
-      <div style="text-align:right;margin-top:.75rem">
-        <button class="btn-sm" onclick="showPage('fiche')" style="border:1px solid rgba(46,204,113,.4);color:var(--green);background:none;padding:.35rem .75rem;border-radius:8px;cursor:pointer;font-size:.82rem">📋 Voir le détail →</button>
-      </div>
-    </div>
-    <div class="section-title">Changer de projet</div>`;
+    html += `<div style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem">Cliquez sur un projet pour en voir le détail</div>`;
   }
 
   Object.values(PROJETS).forEach(p => {
-    if (state.projet === p.num) return; // masquer le projet déjà choisi
-    const locked = !allFilled || !isEditable();
-    html += `<div class="projet-card ${locked?'locked':''}" data-projet="${p.num}">
-      <div class="projet-num">${p.num}</div>
-      <div class="projet-name">${p.nom}</div>
-      <div class="projet-desc">${p.desc}</div>
+    const isCurrent = state.projet === p.num;
+    const c = PROJETS_CONTENT[p.num];
+    const cardLocked = !allFilled;
+    html += `<div class="projet-card ${cardLocked?'locked':''} ${isCurrent?'selected':''}" data-projet="${p.num}" style="position:relative">
+      ${isCurrent ? `<div style="position:absolute;top:.6rem;right:.6rem;font-size:.7rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em">✓ Votre projet</div>` : ''}
+      <div class="projet-num">${c ? c.badge : p.num}</div>
+      <div class="projet-name">${c ? c.titre : p.nom}</div>
+      <div class="projet-desc">${c ? c.sousTitre : p.desc}</div>
       <div class="projet-tags">
         <span class="tag">💪 ${p.intensites[0]}–${p.intensites[p.intensites.length-1]}% maxi</span>
         <span class="tag">📊 ${p.repsMin}–${p.repsMax} reps</span>
         <span class="tag">🔁 ${p.seriesMin}–${p.seriesMax} séries</span>
-        <span class="tag">⚡ ${p.vitesse}</span>
-        <span class="tag">⏱ ${p.recup}</span>
       </div>
+      <div style="text-align:right;margin-top:.5rem;font-size:.8rem;color:var(--accent)">Voir le détail →</div>
     </div>`;
   });
 
   pg.innerHTML = html;
 
-  if (allFilled && isEditable()) {
-    pg.querySelectorAll('.projet-card').forEach(card => {
-      card.addEventListener('click', () => selectProjet(card.dataset.projet));
-    });
+  pg.querySelectorAll('.projet-card:not(.locked)').forEach(card => {
+    card.addEventListener('click', () => goToProjetDetail(card.dataset.projet));
+  });
+}
+
+let currentProjetDetail = null;
+function goToProjetDetail(num) {
+  currentProjetDetail = num;
+  showPage('projet-detail');
+}
+
+function buildProjetDetail() {
+  const pg = $('page-projet-detail');
+  const num = currentProjetDetail;
+  if (!num) { showPage('projet'); return; }
+
+  const c = PROJETS_CONTENT[num];
+  const p = PROJETS[num];
+  if (!c || !p) { showPage('projet'); return; }
+
+  const isCurrent = state.projet === num;
+  const canChoose = maxisAllFilled() && isEditable();
+
+  let chooseBtn = '';
+  if (isCurrent) {
+    chooseBtn = `<div style="background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3);border-radius:12px;padding:.75rem 1rem;text-align:center;font-size:.9rem;color:var(--green);font-weight:600">✓ Votre projet actuel</div>`;
+  } else if (canChoose) {
+    chooseBtn = `<button class="btn" style="width:100%" onclick="selectProjetFromDetail('${num}')">Choisir ce projet</button>`;
   }
+
+  pg.innerHTML = `
+    <button onclick="showPage('projet')" style="background:none;border:none;color:var(--accent);font-size:.95rem;cursor:pointer;padding:0;margin-bottom:1rem">← Retour aux projets</button>
+    <div class="projet-fiche">
+      <div class="fiche-header">
+        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.6);margin-bottom:.3rem">${c.badge}</div>
+        <h2>${c.titre}</h2>
+        <p>${c.sousTitre}</p>
+      </div>
+      <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">En résumé</div>
+        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.resume}</div>
+      </div>
+      <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">Ce que vous allez ressentir</div>
+        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.sensations}</div>
+      </div>
+      <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem">Ce projet est fait pour vous si…</div>
+        ${c.profils.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--accent);margin-bottom:.35rem">→ ${s}</div>`).join('')}
+      </div>
+      <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem">Ce que vous allez gagner</div>
+        ${c.gains.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--green);margin-bottom:.35rem">✓ ${s}</div>`).join('')}
+      </div>
+      <div style="padding:.9rem 1.25rem">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.6rem">Paramètres de travail</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+          <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Intensité</div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${c.parametres.intensite}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Répétitions</div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${c.parametres.repetitions}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Séries</div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${c.parametres.series}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Récupération</div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${c.parametres.recuperation}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button onclick="window.open('${c.pdf}','_blank')" style="width:100%;background:none;border:1px solid var(--border);border-radius:12px;padding:.75rem;color:var(--muted);font-size:.88rem;cursor:pointer;margin-bottom:.75rem">📄 Télécharger la fiche complète</button>
+    ${chooseBtn}
+    <div style="height:1rem"></div>
+  `;
 }
 
 let pendingProjet = null;
@@ -1425,6 +1597,9 @@ function selectProjet(num) {
   } else {
     confirmProjet(num);
   }
+}
+function selectProjetFromDetail(num) {
+  selectProjet(num);
 }
 $('modal-cancel').onclick = () => { $('modal-bg').classList.add('hidden'); pendingProjet=null; };
 $('modal-confirm').onclick = () => { $('modal-bg').classList.add('hidden'); if(pendingProjet) confirmProjet(pendingProjet); };
@@ -1437,7 +1612,7 @@ async function confirmProjet(num) {
     if (d.error) throw new Error(d.error);
     state.projet = num;
     toast(`Projet ${PROJETS[num].nom} enregistré ✓`);
-    buildProjet();
+    showPage('projet');
   } catch(e) { toast('Erreur','error'); }
   loading(false);
 }
@@ -1451,35 +1626,56 @@ function buildFiche() {
     pg.innerHTML = `<div class="lock-msg" style="margin-top:2rem">🎯 Choisissez d'abord votre projet pour voir votre fiche !</div>`;
     return;
   }
+  const c = PROJETS_CONTENT[state.projet];
   const p = PROJETS[state.projet];
+
   pg.innerHTML = `
     <div class="projet-fiche">
       <div class="fiche-header">
-        <h2>Projet ${p.num} — ${p.nom}</h2>
-        <p>${p.mobile}</p>
+        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.6);margin-bottom:.3rem">${c.badge}</div>
+        <h2>${c.titre}</h2>
+        <p>${c.sousTitre}</p>
       </div>
-      <div style="padding:.85rem 1.25rem;border-bottom:1px solid var(--border);font-size:.88rem;color:var(--muted);line-height:1.5">${p.desc}</div>
-      <div class="fiche-body">
-        <div class="fiche-row"><span class="fiche-key">Intensité (% maxi)</span><span class="fiche-val">${p.intensites.join(' · ')}%</span></div>
-        <div class="fiche-row"><span class="fiche-key">Nombre de séries</span><span class="fiche-val">${p.seriesMin} à ${p.seriesMax}</span></div>
-        <div class="fiche-row"><span class="fiche-key">Répétitions</span><span class="fiche-val">${p.repsMin} à ${p.repsMax}</span></div>
-        <div class="fiche-row"><span class="fiche-key">Durée d'une série</span><span class="fiche-val">${p.dureeSerie}</span></div>
-        <div class="fiche-row"><span class="fiche-key">Vitesse d'exécution</span><span class="fiche-val">${p.vitesse}</span></div>
-        <div class="fiche-row"><span class="fiche-key">Récupération</span><span class="fiche-val">${p.recup}</span></div>
-        <div class="fiche-row"><span class="fiche-key">Contractions</span><span class="fiche-val">${p.contractions}</span></div>
+      <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">En résumé</div>
+        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.resume}</div>
+      </div>
+      <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">Ce que vous allez ressentir</div>
+        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.sensations}</div>
+      </div>
+      <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem">Ce projet est fait pour vous si…</div>
+        ${c.profils.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--accent);margin-bottom:.35rem">→ ${s}</div>`).join('')}
+      </div>
+      <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem">Ce que vous allez gagner</div>
+        ${c.gains.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--green);margin-bottom:.35rem">✓ ${s}</div>`).join('')}
+      </div>
+      <div style="padding:.9rem 1.25rem">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.6rem">Paramètres de travail</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+          <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Intensité</div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${c.parametres.intensite}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Répétitions</div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${c.parametres.repetitions}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Séries</div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${c.parametres.series}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Récupération</div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${c.parametres.recuperation}</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:1rem">
-      <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem">En pratique : 4 séries par atelier durant les séances d'EPS</div>
-      ${p.intensites.map(i=>{
-        const reps = calcReps(state.projet, i);
-        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border)">
-          <span style="font-weight:700;color:var(--accent)">${i}%</span>
-          <span style="font-size:.85rem;color:var(--muted)">${reps} répétitions</span>
-          <span style="font-size:.72rem;color:var(--muted)">maxi × ${i/100}</span>
-        </div>`;
-      }).join('')}
-    </div>
+    <button onclick="window.open('${c.pdf}','_blank')" style="width:100%;background:none;border:1px solid var(--border);border-radius:12px;padding:.75rem;color:var(--muted);font-size:.88rem;cursor:pointer;margin-bottom:1rem">📄 Télécharger la fiche complète</button>
+    <div style="height:.5rem"></div>
   `;
 }
 
