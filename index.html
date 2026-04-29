@@ -1313,11 +1313,13 @@ function buildMaxiCalc() {
       } else if (type === 'lombaires') {
         formHtml = `
           <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.5">
-            Le maxi pour cet atelier est de <strong style="color:var(--text)">30 répétitions en 1 minute</strong>.
-            Indiquez le poids additionnel que vous tenez contre la poitrine.
+            À cet atelier vous devez faire <strong style="color:var(--text)">30 répétitions en 1 mn</strong>.<br>
+            Indiquez ici quel poids vous devez rajouter pour que l'exercice soit difficile à faire.<br>
+            Si vous ne rajoutez rien, indiquez 0.<br>
+            <strong style="color:var(--yellow)">Attention vous ne pouvez pas ajouter + de 10 kg.</strong>
           </p>
           <div class="field">
-            <label class="field-label">Poids additionnel contre la poitrine</label>
+            <label class="field-label">Poids additionnel</label>
             <select id="calc-poids-add">
               <option value="0">0 kg (sans lest)</option>
               <option value="2">2 kg</option>
@@ -2050,9 +2052,9 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
       const bravoSub   = bravo.querySelector('.bravo-sub');
       if (bravoEmoji) bravoEmoji.textContent = '⬇️';
       if (bravoText)  { bravoText.textContent = '2 Échecs !'; bravoText.style.color = 'var(--red)'; }
-      if (bravoSub)   bravoSub.textContent = 'Votre maxi est probablement surévalué. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.';
+      if (bravoSub)   bravoSub.innerHTML = 'Votre maxi est probablement surévalué. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.<br><em>Vous allez être redirigé(e) automatiquement.</em>';
     }
-    setTimeout(() => allerAuxMaxis(nomAtelier), 6000);
+    setTimeout(() => allerAuxMaxis(nomAtelier), 10000);
     return;
   }
 
@@ -2243,7 +2245,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
         sugBox.innerHTML = `
           <div class="suggestion-title" style="color:var(--yellow)">⬆️ 2 fois Facile d'affilée !</div>
           <div class="suggestion-text" style="margin-bottom:.6rem">
-            Votre maxi est probablement <strong>sous-évalué</strong>. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.
+            Votre maxi est probablement <strong>sous-évalué</strong>. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.<br><em>Vous allez être redirigé(e) automatiquement.</em>
           </div>
           <div class="suggestion-actions">
             <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
@@ -2253,7 +2255,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
         sugBox.innerHTML = `
           <div class="suggestion-title" style="color:var(--red)">⬇️ 2 fois Échec d'affilée !</div>
           <div class="suggestion-text" style="margin-bottom:.6rem">
-            Votre maxi est probablement <strong>surévalué</strong>. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.
+            Votre maxi est probablement <strong>surévalué</strong>. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.<br><em>Vous allez être redirigé(e) automatiquement.</em>
           </div>
           <div class="suggestion-actions">
             <button class="btn" style="background:linear-gradient(135deg,var(--red),#c0392b);color:#fff"
@@ -2261,7 +2263,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
           </div>`;
       }
     }
-    setTimeout(() => allerAuxMaxis(nomAtelier), 6000);
+    setTimeout(() => allerAuxMaxis(nomAtelier), 10000);
     return;
   }
 
