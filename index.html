@@ -1583,7 +1583,7 @@ function buildProjetDetail() {
             <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${c.parametres.recuperation}</div>
           </div>
           <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
-            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Durée de série</div>
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Durée d'une série</div>
             <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${p.dureeSerie}</div>
           </div>
           <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
@@ -1597,7 +1597,7 @@ function buildProjetDetail() {
         </div>
       </div>
     </div>
-    <button onclick="window.open('${c.pdf}','_blank')" style="width:100%;background:none;border:1px solid var(--border);border-radius:12px;padding:.75rem;color:var(--muted);font-size:.88rem;cursor:pointer;margin-bottom:.75rem">📄 Télécharger la fiche complète de ce projet ${c.titre} au format PDF</button>
+    <button onclick="window.open('${c.pdf}','_blank')" style="width:100%;background:none;border:1px solid var(--green);border-radius:12px;padding:.75rem;color:var(--green);font-size:.88rem;cursor:pointer;margin-bottom:.75rem">📄 Télécharger la fiche complète de ce projet ${c.titre} au format PDF</button>
     <div style="height:1rem"></div>
   `;
 }
@@ -1896,7 +1896,7 @@ function buildSeance() {
 
     <!-- Choix intensité -->
     <div class="seance-header">
-      <div class="field-label">Intensité du travail du projet ${p.nom} :</div>
+      <div class="field-label">Intensité du travail du projet <span style="font-family:'Bebas Neue',sans-serif;font-size:1.1em;letter-spacing:.05em;color:var(--accent)">${p.nom}</span> :</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;color:var(--accent);margin:.3rem 0">${p.intensites[0]}–${p.intensites[p.intensites.length-1]}% du MAXI</div>
       <div style="font-size:.82rem;color:var(--text);margin-bottom:.25rem">Choisissez l'intensité de votre première série :</div>
       <div class="intensite-row">
@@ -2212,6 +2212,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   if (interruption.interrompu) {
     delete state.serieLocale[nomAtelier];
     if (state.suggestionEnAttente) delete state.suggestionEnAttente[nomAtelier];
+    if (state.suggestionEnCours) state.suggestionEnCours[nomAtelier] = false;
     if (sgEl && a) sgEl.innerHTML = buildSeriesHTML(a, 0, []);
     clearMaxiForAtelier(nomAtelier);
 
@@ -2261,6 +2262,9 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
       } else if (validation.type === 'valide-bien') {
         if (bravoText) bravoText.textContent = '💪 Très bien !';
         if (bravoSub)  bravoSub.textContent  = 'TD en S3 et S4 — continuez comme ça !';
+      } else if (validation.type === 'valide-s4') {
+        if (bravoText) bravoText.textContent = '👍 Bien joué !';
+        if (bravoSub)  bravoSub.textContent  = 'Cherchez à réussir cette 4ème série la prochaine fois !';
       } else {
         if (bravoText) bravoText.textContent = '👍 Bien joué !';
         if (bravoSub)  bravoSub.textContent  = 'Cherchez le TD dès la S3 la prochaine fois pour progresser.';
@@ -2341,6 +2345,7 @@ function decideValidation(serieLocale) {
   const s3td = serieLocale[2] && serieLocale[2].ressenti === 'TD';
   const s4td = serieLocale[3] && serieLocale[3].ressenti === 'TD';
   if (s3td && s4td) return { type: 'valide-bien' };
+  if (s3td && !s4td) return { type: 'valide-s4' };
   return { type: 'valide-progres' };
 }
 
@@ -2420,6 +2425,9 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
         <div class="suggestion-actions" style="margin-top:.6rem">
           <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↓ La charge</button>
           <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↓ Les reps</button>
+        </div>
+        <div style="margin-top:.4rem">
+          <button class="btn btn-outline" style="width:100%" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.reps})">= Ne rien changer</button>
         </div>`;
       break;
 
@@ -2657,6 +2665,7 @@ function modifierSuggestion(nomAtelier, key, unite, newCharge, newReps, newInten
 
   sugBox.innerHTML = `
     <div class="suggestion-title">✏️ Modifier les paramètres</div>
+    <div style="font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:.5rem">Proposition de l'application : <span style="color:var(--text);font-weight:600">${newReps} reps × ${newCharge} ${unite}</span></div>
     <div class="drum-picker-wrap">
       <div class="drum-picker-col">
         <div class="field-label" style="margin-bottom:.3rem">Reps</div>
