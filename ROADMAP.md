@@ -189,6 +189,39 @@ Nouveau handler `handleSaveBadge()` ; `loadEleve` renvoie maintenant `dernierBad
 
 ---
 
+## ✅ Session du 29/04/2026 — UX page projet + corrections logique séance
+
+### Page projet — détail (buildProjetDetail)
+
+- Retours à la ligne après chaque point dans les textes "En résumé" et "Ce que vous allez ressentir"
+- Bouton "Choisir ce projet" remonté en haut de la page (avant la fiche)
+- Tous les paramètres affichés dans la grille 2 colonnes : ajout Durée d'une série, Vitesse, Contractions (ce dernier sur toute la largeur)
+- Bouton téléchargement PDF : rendu en vert, texte complet avec nom du projet "Télécharger la fiche complète de ce projet [Nom] au format PDF"
+
+### Page projets (buildProjet)
+
+- Le projet choisi par l'élève remonte automatiquement en premier dans la liste
+
+### Page Séances
+
+- Nom du projet mis en valeur inline (Bebas Neue, couleur accent) dans la ligne d'intensité
+- Rappel de la proposition de l'application dans le panneau "Modifier les paramètres"
+- Nouveau bouton "= Ne rien changer" dans le panneau "Diminuer l'effort" → repropose la même série
+- Fix : après recalcul du maxi (suite à interruption), la série 1 affichait "? × ? kg" au lieu des vraies valeurs → `state.suggestionEnCours[nomAtelier]` n'était pas remis à `false` lors de l'interruption
+- Nouveau cas bravo `valide-s4` : S3=TD mais S4 pas TD → message "Cherchez à réussir cette 4ème série la prochaine fois !"
+
+### Ateliers spéciaux (Gainage sol, Banc à Lombaires, Abdo Sol)
+
+- Interruption sur 2 Échecs cumulés (consécutifs ou non) : même logique que les ateliers standard → maxi effacé, message d'erreur, redirection vers calcul du maxi
+- L'atelier n'est pas validé en cas d'interruption
+- Timeout de redirection : 6 s → 10 s, avec mention "Vous allez être redirigé(e) automatiquement."
+- Page calcul du maxi : suppression des onglets "Calculer" / "Saisie directe" pour les 3 ateliers spéciaux (inutiles)
+- Page calcul du maxi lombaires : nouveau texte explicatif en 4 lignes + avertissement 10 kg en jaune
+- Suppression de l'encadré `calc-result` vide pour les ateliers spéciaux
+- Fix : listeners `tab-calc` / `tab-direct` et `calc-result` plantaient pour les ateliers spéciaux → bouton "Valider ce maxi" inopérant → corrigé
+
+---
+
 ## 🔜 À réfléchir — Validation atelier avec maxi sous-évalué
 
 Quand le maxi est détecté comme sous-évalué (warning "Maxi à revoir"), faut-il comptabiliser
