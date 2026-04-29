@@ -1487,7 +1487,8 @@ function buildProjet() {
     html += `<div style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem">Cliquez sur un projet pour en voir le détail</div>`;
   }
 
-  Object.values(PROJETS).forEach(p => {
+  const projetsOrdonnes = Object.values(PROJETS).sort((a,b) => a.num===state.projet ? -1 : b.num===state.projet ? 1 : 0);
+  projetsOrdonnes.forEach(p => {
     const isCurrent = state.projet === p.num;
     const c = PROJETS_CONTENT[p.num];
     const cardLocked = !allFilled;
@@ -1539,6 +1540,7 @@ function buildProjetDetail() {
 
   pg.innerHTML = `
     <button onclick="showPage('projet')" style="background:none;border:none;color:var(--accent);font-size:.95rem;cursor:pointer;padding:0;margin-bottom:1rem">← Retour aux projets</button>
+    ${chooseBtn ? `<div style="margin-bottom:.75rem">${chooseBtn}</div>` : ''}
     <div class="projet-fiche">
       <div class="fiche-header">
         <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.6);margin-bottom:.3rem">${c.badge}</div>
@@ -1547,11 +1549,11 @@ function buildProjetDetail() {
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
         <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">En résumé</div>
-        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.resume}</div>
+        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.resume.replace(/\. /g,'.<br>')}</div>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
         <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">Ce que vous allez ressentir</div>
-        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.sensations}</div>
+        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.sensations.replace(/\. /g,'.<br>')}</div>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
         <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem">Ce projet est fait pour vous si…</div>
@@ -1580,11 +1582,22 @@ function buildProjetDetail() {
             <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Récupération</div>
             <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${c.parametres.recuperation}</div>
           </div>
+          <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Durée de série</div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${p.dureeSerie}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Vitesse</div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${p.vitesse}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem;grid-column:span 2">
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Contractions</div>
+            <div style="font-size:.88rem;font-weight:700;color:var(--accent)">${p.contractions}</div>
+          </div>
         </div>
       </div>
     </div>
-    <button onclick="window.open('${c.pdf}','_blank')" style="width:100%;background:none;border:1px solid var(--border);border-radius:12px;padding:.75rem;color:var(--muted);font-size:.88rem;cursor:pointer;margin-bottom:.75rem">📄 Télécharger la fiche complète</button>
-    ${chooseBtn}
+    <button onclick="window.open('${c.pdf}','_blank')" style="width:100%;background:none;border:1px solid var(--border);border-radius:12px;padding:.75rem;color:var(--muted);font-size:.88rem;cursor:pointer;margin-bottom:.75rem">📄 Télécharger la fiche complète de ce projet ${c.titre} au format PDF</button>
     <div style="height:1rem"></div>
   `;
 }
