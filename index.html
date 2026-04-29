@@ -1390,8 +1390,8 @@ function buildMaxiCalc() {
 
   function attachListeners() {
     $('calc-back').addEventListener('click', () => showPage('maxis'));
-    $('tab-calc').addEventListener('click',   () => { _calcMode = 1; render(); });
-    $('tab-direct').addEventListener('click', () => { _calcMode = 2; render(); });
+    if ($('tab-calc'))   $('tab-calc').addEventListener('click',   () => { _calcMode = 1; render(); });
+    if ($('tab-direct')) $('tab-direct').addEventListener('click', () => { _calcMode = 2; render(); });
 
     if (_calcMode === 1) {
       if (type === 'standard') {
