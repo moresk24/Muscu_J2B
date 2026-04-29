@@ -150,6 +150,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
              var(--bg);
   padding:1.5rem;overflow-y:auto;
 }
+#screen-dispensed{
+  justify-content:center;align-items:center;
+  background:var(--bg);
+  padding:1.5rem;
+}
 .login-hero{text-align:center;margin-bottom:2rem}
 .login-logo{
   font-family:'Bebas Neue',sans-serif;font-size:4rem;letter-spacing:.05em;line-height:1;
@@ -532,6 +537,20 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════
+     ÉCRAN DISPENSÉ
+══════════════════════════════════════════════════ -->
+<div id="screen-dispensed" class="screen">
+  <div style="width:100%;max-width:400px;text-align:center">
+    <div style="font-size:4rem;margin-bottom:1rem">🩹</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.05em;margin-bottom:.5rem">Dispensé(e)</div>
+    <p style="color:var(--muted);font-size:1rem;line-height:1.6;margin-bottom:2rem">
+      Vous êtes dispensé(e) pour cette période.<br>Vous pouvez accompagner vos camarades.
+    </p>
+    <button class="btn btn-outline" id="btn-logout-dispensed">Se déconnecter</button>
+  </div>
+</div>
+
 <!-- Loading overlay -->
 <div class="overlay hidden" id="loading"><div class="spinner"></div></div>
 
@@ -677,7 +696,8 @@ let state = {
   comptArgent: 0,
   comptOr: 0,
   badgeCourant: "",
-  badgeCourantNbAteliers: 0
+  badgeCourantNbAteliers: 0,
+  statut: ""
 };
 
 // ═══════════════════════════════════════════════════
@@ -814,6 +834,7 @@ async function autoConnect(saved, classes) {
     state.nom          = saved.nom;
     state.prenom       = saved.prenom;
     state.mdp          = saved.mdp;
+    state.statut       = d.statut  || '';
     state.projet       = d.projet || '';
     state.maxis        = d.maxis  || {};
     state.series       = d.series || {};
@@ -918,6 +939,7 @@ $('btn-login').addEventListener('click', async () => {
     state.nom          = eInfo.nom;
     state.prenom       = eInfo.prenom;
     state.mdp          = mdp;
+    state.statut       = d.statut  || '';
     state.projet       = d.projet || '';
     state.maxis        = d.maxis  || {};
     state.series       = d.series || {};
@@ -976,20 +998,8 @@ function showPage(name) {
 document.querySelectorAll('.nav-btn').forEach(b => {
   b.addEventListener('click', ()=>showPage(b.dataset.page));
 });
-$('btn-logout').addEventListener('click', async () => {
-  stopSessionCheck();
-  if (state.compteurAteliersSeance > 0 && isEditable()) {
-    saveBadgeQuietly();
-    toast('⚠️ Votre travail a été enregistré sans attribution de badge. Utilisez "Fin de Séance" pour valider votre bilan.', 'warn');
-  }
-  localStorage.removeItem('muscu_login');
-  $('screen-app').classList.remove('active');
-  $('screen-login').classList.add('active');
-  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,projet:'',maxis:{},series:{},intensite:null,serieLocale:{},maxiARevoir:{},compteurAteliersSeance:0,sessionId:'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0,dernierBadge:'',comptCarton:0,comptBronze:0,comptArgent:0,comptOr:0,badgeCourant:'',badgeCourantNbAteliers:0};
-  localStorage.setItem('compteurAteliersSeance', '0');
-  $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
-  $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
-});
+$('btn-logout').addEventListener('click', () => doLogout());
+$('btn-logout-dispensed').addEventListener('click', () => doLogout());
 
 // ═══════════════════════════════════════════════════
 //  PAGE MAXIS
@@ -1001,6 +1011,7 @@ function getAtelierType(nom) {
 }
 
 function isMaxiValid(a, val) {
+  if (val === 'B') return true; // atelier exclu pour blessure = considéré renseigné
   if (val === '' || val === undefined || val === null) return false;
   if (getAtelierType(a.nom) === 'standard') return parseFloat(val) > 0;
   return true; // 0 kg additionnel et niveau 1 sont valides
@@ -1013,9 +1024,31 @@ function formatMaxiDisplay(a, val) {
 }
 
 function showPageAfterLogin() {
+  if (state.statut === 'D') {
+    $('screen-login').classList.remove('active');
+    $('screen-app').classList.remove('active');
+    $('screen-dispensed').classList.add('active');
+    return;
+  }
   if (!maxisAllFilled()) showPage('maxis');
   else if (!state.projet)  showPage('projet');
   else                     showPage('seance');
+}
+
+function doLogout() {
+  stopSessionCheck();
+  if (state.compteurAteliersSeance > 0 && isEditable()) {
+    saveBadgeQuietly();
+    toast('⚠️ Votre travail a été enregistré sans attribution de badge. Utilisez "Fin de Séance" pour valider votre bilan.', 'warn');
+  }
+  localStorage.removeItem('muscu_login');
+  $('screen-app').classList.remove('active');
+  $('screen-dispensed').classList.remove('active');
+  $('screen-login').classList.add('active');
+  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,statut:'',projet:'',maxis:{},series:{},intensite:null,serieLocale:{},maxiARevoir:{},compteurAteliersSeance:0,sessionId:'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0,dernierBadge:'',comptCarton:0,comptBronze:0,comptArgent:0,comptOr:0,badgeCourant:'',badgeCourantNbAteliers:0};
+  localStorage.setItem('compteurAteliersSeance', '0');
+  $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
+  $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
 }
 
 function updateNavLock() {
@@ -1032,16 +1065,16 @@ function buildMaxis() {
   const oldSaveBar = document.querySelector('.save-bar');
   if (oldSaveBar) oldSaveBar.remove();
 
-  const total = ATELIERS.length;
-  const maxisFilled = ATELIERS.filter(a => isMaxiValid(a, state.maxis[a.nom])).length;
-  const allFilled = maxisFilled === total;
+  const nbDispo = ATELIERS.filter(a => state.maxis[a.nom] !== 'B').length;
+  const maxisFilled = ATELIERS.filter(a => isMaxiValid(a, state.maxis[a.nom]) && state.maxis[a.nom] !== 'B').length;
+  const allFilled = maxisAllFilled();
 
   let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.75rem">Vos Maxis <span style="color:var(--accent)">(1RM)</span></div>
   <div style="margin-bottom:.75rem">
     <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.35rem">
-      <span>Maxis renseignés</span><span style="color:var(--text);font-weight:700">${maxisFilled} / ${total}</span>
+      <span>Maxis renseignés</span><span style="color:var(--text);font-weight:700">${maxisFilled} / ${nbDispo}</span>
     </div>
-    <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${(maxisFilled/total*100).toFixed(0)}%"></div></div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${nbDispo > 0 ? (maxisFilled/nbDispo*100).toFixed(0) : 0}%"></div></div>
   </div>`;
 
   if (allFilled && !state.projet) {
@@ -1061,19 +1094,32 @@ function buildMaxis() {
       html += `<div class="section-title">${a.groupe==='haut'?'🏋️ Haut du corps':'🦵 Bas du corps'}</div>`;
     }
     const val = state.maxis[a.nom];
+    const isBless = val === 'B';
     const hasMaxi = isMaxiValid(a, val);
-    const maxiHtml = hasMaxi
-      ? `<div class="maxi-ro">${formatMaxiDisplay(a, val)}</div>`
-      : `<div class="maxi-ro-empty">+ maxi</div>`;
 
-    html += `<div class="atelier-card ${hasMaxi?'validated':''} clickable" data-idx="${i}">
-      <div class="atelier-icon ${a.groupe==='haut'?'icon-haut':'icon-bas'}">${a.icon}</div>
-      <div class="atelier-info">
-        <div class="atelier-name">${a.nom}</div>
-        <div class="atelier-muscles">${a.muscles}${a.note?` · <em>${a.note}</em>`:''}</div>
-      </div>
-      ${maxiHtml}
-    </div>`;
+    if (isBless) {
+      html += `<div class="atelier-card" style="opacity:.45;cursor:default" data-idx="${i}">
+        <div class="atelier-icon ${a.groupe==='haut'?'icon-haut':'icon-bas'}" style="filter:grayscale(1)">${a.icon}</div>
+        <div class="atelier-info">
+          <div class="atelier-name">${a.nom}</div>
+          <div class="atelier-muscles">${a.muscles}</div>
+        </div>
+        <div class="maxi-ro" style="color:var(--muted)">🚫</div>
+      </div>`;
+    } else {
+      const maxiHtml = hasMaxi
+        ? `<div class="maxi-ro">${formatMaxiDisplay(a, val)}</div>`
+        : `<div class="maxi-ro-empty">+ maxi</div>`;
+
+      html += `<div class="atelier-card ${hasMaxi?'validated':''} clickable" data-idx="${i}">
+        <div class="atelier-icon ${a.groupe==='haut'?'icon-haut':'icon-bas'}">${a.icon}</div>
+        <div class="atelier-info">
+          <div class="atelier-name">${a.nom}</div>
+          <div class="atelier-muscles">${a.muscles}${a.note?` · <em>${a.note}</em>`:''}</div>
+        </div>
+        ${maxiHtml}
+      </div>`;
+    }
   });
 
   pg.innerHTML = html + '<div style="height:2rem"></div>';
@@ -1442,16 +1488,29 @@ function buildFiche() {
 //  SYSTÈME DE BADGES
 // ═══════════════════════════════════════════════════
 
-function calculateBadge(nbAteliers) {
-  if (nbAteliers >= 6) return 'Or';
-  if (nbAteliers >= 5) return 'Argent';
-  if (nbAteliers >= 4) return 'Bronze';
+function calculateSeuils(nbDispo) {
+  const bronze = Math.max(3, Math.ceil(4 / 16 * nbDispo));
+  const argent = Math.max(4, Math.ceil(5 / 16 * nbDispo));
+  const or     = Math.max(5, Math.ceil(6 / 16 * nbDispo));
+  return { bronze, argent, or };
+}
+
+function getNbDispo() {
+  return ATELIERS.filter(a => state.maxis[a.nom] !== 'B').length;
+}
+
+function calculateBadge(nbAteliers, nbDispo) {
+  const n = nbDispo !== undefined ? nbDispo : ATELIERS.length;
+  const s = calculateSeuils(n);
+  if (nbAteliers >= s.or)     return 'Or';
+  if (nbAteliers >= s.argent) return 'Argent';
+  if (nbAteliers >= s.bronze) return 'Bronze';
   return 'Carton';
 }
 
 async function saveBadge() {
   const nbAteliers = state.compteurAteliersSeance;
-  const badge = calculateBadge(nbAteliers);
+  const badge = calculateBadge(nbAteliers, getNbDispo());
   if (badge === 'Carton') state.comptCarton++;
   else if (badge === 'Bronze') state.comptBronze++;
   else if (badge === 'Argent') state.comptArgent++;
@@ -1483,7 +1542,7 @@ async function saveBadge() {
 }
 
 function saveBadgeQuietly() {
-  const badge = calculateBadge(state.compteurAteliersSeance);
+  const badge = calculateBadge(state.compteurAteliersSeance, getNbDispo());
   if (badge === 'Carton') state.comptCarton++;
   else if (badge === 'Bronze') state.comptBronze++;
   else if (badge === 'Argent') state.comptArgent++;
@@ -1616,13 +1675,15 @@ function buildSeance() {
   if (!state.suggestionEnAttente) state.suggestionEnAttente = {};
 
   const count = state.compteurAteliersSeance;
-  const pct = Math.min((count/5)*100,100).toFixed(0);
+  const nbDispo = getNbDispo();
+  const objectif = calculateSeuils(nbDispo).argent;
+  const pct = Math.min((count/objectif)*100,100).toFixed(0);
   const readonlyBanner = !isEditable() ? `<div class="lock-msg" style="margin-bottom:1rem">🔒 Mode consultation — enregistrement disponible uniquement pendant le cours</div>` : '';
 
   let html = `${readonlyBanner}
     <!-- Barre de progression séance -->
     <div class="progress-bar-wrap">
-      <div class="progress-bar-label"><span>Ateliers validés cette séance</span><span id="seance-count">${count} / 5</span></div>
+      <div class="progress-bar-label"><span>Ateliers validés cette séance</span><span id="seance-count">${count} / ${objectif}</span></div>
       <div class="progress-bar-track"><div class="progress-bar-fill" id="seance-bar" style="width:${pct}%"></div></div>
       <div class="progress-msg" id="seance-msg">${progressMsg(count)}</div>
     </div>
@@ -1647,9 +1708,9 @@ function buildSeance() {
     </div>
   `;
 
-  // Ateliers
+  // Ateliers (les ateliers exclus pour blessure ne s'affichent pas)
   let lastGroupe = null;
-  ATELIERS.forEach(a => {
+  ATELIERS.filter(a => state.maxis[a.nom] !== 'B').forEach(a => {
     if (a.groupe !== lastGroupe) {
       lastGroupe = a.groupe;
       html += `<div class="section-title">${a.groupe==='haut'?'🏋️ Haut du corps':'🦵 Bas du corps'}</div>`;
@@ -1879,11 +1940,12 @@ async function validateAtelier(nomAtelier) {
   delete state.serieLocale[nomAtelier];
   state.compteurAteliersSeance++;
   localStorage.setItem('compteurAteliersSeance', state.compteurAteliersSeance);
-  const pct = Math.min((state.compteurAteliersSeance/5)*100,100).toFixed(0);
+  const _objectif = calculateSeuils(getNbDispo()).argent;
+  const pct = Math.min((state.compteurAteliersSeance/_objectif)*100,100).toFixed(0);
   const bar = $('seance-bar'), msg = $('seance-msg'), cnt = $('seance-count');
   if (bar) bar.style.width = pct+'%';
   if (msg) msg.textContent = progressMsg(state.compteurAteliersSeance);
-  if (cnt) cnt.textContent = state.compteurAteliersSeance + ' / 5';
+  if (cnt) cnt.textContent = state.compteurAteliersSeance + ' / ' + _objectif;
   if (state.compteurAteliersSeance >= 4 && (isEditable() || state.isAdmin)) {
     const btn = $('fin-seance-btn');
     if (btn) btn.style.display = 'block';

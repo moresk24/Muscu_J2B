@@ -292,6 +292,55 @@ suite('Autre atelier + 4×ok → pas de proposition', () => {
   assert(res.proposer === false, 'pas de proposition pour un atelier standard');
 });
 
+// ─── Tests calculateSeuils ────────────────────────────────────────────────────
+
+function calculateSeuils(nbDispo) {
+  const bronze = Math.max(3, Math.ceil(4 / 16 * nbDispo));
+  const argent = Math.max(4, Math.ceil(5 / 16 * nbDispo));
+  const or     = Math.max(5, Math.ceil(6 / 16 * nbDispo));
+  return { bronze, argent, or };
+}
+
+suite('calculateSeuils(16) → seuils standard', () => {
+  const s = calculateSeuils(16);
+  assert(s.bronze === 4, 'bronze = 4');
+  assert(s.argent === 5, 'argent = 5');
+  assert(s.or === 6,     'or = 6');
+});
+
+suite('calculateSeuils(12) → seuils réduits', () => {
+  const s = calculateSeuils(12);
+  assert(s.bronze === 3, 'bronze = 3');
+  assert(s.argent === 4, 'argent = 4');
+  assert(s.or === 5,     'or = 5');
+});
+
+suite('calculateSeuils(8) → seuils plancher', () => {
+  const s = calculateSeuils(8);
+  assert(s.bronze === 3, 'bronze = 3');
+  assert(s.argent === 4, 'argent = 4');
+  assert(s.or === 5,     'or = 5');
+});
+
+// ─── Tests isMaxiValid avec 'B' ───────────────────────────────────────────────
+
+function isMaxiValid_test(nomAtelier, val) {
+  if (val === 'B') return true;
+  if (val === '' || val === undefined || val === null) return false;
+  const type = nomAtelier === 'Banc à Lombaires' || nomAtelier === 'Abdo Sol' ? 'lombaires'
+             : nomAtelier === 'Gainage sol' ? 'gainage' : 'standard';
+  if (type === 'standard') return parseFloat(val) > 0;
+  return true;
+}
+
+suite('isMaxiValid avec valeur "B" → true (atelier blessé)', () => {
+  assert(isMaxiValid_test('Développé Couché', 'B') === true,  'standard + B → true');
+  assert(isMaxiValid_test('Gainage sol',      'B') === true,  'gainage + B → true');
+  assert(isMaxiValid_test('Banc à Lombaires', 'B') === true,  'lombaires + B → true');
+  assert(isMaxiValid_test('Développé Couché', '')  === false, 'vide → false');
+  assert(isMaxiValid_test('Développé Couché', '0') === false, 'zéro standard → false');
+});
+
 // ─── Résumé ───────────────────────────────────────────────────────────────────
 
 console.log(`\n${'─'.repeat(50)}`);
