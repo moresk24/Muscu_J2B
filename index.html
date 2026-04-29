@@ -1380,10 +1380,10 @@ function buildMaxiCalc() {
         <button class="calc-back-btn" id="calc-back">← Retour</button>
         <div class="calc-atelier-title">${a.icon} ${a.nom}</div>
       </div>
-      <div class="calc-mode-tabs">
+      ${type === 'standard' ? `<div class="calc-mode-tabs">
         <button class="calc-mode-tab ${_calcMode===1?'active':''}" id="tab-calc">Calculer mon maxi</button>
         <button class="calc-mode-tab ${_calcMode===2?'active':''}" id="tab-direct">Saisie directe</button>
-      </div>
+      </div>` : ''}
       ${formHtml}
       <div style="height:2rem"></div>`;
 
