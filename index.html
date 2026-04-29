@@ -680,7 +680,6 @@ let state = {
   // Séance locale
   intensite:null,
   serieLocale:{}, // {nomAtelier: [{ressenti, charge, reps}]}
-  maxiARevoir:{},
   compteurAteliersSeance: parseInt(localStorage.getItem('compteurAteliersSeance')||'0'),
   sessionId: localStorage.getItem('sessionId')||'',
   // Config
@@ -1045,7 +1044,7 @@ function doLogout() {
   $('screen-app').classList.remove('active');
   $('screen-dispensed').classList.remove('active');
   $('screen-login').classList.add('active');
-  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,statut:'',projet:'',maxis:{},series:{},intensite:null,serieLocale:{},maxiARevoir:{},compteurAteliersSeance:0,sessionId:'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0,dernierBadge:'',comptCarton:0,comptBronze:0,comptArgent:0,comptOr:0,badgeCourant:'',badgeCourantNbAteliers:0};
+  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,statut:'',projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurAteliersSeance:0,sessionId:'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0,dernierBadge:'',comptCarton:0,comptBronze:0,comptArgent:0,comptOr:0,badgeCourant:'',badgeCourantNbAteliers:0};
   localStorage.setItem('compteurAteliersSeance', '0');
   $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
   $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
@@ -1536,7 +1535,6 @@ async function saveBadge() {
   state.compteurAteliersSeance = 0;
   localStorage.setItem('compteurAteliersSeance', '0');
   state.serieLocale = {};
-  state.maxiARevoir = {};
 
   showPage('bilan-badge');
 }
@@ -1841,11 +1839,6 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
 
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
-    if (state.maxiARevoir[nomAtelier]) {
-      const bravoMaxi = document.getElementById('bravo-maxi-'+key);
-      if (bravoMaxi) bravoMaxi.style.display = 'block';
-      clearMaxiForAtelier(nomAtelier); // état sync immédiat, API en arrière-plan
-    }
     validateAtelier(nomAtelier); // fire & forget
     if (state.propositionNiveauSup && state.propositionNiveauSup.atelier === nomAtelier) {
       const prop = state.propositionNiveauSup;
@@ -1990,65 +1983,87 @@ function toggleAtelier(key) {
 async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps, serieIntensite) {
   const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
 
-  // Enregistrer localement
+  // 1. Enregistrer localement
   if (!state.serieLocale[nomAtelier]) state.serieLocale[nomAtelier] = [];
   state.serieLocale[nomAtelier][serieIndex] = {ressenti, charge, reps, unite, intensite: serieIntensite || state.intensite};
-
-  // Détecter maxi à revoir sur les valeurs réelles de la série qui vient d'être faite
-  const pDetect = state.projet ? PROJETS[state.projet] : null;
-  if (pDetect) {
-    const s = state.serieLocale[nomAtelier][serieIndex];
-    const atMaxInt = pDetect.intensites.indexOf(s.intensite) >= pDetect.intensites.length - 1;
-    if ((s.ressenti === 'F' || s.ressenti === 'D') && atMaxInt && s.reps >= pDetect.repsMax) {
-      state.maxiARevoir[nomAtelier] = true;
-    }
-  }
 
   const localSeries = state.serieLocale[nomAtelier];
   const seriesCount = localSeries.length;
 
-  // Marquer la série comme faite et reconstruire la grille
+  // 2. Reconstruire la grille de séries
   const a = ATELIERS.find(x => x.nom === nomAtelier);
   const maxi = parseFloat(state.maxis[nomAtelier]) || 0;
-  // Si TD → on affiche directement les mêmes params ; sinon on attend la validation
   if (!state.suggestionEnCours) state.suggestionEnCours = {};
   state.suggestionEnCours[nomAtelier] = (ressenti !== 'TD');
   const sgEl = document.getElementById('sg-' + key);
-  if (sgEl && a) {
-    sgEl.innerHTML = buildSeriesHTML(a, maxi, state.serieLocale[nomAtelier]);
-  }
+  if (sgEl && a) sgEl.innerHTML = buildSeriesHTML(a, maxi, localSeries);
 
-  // Bravo après série 4 — affichage immédiat, API en arrière-plan
-  if (seriesCount >= 4) {
-    const maxiSousEvalue = !!(state.maxiARevoir && state.maxiARevoir[nomAtelier]);
-    const validation = decideValidation(localSeries, maxiSousEvalue);
-    if (validation.maxiARevoir) state.maxiARevoir[nomAtelier] = true;
+  // 3. Règle 1 — Interruption immédiate (priorité absolue)
+  const interruption = detectInterruption(localSeries);
+  if (interruption.interrompu) {
+    delete state.serieLocale[nomAtelier];
+    if (state.suggestionEnAttente) delete state.suggestionEnAttente[nomAtelier];
+    if (sgEl && a) sgEl.innerHTML = buildSeriesHTML(a, 0, []);
+    clearMaxiForAtelier(nomAtelier);
 
-    // Afficher le bravo sans attendre l'API (évite l'app figée sur réseau lent)
-    const bravo = document.getElementById('bravo-'+key);
-    if (bravo) bravo.classList.add('visible');
-    const sug = document.getElementById('sug-'+key);
-    if (sug) sug.classList.remove('visible');
-    if (state.maxiARevoir[nomAtelier]) {
-      const bravoMaxi = document.getElementById('bravo-maxi-'+key);
-      if (bravoMaxi) {
-        if (validation.isSurEvalue) {
-          bravoMaxi.innerHTML = `
-            <div style="font-size:.78rem;font-weight:700;color:var(--yellow);margin-bottom:.3rem">⚠️ Atelier validé, mais attention !</div>
-            <div style="font-size:.75rem;color:var(--text);margin-bottom:.5rem">Vous avez fait plusieurs échecs. Votre maxi est probablement surévalué. Il faut le recalculer avant de continuer votre séance.</div>
-            <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000;font-size:.78rem;padding:.4rem .8rem" onclick="allerAuxMaxis('${nomAtelier}')">📊 Corriger mon maxi maintenant</button>`;
-        }
-        bravoMaxi.style.display = 'block';
+    const sugBox = document.getElementById('sug-' + key);
+    if (sugBox) {
+      sugBox.classList.add('visible');
+      if (interruption.raison === 'sous-evalue') {
+        sugBox.innerHTML = `
+          <div class="suggestion-title" style="color:var(--yellow)">⬆️ 2 fois Facile d'affilée !</div>
+          <div class="suggestion-text" style="margin-bottom:.6rem">
+            Votre maxi est probablement <strong>sous-évalué</strong>. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.
+          </div>
+          <div class="suggestion-actions">
+            <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
+              onclick="allerAuxMaxis('${nomAtelier}')">📊 Refaire mon maxi</button>
+          </div>`;
+      } else {
+        sugBox.innerHTML = `
+          <div class="suggestion-title" style="color:var(--red)">⬇️ 2 fois Échec d'affilée !</div>
+          <div class="suggestion-text" style="margin-bottom:.6rem">
+            Votre maxi est probablement <strong>surévalué</strong>. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.
+          </div>
+          <div class="suggestion-actions">
+            <button class="btn" style="background:linear-gradient(135deg,var(--red),#c0392b);color:#fff"
+              onclick="allerAuxMaxis('${nomAtelier}')">📊 Refaire mon maxi</button>
+          </div>`;
       }
-      clearMaxiForAtelier(nomAtelier); // état sync immédiat, API en arrière-plan
-      setTimeout(() => showPage('maxis'), 8000);
     }
-    validateAtelier(nomAtelier); // fire & forget : compteur + séries dans le GS
+    setTimeout(() => allerAuxMaxis(nomAtelier), 6000);
     return;
   }
 
-  // Suggestion série suivante
-  showSuggestion(nomAtelier, key, unite, ressenti, serieIndex+1, charge, reps, serieIntensite || state.intensite);
+  // 4. Règle 2 — Validation à la S4
+  if (seriesCount >= 4) {
+    const validation = decideValidation(localSeries);
+
+    const bravo = document.getElementById('bravo-' + key);
+    const sug   = document.getElementById('sug-' + key);
+    if (sug) sug.classList.remove('visible');
+    if (bravo) {
+      bravo.classList.add('visible');
+      const bravoText = bravo.querySelector('.bravo-text');
+      const bravoSub  = bravo.querySelector('.bravo-sub');
+      if (validation.type === 'exceptionnel') {
+        if (bravoText) bravoText.textContent = '🔥 Exceptionnel !';
+        if (bravoSub)  bravoSub.textContent  = '4 séries parfaites — vous maîtrisez cet atelier !';
+      } else if (validation.type === 'valide-bien') {
+        if (bravoText) bravoText.textContent = '💪 Très bien !';
+        if (bravoSub)  bravoSub.textContent  = 'TD en S3 et S4 — continuez comme ça !';
+      } else {
+        if (bravoText) bravoText.textContent = '👍 Bien joué !';
+        if (bravoSub)  bravoSub.textContent  = 'Cherchez le TD dès la S3 la prochaine fois pour progresser.';
+      }
+    }
+
+    validateAtelier(nomAtelier);
+    return;
+  }
+
+  // 5. Suggestion série suivante
+  showSuggestion(nomAtelier, key, unite, ressenti, serieIndex + 1, charge, reps, serieIntensite || state.intensite);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2056,15 +2071,15 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * decideSuggestion — décide quoi suggérer après une série.
+ * decideSuggestion — décide quoi suggérer après une série (S1–S3 uniquement).
+ * Les cas 2F/2E consécutifs sont traités en amont par detectInterruption.
  *
  * @param {{ressenti:string, charge:number, reps:number, intensite:number}} serie
  * @param {{intensites:number[], repsMin:number, repsMax:number}} projet
  * @param {Array<{ressenti:string}>} historique  toutes les séries de l'atelier (y.c. la courante)
- * @param {boolean} maxiARevoir  flag sous-évalué déjà positionné
- * @returns {{type:string, params:Object}}
+ * @returns {{type:string, params:Object, avertissementDoux?:boolean}}
  */
-function decideSuggestion(serie, projet, historique, maxiARevoir) {
+function decideSuggestion(serie, projet, historique) {
   const {ressenti, charge, reps, intensite} = serie;
   const ints = projet.intensites;
   const idxCurrent = ints.indexOf(intensite);
@@ -2076,14 +2091,6 @@ function decideSuggestion(serie, projet, historique, maxiARevoir) {
   }
 
   if (ressenti === 'E') {
-    let consecutiveE = 0;
-    for (let i = historique.length - 1; i >= 0; i--) {
-      if (historique[i] && historique[i].ressenti === 'E') consecutiveE++;
-      else break;
-    }
-    const contReps = Math.max(projet.repsMin, Math.ceil(reps * 0.85));
-    if (consecutiveE >= 3) return {type: 'warning-3-echecs', params: {contReps, charge, intensite}};
-    if (consecutiveE >= 2) return {type: 'warning-2-echecs', params: {contReps, charge, intensite}};
     if (atMinIntensite) {
       const newReps = Math.max(projet.repsMin, Math.ceil(reps * 0.85));
       return {type: 'e-min-intensite', params: {newReps, charge, intensite}};
@@ -2091,12 +2098,13 @@ function decideSuggestion(serie, projet, historique, maxiARevoir) {
     return {type: 'e-choix', params: {charge, reps, intensite}};
   }
 
-  // F ou D
+  // F ou D — F isolé après S1 → avertissement doux
+  const avertissementDoux = ressenti === 'F' && historique.length > 1;
+
   if (atMaxIntensite) {
-    if (maxiARevoir) return {type: 'maxi-sous-eval', params: {charge, reps, intensite}};
     const mult = ressenti === 'F' ? 1.30 : 1.15;
     const newReps = Math.min(Math.ceil(reps * mult), projet.repsMax);
-    return {type: 'fd-max-intensite', params: {newReps, charge, intensite}};
+    return {type: 'fd-max-intensite', params: {newReps, charge, intensite}, avertissementDoux};
   }
 
   const atMaxReps = reps >= projet.repsMax;
@@ -2105,27 +2113,26 @@ function decideSuggestion(serie, projet, historique, maxiARevoir) {
       ? Math.min(idxCurrent + 2, ints.length - 1)
       : Math.min(idxCurrent + 1, ints.length - 1);
     const newIntensite = ints[newIdx];
-    return {type: 'fd-force-charge', params: {newIntensite, reps}};
+    return {type: 'fd-force-charge', params: {newIntensite, reps}, avertissementDoux};
   }
 
-  return {type: 'fd-choix', params: {charge, reps, intensite}};
+  return {type: 'fd-choix', params: {charge, reps, intensite}, avertissementDoux};
 }
 
 /**
- * decideValidation — décide du résultat à la 4e série.
+ * decideValidation — évalue la qualité de l'atelier à la 4e série.
+ * Ne s'exécute que si detectInterruption n'a pas déclenché l'arrêt.
  *
  * @param {Array<{ressenti:string}>} serieLocale  les 4 séries complètes
- * @param {boolean} maxiSousEvalue  flag sous-évalué déjà positionné avant la série 4
- * @returns {{maxiARevoir:boolean, isSurEvalue:boolean, isSousEvalue:boolean}}
+ * @returns {{type:'exceptionnel'|'valide-bien'|'valide-progres'}}
  */
-function decideValidation(serieLocale, maxiSousEvalue) {
-  const totalEchecs = serieLocale.filter(s => s && s.ressenti === 'E').length;
-  const isSurEvalue = totalEchecs >= 2 && !maxiSousEvalue;
-  return {
-    maxiARevoir: isSurEvalue || maxiSousEvalue,
-    isSurEvalue,
-    isSousEvalue: maxiSousEvalue
-  };
+function decideValidation(serieLocale) {
+  const allTD = serieLocale.slice(0, 4).every(s => s && s.ressenti === 'TD');
+  if (allTD) return { type: 'exceptionnel' };
+  const s3td = serieLocale[2] && serieLocale[2].ressenti === 'TD';
+  const s4td = serieLocale[3] && serieLocale[3].ressenti === 'TD';
+  if (s3td && s4td) return { type: 'valide-bien' };
+  return { type: 'valide-progres' };
 }
 
 /**
@@ -2143,6 +2150,21 @@ function decideNiveauSup(nomAtelier, nbOk, niveauActuel) {
   return {proposer: false, niveauSuivant: null};
 }
 
+/**
+ * detectInterruption — 2 ressentis consécutifs identiques (F ou E) → arrêt immédiat.
+ * Priorité absolue sur toute autre règle.
+ */
+function detectInterruption(serieLocale) {
+  const n = serieLocale.length;
+  if (n < 2) return { interrompu: false };
+  const last = serieLocale[n - 1];
+  const prev = serieLocale[n - 2];
+  if (!last || !prev) return { interrompu: false };
+  if (last.ressenti === 'F' && prev.ressenti === 'F') return { interrompu: true, raison: 'sous-evalue' };
+  if (last.ressenti === 'E' && prev.ressenti === 'E') return { interrompu: true, raison: 'sur-evalue' };
+  return { interrompu: false };
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentCharge, currentReps, currentIntensite) {
@@ -2150,10 +2172,8 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
   const maxi = parseFloat(state.maxis[nomAtelier]) || 0;
   const intensiteRef = currentIntensite || state.intensite;
   const historique = state.serieLocale[nomAtelier] || [];
-  const maxiARevoir = !!(state.maxiARevoir && state.maxiARevoir[nomAtelier]);
-
   const serie = {ressenti, charge: currentCharge, reps: currentReps, intensite: intensiteRef};
-  const {type, params} = decideSuggestion(serie, p, historique, maxiARevoir);
+  const {type, params, avertissementDoux} = decideSuggestion(serie, p, historique);
 
   const sugBox = document.getElementById('sug-' + key);
   if (!sugBox) return;
@@ -2169,66 +2189,6 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
         <div class="suggestion-actions">
           <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.reps})">✓ On y va !</button>
           <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${params.charge},${params.reps},${params.intensite})">✏️ Modifier</button>
-        </div>`;
-      break;
-
-    case 'warning-3-echecs': {
-      // Abandon forcé : maxi effacé immédiatement, séries annulées
-      clearMaxiForAtelier(nomAtelier);
-      delete state.serieLocale[nomAtelier];
-      if (state.suggestionEnAttente) delete state.suggestionEnAttente[nomAtelier];
-      // suggestionEnCours reste true → série 1 reste "? × ?" avec boutons désactivés
-      const sgEl3 = document.getElementById('sg-' + key);
-      const atelierObj3 = ATELIERS.find(x => x.nom === nomAtelier);
-      if (sgEl3 && atelierObj3) sgEl3.innerHTML = buildSeriesHTML(atelierObj3, 0, []);
-      sugBox.innerHTML = `
-        <div class="suggestion-title" style="color:#e74c3c">🚨 3 échecs d'affilée !</div>
-        <div class="suggestion-text" style="margin-bottom:.6rem">
-          Votre maxi ne correspond vraiment pas à vos capacités. Vous devez faire une nouvelle recherche de maxi pour cet atelier !
-        </div>
-        <div class="suggestion-actions">
-          <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
-            onclick="allerAuxMaxis('${nomAtelier}')">
-            📊 Rechercher mon maxi
-          </button>
-        </div>`;
-      break;
-    }
-
-    case 'warning-2-echecs':
-      sugBox.innerHTML = `
-        <div class="suggestion-title" style="color:var(--yellow)">⚠️ 2 échecs d'affilée</div>
-        <div class="suggestion-text" style="margin-bottom:.6rem">
-          Vous n'arrivez pas à faire les séries proposées. Votre maxi est peut-être surévalué.
-        </div>
-        <div class="suggestion-actions">
-          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)"
-            onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.contReps})">
-            ✓ Continuer quand même
-          </button>
-          <button class="btn btn-outline" style="border-color:var(--yellow);color:var(--yellow)"
-            onclick="allerAuxMaxis('${nomAtelier}')">
-            📊 Recalculer mon maxi
-          </button>
-        </div>`;
-      break;
-
-    case 'maxi-sous-eval':
-      sugBox.innerHTML = `
-        <div class="suggestion-title" style="color:var(--yellow)">⚠️ Maxi à revoir !</div>
-        <div class="suggestion-text" style="margin-bottom:.6rem">
-          Votre maxi sur cet atelier <strong>ne correspond pas à vos capacités réelles</strong>.<br>
-          Vous êtes capable de faire plus ! Il faut le corriger.
-        </div>
-        <div class="suggestion-actions">
-          <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
-            onclick="allerAuxMaxis('${nomAtelier}')">
-            📊 Corriger mon maxi
-          </button>
-          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)"
-            onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.reps})">
-            Continuer quand même
-          </button>
         </div>`;
       break;
 
@@ -2289,6 +2249,10 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
           <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↑ Les reps</button>
         </div>`;
       break;
+  }
+
+  if (avertissementDoux) {
+    sugBox.innerHTML = `<div style="font-size:.75rem;color:var(--yellow);margin-bottom:.5rem">⚠️ Votre maxi semble peut-être sous-évalué</div>` + sugBox.innerHTML;
   }
 }
 
