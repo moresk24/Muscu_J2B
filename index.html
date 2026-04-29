@@ -1418,22 +1418,10 @@ function buildMaxiCalc() {
 
       } else if (type === 'lombaires') {
         const sel = $('calc-poids-add');
-        const result = $('calc-result');
-        function updateLombRes() {
-          result.textContent = `Votre maxi au ${a.nom} : 30 reps en 1' + ${sel.value} kg`;
-        }
-        updateLombRes();
-        sel.addEventListener('change', updateLombRes);
         $('btn-valid-calc').addEventListener('click', () => saveSingleMaxi(a.nom, sel.value));
 
       } else {
         const sel = $('calc-niveau');
-        const result = $('calc-result');
-        function updateGainRes() {
-          result.textContent = `Votre maxi au Gainage sol : Niveau ${sel.value}`;
-        }
-        updateGainRes();
-        sel.addEventListener('change', updateGainRes);
         $('btn-valid-calc').addEventListener('click', () => saveSingleMaxi(a.nom, sel.value));
       }
 
