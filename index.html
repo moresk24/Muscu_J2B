@@ -529,7 +529,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   <!-- Bottom nav -->
   <div class="bottom-nav">
     <button class="nav-btn active" data-page="maxis">
-      <span class="nav-icon">📊</span>Maxis
+      <span class="nav-icon">💪</span>Maxis
     </button>
     <button class="nav-btn" data-page="projet" disabled>
       <span class="nav-icon">🎯</span>Les Projets
@@ -1186,7 +1186,7 @@ function buildMaxis() {
   const maxisFilled = ATELIERS.filter(a => isMaxiValid(a, state.maxis[a.nom]) && state.maxis[a.nom] !== 'B').length;
   const allFilled = maxisAllFilled();
 
-  let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.5rem">📊 Mes Maxis <span style="color:var(--accent)">(1RM)</span></div>
+  let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.5rem">💪 Mes Maxis <span style="color:var(--accent)">(1RM)</span></div>
   <div style="font-size:.78rem;color:var(--muted);line-height:1.55;margin-bottom:.9rem">MAXI : c'est le poids maximum que vous pouvez soulever <strong style="color:var(--text)">une seule fois</strong> (1RM) sur un atelier, dans une exécution correcte. C'est votre référence personnelle pour calculer ensuite vos charges de travail en fonction de votre projet.</div>
   <div style="margin-bottom:.75rem">
     <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.35rem">
@@ -1961,7 +1961,7 @@ function buildSeance() {
           <div id="bravo-maxi-${a.nom.replace(/[^a-zA-Z]/g,'_')}" style="display:none;margin-top:.75rem;padding:.6rem .8rem;background:rgba(230,126,34,.12);border:1px solid var(--yellow);border-radius:8px;text-align:left">
             <div style="font-size:.78rem;font-weight:700;color:var(--yellow);margin-bottom:.3rem">⚠️ Il faut corriger de suite votre maxi à cet atelier !</div>
             <div style="font-size:.75rem;color:var(--text);margin-bottom:.5rem">Vous devez le recalculer avant de pouvoir continuer votre séance.</div>
-            <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000;font-size:.78rem;padding:.4rem .8rem" onclick="allerAuxMaxis('${a.nom}')">📊 Recalculer mon maxi</button>
+            <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000;font-size:.78rem;padding:.4rem .8rem" onclick="allerAuxMaxis('${a.nom}')">💪 Recalculer mon maxi</button>
           </div>
           ${a.nom === 'Gainage sol' ? `
           <div id="bravo-niveau-${a.nom.replace(/[^a-zA-Z]/g,'_')}" style="display:none;margin-top:.75rem;padding:.75rem;background:rgba(46,204,113,.08);border:1px solid var(--green);border-radius:10px;text-align:left">
@@ -2265,7 +2265,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
           </div>
           <div class="suggestion-actions">
             <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
-              onclick="allerAuxMaxis('${nomAtelier}')">📊 Refaire mon maxi</button>
+              onclick="allerAuxMaxis('${nomAtelier}')">💪 Refaire mon maxi</button>
           </div>`;
       } else {
         sugBox.innerHTML = `
@@ -2275,7 +2275,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
           </div>
           <div class="suggestion-actions">
             <button class="btn" style="background:linear-gradient(135deg,var(--red),#c0392b);color:#fff"
-              onclick="allerAuxMaxis('${nomAtelier}')">📊 Refaire mon maxi</button>
+              onclick="allerAuxMaxis('${nomAtelier}')">💪 Refaire mon maxi</button>
           </div>`;
       }
     }
