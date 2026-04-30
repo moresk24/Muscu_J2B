@@ -609,6 +609,17 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   </div>
 </div>
 
+<div class="modal-bg hidden" id="modal-fin-seance-bg">
+  <div class="modal">
+    <h3>Terminer la séance ?</h3>
+    <p>Êtes-vous sûr(e) de vouloir mettre fin à la séance en cours ? Votre badge sera attribué et vous ne pourrez plus valider d'ateliers supplémentaires.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="modal-fin-cancel">Annuler</button>
+      <button class="btn" id="modal-fin-confirm">Oui, terminer</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════
 //  CONFIG
@@ -796,37 +807,37 @@ const ATELIERS_CONTENT = {
   "Développé Couché":{
     exec:["La barre fait 10 kg à vide — repérez-vous sur les anneaux gravés pour la prise","Prise en pronation, largeur légèrement supérieure aux épaules","Descendre la barre jusqu'à toucher la poitrine","Pousser en expirant, bras presque tendus — ne pas verrouiller les coudes"],
     secu:["⚠️ Ne jamais travailler seul sans parade sur des charges lourdes","Ne pas rebondir la barre sur la poitrine","Poignets dans l'axe, ne pas les casser vers l'arrière"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=6BTdsptL1BQ"
   },
   "Développé Incliné":{
     exec:["La barre fait 10 kg à vide — repérez-vous sur les anneaux gravés pour la prise","Prise en pronation, largeur légèrement supérieure aux épaules","Dossier incliné à environ 30–45°, descendre la barre vers le haut de la poitrine (clavicules)","Mouvement contrôlé, pas de rebond, expirer à la poussée"],
     secu:["Vérifier le verrouillage du dossier avant de commencer","Ne pas cambrer excessivement le dos","La charge est inférieure au développé couché — c'est normal"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=4u_cmy1ijDA"
   },
   "Pull-Down Nuque":{
     exec:["Prise large en pronation","Tirer la barre derrière la tête jusqu'à la nuque","Coudes qui descendent vers le bas et l'arrière","Remonter lentement et de façon contrôlée, expirer à la traction"],
     secu:["⚠️ Déconseillé en cas de problème cervical","Ne pas incliner excessivement la tête vers l'avant","Ne pas lâcher la barre brutalement à la remontée"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=uq8OXMuU4_o"
   },
   "Pull-Down Poitrine":{
     exec:["Prise large en pronation","Tirer la barre devant, jusqu'au haut de la poitrine","Se pencher légèrement en arrière, poitrine sortie","Remonter lentement en contrôlant, expirer à la traction"],
     secu:["Ne pas tirer avec les bras seuls — initier avec les dorsaux","Ne pas laisser les épaules monter vers les oreilles en haut du mouvement","Cuisse bien calée sous les appuis"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=dOukQ7QBSQs"
   },
   "Butterfly":{
     exec:["Dos bien appuyé contre le dossier — régler l'assise en hauteur avant de commencer","Bras légèrement fléchis tout au long du mouvement","Fermer lentement devant la poitrine, ouvrir en résistant, expirer à la fermeture","Amplitude maximale sans douleur à l'épaule"],
     secu:["⚠️ Déconseillé en cas de problème d'épaule","Ne pas ouvrir au-delà de la ligne des épaules","Éviter les mouvements brusques en ouverture"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=vy4N60MrPWA"
   },
   "Banc Tirage Biceps":{
     exec:["Assis sur le banc, pieds posés sur la planche en aluminium, jambes presque tendues","Tirer les poignées vers les hanches en serrant les omoplates, coudes proches du corps","Repère : vous devez pouvoir toucher vos côtes avec vos pouces","Relâcher en tendant les bras de façon contrôlée, expirer à la traction"],
     secu:["Ne pas décoller la poitrine du banc pendant le tirage","Ne pas hausser les épaules — garder les trapèzes relâchés au départ","Amplitude complète — ne pas couper le mouvement"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=w2Q7LbkhtLI"
   },
   "Machine Biceps":{
     exec:["Coudes bien calés sur l'appui, immobiles pendant tout le mouvement","Fléchir jusqu'à avoir les avant-bras à la verticale","Étendre presque complètement, mouvement lent et contrôlé dans les deux sens","Expirer à la flexion"],
     secu:["Ne pas balancer le haut du corps pour aider","Ne pas verrouiller les coudes en bas du mouvement","⚠️ Charges modérées — articulation fragile"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=Ds-d-hmgIPE"
   },
   "Deltoïdes (haltères)":{
     exec:["Debout ou assis, dos droit","Lever les bras latéralement jusqu'à l'horizontale, légère flexion des coudes, pouces légèrement vers le bas","Redescendre lentement en résistant, expirer à la montée"],
@@ -846,37 +857,43 @@ const ATELIERS_CONTENT = {
       {label:"Niveau 4 — 30 secondes + jambe levée",steps:["Planche face au sol, jambe gauche levée — tenir 30s","Côté droit, jambe gauche levée — tenir 30s","Planche face au sol, jambe droite levée — tenir 30s","Côté gauche, jambe droite levée — tenir 30s"]}
     ],
     secu:["Garder le corps bien aligné, ne pas laisser les hanches s'affaisser","Ne pas retenir sa respiration","⚠️ Déconseillé en cas de problème lombaire ou d'épaule"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=auaPX7B2rV4"
   },
   "Abdo Sol":{
     exec:["Allongé sur le dos, genoux fléchis, pieds au sol","Mains croisées sur la poitrine ou derrière les tempes (pas derrière la nuque)","Monter les épaules vers les genoux, ne pas toucher le sol avec le haut du dos à la redescente","30 répétitions en 1 minute, expirer à la montée","Si l'exercice est trop facile : tenir un disque contre la poitrine"],
     secu:["Ne pas tirer sur la nuque avec les mains","Le bas du dos reste en contact avec le sol","Ne pas bloquer la respiration"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    videos:[
+      {label:"Foot 2 foot crunch",url:"https://www.youtube.com/watch?v=8FSPprNrqx4"},
+      {label:"Alternés",url:"https://www.youtube.com/watch?v=UuQNxjMPIfw"},
+      {label:"Élévation des jambes (4 temps)",url:"https://www.youtube.com/watch?v=FCcSgVWhmIE"},
+      {label:"Crunch bras croisés",url:"https://www.youtube.com/watch?v=iT5EjBwZLRM"},
+      {label:"Crunch genou/poitrine",url:"https://www.youtube.com/watch?v=gPJ_lSfgROM"}
+    ]
   },
   "Banc Ischio Jambiers":{
     exec:["Allongé face vers le bas sur le banc, chevilles calées sous les rouleaux","Fléchir les jambes jusqu'à avoir les mollets à la verticale","Redescendre lentement en contrôlant","Expirer à la flexion"],
     secu:["Régler l'atelier pour ne pas avoir les jambes en hyperextension au départ","Ne pas laisser les hanches se décoller du banc","Mouvement lent et contrôlé — pas d'à-coups","⚠️ Déconseillé en cas de problème aux genoux"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=gnOg-r7T6TY"
   },
   "Chaise à ADDucteurs":{
     exec:["Assis, dos bien appuyé contre le dossier, chevilles calées sur les appuis extérieurs","Fermer les jambes en résistant jusqu'au bout","Relâcher lentement en contrôlant l'ouverture","Expirer à la fermeture"],
     secu:["Régler l'écartement initial selon sa souplesse — pas de douleur à l'ouverture","Dos bien plaqué contre le dossier pendant tout le mouvement","⚠️ Déconseillé en cas de problème à l'aine ou aux genoux"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=Rm8kKSrSNgI"
   },
   "Chaise à ABDucteurs":{
     exec:["Assis, dos bien appuyé contre le dossier, chevilles calées sur les appuis intérieurs","Ouvrir les jambes vers l'extérieur jusqu'au maximum","Revenir lentement en contrôlant","Expirer à l'ouverture"],
     secu:["Régler l'écartement initial confortablement","Dos bien plaqué contre le dossier pendant tout le mouvement","⚠️ Déconseillé en cas de problème aux hanches ou aux genoux"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=Rm8kKSrSNgI"
   },
   "Chaise à Quadriceps":{
     exec:["Assis, dos bien appuyé contre le dossier, chevilles calées sous les rouleaux","Régler le dossier en profondeur pour que le creux poplité épouse la mousse de l'assise","Étendre les jambes jusqu'à l'horizontale","Redescendre lentement en contrôlant, expirer à l'extension"],
     secu:["Ne pas verrouiller les genoux en extension","Mouvement lent et contrôlé — pas de balancier","⚠️ Déconseillé en cas de problème aux genoux"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=FvWTjrAOG3k"
   },
   "Presse Inclinée":{
     exec:["Assis dans la machine, dos bien plaqué contre le dossier incliné","Pieds à plat sur la plateforme, largeur des épaules","Fléchir les jambes jusqu'à 90° puis pousser jusqu'à presque tendre","Toujours vérifier les sécurités de la machine avant de commencer","Expirer à la poussée"],
     secu:["⚠️ Ne jamais verrouiller les genoux en extension","Ne pas décoller le bas du dos du dossier","⚠️ Déconseillé en cas de problème aux genoux ou au dos"],
-    video:"https://www.youtube.com/watch?v=PLACEHOLDER"
+    video:"https://www.youtube.com/watch?v=cij6M0YkHQ0"
   }
 };
 
@@ -936,6 +953,25 @@ let state = {
   ateliersSeanceEnCours: [],
   currentAtelierDetail: ""
 };
+
+// ═══════════════════════════════════════════════════
+//  PERSISTANCE SÉRIE LOCALE
+// ═══════════════════════════════════════════════════
+function saveSerieLocale() {
+  localStorage.setItem('muscu_serieLocale', JSON.stringify(state.serieLocale));
+}
+
+function rebuildAteliersSeanceEnCours() {
+  state.ateliersSeanceEnCours = Object.keys(state.serieLocale).filter(
+    nom => Array.isArray(state.serieLocale[nom]) && state.serieLocale[nom].length >= 4
+  );
+}
+
+function loadSerieLocale() {
+  const raw = localStorage.getItem('muscu_serieLocale');
+  if (raw) { try { state.serieLocale = JSON.parse(raw); } catch(e) {} }
+  rebuildAteliersSeanceEnCours();
+}
 
 // ═══════════════════════════════════════════════════
 //  VÉRIFICATION PÉRIODIQUE DE LA SESSION
@@ -1001,7 +1037,7 @@ function toast(msg, type='ok') {
   t.className = 'toast' + (type==='error'?' error':type==='warn'?' warn':'');
   clearTimeout(toastTimer);
   setTimeout(()=>t.classList.add('show'),10);
-  toastTimer = setTimeout(()=>t.classList.remove('show'),3000);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), type==='warn' ? 8000 : 3000);
 }
 function loading(show) { $('loading').classList.toggle('hidden',!show); }
 
@@ -1084,8 +1120,12 @@ async function autoConnect(saved, classes) {
     if (localStorage.getItem('sessionId') !== newSession) {
       localStorage.setItem('sessionId', newSession);
       localStorage.setItem('compteurAteliersSeance', '0');
+      localStorage.removeItem('muscu_serieLocale');
       state.compteurAteliersSeance = 0;
       state.serieLocale = {};
+      state.ateliersSeanceEnCours = [];
+    } else {
+      loadSerieLocale();
     }
     $('tb-prenom').textContent = saved.prenom;
     $('tb-classe').textContent = saved.classe;
@@ -1192,8 +1232,12 @@ $('btn-login').addEventListener('click', async () => {
     if (localStorage.getItem('sessionId') !== newSession) {
       localStorage.setItem('sessionId', newSession);
       localStorage.setItem('compteurAteliersSeance', '0');
+      localStorage.removeItem('muscu_serieLocale');
       state.compteurAteliersSeance = 0;
       state.serieLocale = {};
+      state.ateliersSeanceEnCours = [];
+    } else {
+      loadSerieLocale();
     }
 
     // Sauvegarder identifiants en localStorage
@@ -1290,6 +1334,7 @@ function doLogout() {
     toast('⚠️ Votre travail a été enregistré sans attribution de badge. Utilisez "Fin de Séance" pour valider votre bilan.', 'warn');
   }
   localStorage.removeItem('muscu_login');
+  localStorage.removeItem('muscu_serieLocale');
   $('screen-app').classList.remove('active');
   $('screen-dispensed').classList.remove('active');
   $('screen-login').classList.add('active');
@@ -1755,6 +1800,10 @@ function selectProjetFromDetail(num) {
 $('modal-cancel').onclick = () => { $('modal-bg').classList.add('hidden'); pendingProjet=null; };
 $('modal-confirm').onclick = () => { $('modal-bg').classList.add('hidden'); if(pendingProjet) confirmProjet(pendingProjet); };
 
+function confirmerFinSeance() { $('modal-fin-seance-bg').classList.remove('hidden'); }
+$('modal-fin-cancel').onclick = () => { $('modal-fin-seance-bg').classList.add('hidden'); };
+$('modal-fin-confirm').onclick = () => { $('modal-fin-seance-bg').classList.add('hidden'); saveBadge(); };
+
 async function confirmProjet(num) {
   if (!isEditable()) { toast('Mode consultation — modifications non autorisées', 'warn'); return; }
   loading(true);
@@ -1882,6 +1931,8 @@ async function saveBadge() {
   state.compteurAteliersSeance = 0;
   localStorage.setItem('compteurAteliersSeance', '0');
   state.serieLocale = {};
+  state.ateliersSeanceEnCours = [];
+  localStorage.removeItem('muscu_serieLocale');
 
   showPage('bilan-badge');
 }
@@ -2049,7 +2100,7 @@ function buildSeance() {
         <div class="intensite-badge" id="badge-reps">${calcReps(state.projet,state.intensite)} reps</div>
       </div>
       <div id="fin-seance-btn" style="margin-top:.8rem;display:${count >= 4 && (isEditable() || state.isAdmin) ? 'block' : 'none'}">
-        <button class="btn" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em" onclick="saveBadge()">
+        <button class="btn" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em" onclick="confirmerFinSeance()">
           ✅ Terminer ma séance
         </button>
         <div style="text-align:center;font-size:.75rem;color:#fff;margin-top:.35rem">Ne cliquez pas si vous souhaitez continuer votre séance</div>
@@ -2137,6 +2188,7 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
   const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
   if (!state.serieLocale[nomAtelier]) state.serieLocale[nomAtelier] = [];
   state.serieLocale[nomAtelier][serieIndex] = {resultat, special: true};
+  saveSerieLocale();
 
   const a = ATELIERS.find(x => x.nom === nomAtelier);
   const sgEl = document.getElementById('sg-'+key);
@@ -2146,6 +2198,7 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
   const nbEchecs = state.serieLocale[nomAtelier].filter(s => s && s.resultat === 'echec').length;
   if (nbEchecs >= 2) {
     delete state.serieLocale[nomAtelier];
+    saveSerieLocale();
     clearMaxiForAtelier(nomAtelier);
     if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, []);
     const bravo = document.getElementById('bravo-'+key);
@@ -2264,7 +2317,8 @@ async function clearMaxiForAtelier(nomAtelier) {
 async function validateAtelier(nomAtelier) {
   // Mise à jour UI immédiate (optimiste)
   state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 1);
-  delete state.serieLocale[nomAtelier];
+  // serieLocale conservé intentionnellement pour l'historique et le blocage re-validation
+  saveSerieLocale();
   if (!state.ateliersSeanceEnCours.includes(nomAtelier)) {
     state.ateliersSeanceEnCours.push(nomAtelier);
     const cardEl = document.getElementById('sa-' + nomAtelier.replace(/[^a-zA-Z]/g,'_'));
@@ -2326,6 +2380,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   // 1. Enregistrer localement
   if (!state.serieLocale[nomAtelier]) state.serieLocale[nomAtelier] = [];
   state.serieLocale[nomAtelier][serieIndex] = {ressenti, charge, reps, unite, intensite: serieIntensite || state.intensite};
+  saveSerieLocale();
 
   const localSeries = state.serieLocale[nomAtelier];
   const seriesCount = localSeries.length;
@@ -2342,6 +2397,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   const interruption = detectInterruption(localSeries);
   if (interruption.interrompu) {
     delete state.serieLocale[nomAtelier];
+    saveSerieLocale();
     if (state.suggestionEnAttente) delete state.suggestionEnAttente[nomAtelier];
     if (state.suggestionEnCours) state.suggestionEnCours[nomAtelier] = false;
     if (sgEl && a) sgEl.innerHTML = buildSeriesHTML(a, 0, []);
@@ -2883,7 +2939,7 @@ function buildAtelierDetail() {
       </div>
     </div>
 
-    <div class="atelier-bloc-title">🏋️ Travail de la série</div>
+    <div class="atelier-bloc-title">🏋️ Vos séries à cet atelier</div>
     <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
     ${type==='standard'?`<div class="suggestion-box" id="sug-${key}"></div>`:''}
     <div class="bravo-box" id="bravo-${key}" onclick="showPage('seance')" style="cursor:pointer">
@@ -2918,13 +2974,17 @@ function buildAtelierDetail() {
     <div class="atelier-bloc-title">🛡️ Règles de sécurité</div>
     ${secuHtml}
 
+    ${(c.videos || (c.video && !c.video.includes('PLACEHOLDER'))) ? `
     <div class="atelier-detail-video" style="margin-top:1rem">
       <div style="font-size:1.4rem">🎬</div>
       <div style="flex:1">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.2rem">Vidéo de démonstration</div>
-        <a href="${c.video}" target="_blank" style="font-size:.85rem;color:var(--accent);text-decoration:none">Voir la vidéo →</a>
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.35rem">Vidéo${c.videos?'s':''} de démonstration</div>
+        ${c.videos
+          ? c.videos.map(v=>`<div style="margin-bottom:.25rem"><a href="${v.url}" target="_blank" style="font-size:.85rem;color:var(--accent);text-decoration:none">${v.label} →</a></div>`).join('')
+          : `<a href="${c.video}" target="_blank" style="font-size:.85rem;color:var(--accent);text-decoration:none">Voir la vidéo →</a>`
+        }
       </div>
-    </div>
+    </div>` : ''}
 
     <div style="height:1rem"></div>`;
 
