@@ -1487,9 +1487,10 @@ function buildProjet() {
     html += `<div style="font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem">Cliquez sur un projet pour en voir le détail</div>`;
   }
 
-  const projetsOrdonnes = Object.values(PROJETS).sort((a,b) => a.num===state.projet ? -1 : b.num===state.projet ? 1 : 0);
+  const _projetStr = String(state.projet);
+  const projetsOrdonnes = Object.values(PROJETS).sort((a,b) => a.num===_projetStr ? -1 : b.num===_projetStr ? 1 : 0);
   projetsOrdonnes.forEach(p => {
-    const isCurrent = state.projet === p.num;
+    const isCurrent = _projetStr === p.num;
     const c = PROJETS_CONTENT[p.num];
     const cardLocked = !allFilled;
     html += `<div class="projet-card ${cardLocked?'locked':''} ${isCurrent?'selected':''}" data-projet="${p.num}" style="position:relative">
@@ -1528,7 +1529,7 @@ function buildProjetDetail() {
   const p = PROJETS[num];
   if (!c || !p) { showPage('projet'); return; }
 
-  const isCurrent = state.projet === num;
+  const isCurrent = String(state.projet) === num;
   const canChoose = maxisAllFilled() && isEditable();
 
   let chooseBtn = '';
