@@ -652,7 +652,7 @@ const PROJETS = {
 
 const PROJETS_CONTENT = {
   "1": {
-    badge: "Projet 1",
+    badge: "Projet 1", icon: "⚡",
     titre: "Sportif",
     sousTitre: "Puissance — Explosivité",
     resume: "Développer la puissance musculaire : produire une force maximale dans un temps très court. La qualité physique qui fait la différence dans un sprint, un saut, un tir ou un changement de direction rapide.",
@@ -678,7 +678,7 @@ const PROJETS_CONTENT = {
     pdf: "PDF-Projets/projet1-sportif.pdf"
   },
   "2": {
-    badge: "Projet 2",
+    badge: "Projet 2", icon: "🏛️",
     titre: "Esthétique",
     sousTitre: "Volume musculaire — Hypertrophie",
     resume: "Développer le volume musculaire visible et durable. Une masse musculaire bien développée améliore la posture, protège les articulations et augmente le métabolisme de base.",
@@ -703,7 +703,7 @@ const PROJETS_CONTENT = {
     pdf: "PDF-Projets/projet2-esthetique.pdf"
   },
   "3A": {
-    badge: "Projet 3A",
+    badge: "Projet 3A", icon: "🫀",
     titre: "Santé Endurance",
     sousTitre: "Affinement de la silhouette — Dépense énergétique",
     resume: "Utiliser la musculation comme outil de dépense énergétique. À faible charge et haute cadence, c'est l'une des méthodes les plus efficaces pour mobiliser les graisses tout en renforçant les muscles.",
@@ -728,7 +728,7 @@ const PROJETS_CONTENT = {
     pdf: "PDF-Projets/projet3a-sante-endurance.pdf"
   },
   "3B": {
-    badge: "Projet 3B",
+    badge: "Projet 3B", icon: "⚖️",
     titre: "Santé Tonification",
     sousTitre: "Entretien musculaire — Raffermissement — Prévention",
     resume: "Le projet de l'équilibre et de la prévention. Maintenir les muscles fermes, réactifs et protecteurs pour les articulations — sans chercher à les faire grossir ni les épuiser.",
@@ -1499,7 +1499,7 @@ function buildProjet() {
     html += `<div class="projet-card ${cardLocked?'locked':''} ${isCurrent?'selected':''}" data-projet="${p.num}" style="position:relative">
       ${isCurrent ? `<div style="position:absolute;top:.6rem;right:.6rem;font-size:.7rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em">✓ Votre projet</div>` : ''}
       <div class="projet-num">${c ? c.badge : p.num}</div>
-      <div class="projet-name">${c ? c.titre : p.nom}</div>
+      <div class="projet-name">${c ? `${c.icon} ${c.titre}` : p.nom}</div>
       <div class="projet-desc">${c ? c.sousTitre : p.desc}</div>
       <div class="projet-tags">
         <span class="tag">💪 ${p.intensites[0]}–${p.intensites[p.intensites.length-1]}% maxi</span>
@@ -1551,7 +1551,7 @@ function buildProjetDetail() {
     <div class="projet-fiche">
       <div class="fiche-header">
         <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.6);margin-bottom:.3rem">${c.badge}</div>
-        <h2>${c.titre}</h2>
+        <h2>${c.icon} ${c.titre}</h2>
         <p>${c.sousTitre}</p>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
@@ -1653,7 +1653,7 @@ function buildFiche() {
     <div class="projet-fiche">
       <div class="fiche-header">
         <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.6);margin-bottom:.3rem">${c.badge}</div>
-        <h2>${c.titre}</h2>
+        <h2>${c.icon} ${c.titre}</h2>
         <p>${c.sousTitre}</p>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
