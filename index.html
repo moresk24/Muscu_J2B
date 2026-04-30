@@ -491,6 +491,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       </div>
       <button class="btn" id="btn-login" disabled>Entrer</button>
     </div>
+    <div style="text-align:center;margin-top:1.25rem">
+      <a href="tuto.html" target="_blank" style="font-size:.82rem;color:var(--muted);text-decoration:none">📖 Comment utiliser l'application ?</a>
+    </div>
   </div>
 </div>
 
@@ -1941,7 +1944,8 @@ function buildSeance() {
         <div class="atelier-icon ${a.groupe==='haut'?'icon-haut':'icon-bas'}">${a.icon}</div>
         <div class="seance-atelier-title">
           <div class="atelier-name">${a.nom}${validated?' ✓':''}</div>
-          <div class="atelier-maxi">Maxi : ${getAtelierType(a.nom)!=='standard' ? formatMaxiSeance(a) : `${maxi||'—'} ${a.unite}`} · ${validations} fois</div>
+          <div class="atelier-maxi">Maxi : ${getAtelierType(a.nom)!=='standard' ? formatMaxiSeance(a) : `${maxi||'—'} ${a.unite}`} · ${validations} validation${validations>1?'s':''}</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:.1rem">${a.muscles}</div>
         </div>
         <div class="seance-atelier-chevron">▼</div>
       </div>

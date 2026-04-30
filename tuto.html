@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide d'utilisation — Muscu à J2B</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #16161f;
+      --s1:     #1e1e2e;
+      --s2:     #252538;
+      --border: #2e2e45;
+      --text:   #e8e8f0;
+      --muted:  #7070a0;
+      --accent: #ff6b2b;
+      --accent2:#ffb347;
+      --green:  #2ecc71;
+      --blue:   #3d8bff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: .93rem;
+      line-height: 1.65;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    /* ── En-tête ── */
+    .doc-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .doc-header .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.8rem;
+      letter-spacing: .06em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .doc-header .subtitle {
+      font-size: .85rem;
+      color: var(--muted);
+      margin-top: .3rem;
+    }
+    .doc-header .doc-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: .05em;
+      color: var(--text);
+      margin-top: 1rem;
+    }
+
+    /* ── Sections ── */
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: .05em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header .step-num {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #000;
+      font-size: .85rem;
+      font-weight: 700;
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* ── Cartes ── */
+    .card {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      margin-bottom: .75rem;
+    }
+
+    .card-title {
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: .4rem;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .card p { color: var(--muted); font-size: .87rem; }
+    .card p + p { margin-top: .35rem; }
+
+    /* ── Étapes numérotées ── */
+    ol.steps {
+      list-style: none;
+      padding: 0;
+    }
+    ol.steps li {
+      display: flex;
+      gap: .75rem;
+      margin-bottom: .6rem;
+    }
+    ol.steps li .num {
+      background: var(--s2);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: .8rem;
+      min-width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: .1rem;
+    }
+    ol.steps li .content { font-size: .88rem; color: var(--text); }
+    ol.steps li .content em { color: var(--muted); font-style: normal; font-size: .82rem; }
+
+    /* ── Badges ressenti ── */
+    .ressenti-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .5rem;
+      margin: .75rem 0;
+    }
+
+    .ressenti-badge {
+      background: var(--s2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .6rem .8rem;
+      font-size: .85rem;
+    }
+    .ressenti-badge .label {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: .2rem;
+    }
+    .ressenti-badge.td .label { color: var(--green); }
+    .ressenti-badge.f  .label { color: var(--blue); }
+    .ressenti-badge.d  .label { color: var(--accent2); }
+    .ressenti-badge.e  .label { color: #e74c3c; }
+    .ressenti-badge p  { color: var(--muted); font-size: .78rem; line-height: 1.4; }
+
+    /* ── Alerte ── */
+    .alert {
+      background: rgba(255,107,43,.08);
+      border: 1px solid rgba(255,107,43,.3);
+      border-radius: 10px;
+      padding: .75rem 1rem;
+      margin: .75rem 0;
+      font-size: .85rem;
+    }
+    .alert.green {
+      background: rgba(46,204,113,.08);
+      border-color: rgba(46,204,113,.3);
+    }
+    .alert.yellow {
+      background: rgba(255,179,71,.08);
+      border-color: rgba(255,179,71,.3);
+    }
+    .alert strong { color: var(--accent); }
+    .alert.green strong { color: var(--green); }
+    .alert.yellow strong { color: var(--accent2); }
+
+    /* ── Badges couleurs séance ── */
+    .color-legend {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      margin: .6rem 0;
+    }
+    .color-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-size: .85rem;
+    }
+    .color-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ── Bouton PDF ── */
+    .print-btn {
+      display: block;
+      text-align: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #000;
+      font-weight: 700;
+      font-size: .95rem;
+      border: none;
+      border-radius: 12px;
+      padding: .9rem 1.5rem;
+      cursor: pointer;
+      text-decoration: none;
+      margin: 2rem auto 0;
+      width: fit-content;
+    }
+
+    /* ── Impression ── */
+    @media print {
+      body {
+        background: #fff;
+        color: #111;
+        font-size: .85rem;
+        padding: 1cm 1.5cm;
+      }
+      :root {
+        --bg: #fff;
+        --s1: #f5f5f5;
+        --s2: #ebebeb;
+        --border: #ccc;
+        --text: #111;
+        --muted: #555;
+        --accent: #d94a00;
+        --accent2: #c87000;
+        --green: #1a7a3e;
+        --blue: #1a4fa8;
+      }
+      .print-btn { display: none; }
+      .doc-header .logo {
+        -webkit-text-fill-color: var(--accent);
+      }
+      .section { page-break-inside: avoid; }
+      .card { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="doc-header">
+    <div class="logo">💪 Muscu à J2B</div>
+    <div class="subtitle">Lycée Jay de Beaufort — EPS Musculation · 2025–2026</div>
+    <div class="doc-title">📖 Guide d'utilisation de l'application</div>
+  </div>
+
+  <!-- ══ ÉTAPE 0 : Vue d'ensemble ══ -->
+  <div class="section">
+    <div class="section-header">
+      <span>🗺️</span> Comment fonctionne l'application ?
+    </div>
+    <div class="card">
+      <p>L'application vous accompagne à chaque étape du cycle de musculation. Elle est conçue pour fonctionner depuis votre smartphone pendant le cours, en salle de musculation.</p>
+      <p style="margin-top:.6rem">Le déroulement est toujours le même :</p>
+    </div>
+    <ol class="steps">
+      <li><div class="num">1</div><div class="content"><strong>Connexion</strong> — Choisissez votre classe, votre nom et entrez votre mot de passe.</div></li>
+      <li><div class="num">2</div><div class="content"><strong>Maxis (1RM)</strong> — Renseignez votre charge maximale sur chaque atelier.</div></li>
+      <li><div class="num">3</div><div class="content"><strong>Choix du projet</strong> — Choisissez votre objectif de travail pour le cycle.</div></li>
+      <li><div class="num">4</div><div class="content"><strong>Séances</strong> — L'application vous guide atelier par atelier pendant le cours.</div></li>
+      <li><div class="num">5</div><div class="content"><strong>Badge</strong> — À chaque séance, obtenez un badge selon votre performance.</div></li>
+    </ol>
+  </div>
+
+  <!-- ══ ÉTAPE 1 : Connexion ══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-num">1</span> Connexion
+    </div>
+    <ol class="steps">
+      <li><div class="num">1</div><div class="content">Sélectionnez votre <strong>classe</strong> dans le menu déroulant.</div></li>
+      <li><div class="num">2</div><div class="content">Sélectionnez votre <strong>nom</strong> dans la liste.</div></li>
+      <li><div class="num">3</div><div class="content">Saisissez votre <strong>mot de passe</strong> (6 à 10 lettres minuscules, sans accent). <em>Lors de votre première connexion, vous créez votre mot de passe — retenez-le.</em></div></li>
+      <li><div class="num">4</div><div class="content">Appuyez sur <strong>Entrer</strong>.</div></li>
+    </ol>
+    <div class="alert yellow">
+      <strong>⚠️ Mot de passe oublié ?</strong> Votre enseignant peut le réinitialiser depuis le tableau de bord.
+    </div>
+  </div>
+
+  <!-- ══ ÉTAPE 2 : Maxis ══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-num">2</span> 📊 Mes Maxis (1RM)
+    </div>
+    <div class="card">
+      <div class="card-title">Qu'est-ce que le Maxi (1RM) ?</div>
+      <p>Le <strong>1RM</strong> (1 Répétition Maximale) est le poids maximum que vous pouvez soulever <strong>une seule fois</strong> dans une exécution correcte. C'est votre référence personnelle pour calculer les charges de travail adaptées à votre niveau.</p>
+    </div>
+    <p style="margin-bottom:.6rem;font-size:.88rem">Sur la page Maxis, <strong>cliquez sur un atelier</strong> pour renseigner votre maxi. Deux méthodes sont disponibles :</p>
+    <div class="card">
+      <div class="card-title">⚡ Calculer mon maxi (méthode recommandée)</div>
+      <p>Utilisez les <strong>roulettes</strong> pour indiquer le poids que vous avez soulevé et le nombre de répétitions réalisées. L'application calcule votre 1RM théorique grâce à la formule de Brzycki. Appuyez ensuite sur <strong>Valider ce maxi</strong>.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">✏️ Saisie directe</div>
+      <p>Si vous connaissez déjà votre maxi, basculez sur l'onglet <strong>Saisie directe</strong> et entrez la valeur.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🧍 Ateliers spéciaux</div>
+      <p><strong>Banc à Lombaires / Abdo Sol</strong> — Indiquez le poids additionnel (0, 2, 5 ou 10 kg) que vous pouvez utiliser pour 30 répétitions en 1 minute.</p>
+      <p><strong>Gainage sol</strong> — Sélectionnez votre niveau de 1 à 4.</p>
+    </div>
+    <div class="alert green">
+      <strong>✅ Tous les maxis renseignés ?</strong> Le reste de l'application se déverrouille et vous pouvez choisir votre projet.
+    </div>
+  </div>
+
+  <!-- ══ ÉTAPE 3 : Projets ══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-num">3</span> 🎯 Les Projets
+    </div>
+    <p style="margin-bottom:.75rem;font-size:.88rem">Choisissez <strong>un seul projet</strong> pour tout le cycle. Ce choix détermine l'intensité, le nombre de répétitions et le temps de récupération qui vous seront proposés pendant les séances.</p>
+    <div class="card">
+      <div class="card-title">🏅 Projet 1 — SPORTIF</div>
+      <p>Pour améliorer votre puissance et explosivité. Idéal si vous pratiquez un sport. Séries courtes (4–8 reps) à haute intensité (80–90% du maxi).</p>
+    </div>
+    <div class="card">
+      <div class="card-title">💪 Projet 2 — ESTHÉTIQUE</div>
+      <p>Pour développer le volume musculaire. Séries longues (10–20 reps) à intensité modérée (65–80% du maxi).</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🌿 Projet 3A — SANTÉ Endurance</div>
+      <p>Pour affiner la silhouette et dépenser de l'énergie. Séries très longues (25–35 reps) à faible intensité (40–50% du maxi).</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🛡️ Projet 3B — SANTÉ Tonification</div>
+      <p>Pour entretenir et raffermir les muscles. Séries moyennes (15–25 reps) à intensité modérée (50–65% du maxi).</p>
+    </div>
+    <p style="font-size:.82rem;color:var(--muted);margin-top:.5rem">Consultez le détail de chaque projet en cliquant dessus, puis appuyez sur <strong>Choisir ce projet</strong>. Vous pouvez changer de projet d'une séance à l'autre si vous le souhaitez.</p>
+  </div>
+
+  <!-- ══ ÉTAPE 4 : Séances ══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-num">4</span> 🏋️ Ma Séance
+    </div>
+
+    <div class="card">
+      <div class="card-title">Déroulement général</div>
+      <p>La page Séance liste tous les ateliers disponibles. Choisissez l'atelier sur lequel vous travaillez, effectuez <strong>4 séries</strong>, et indiquez votre ressenti après chaque série. Répétez sur au moins 5 ateliers pour obtenir un badge.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Choisir l'intensité</div>
+      <p>En haut de la page, un menu vous permet de choisir votre intensité de travail dans la fourchette de votre projet. L'application vous indique automatiquement le nombre de répétitions correspondant.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Faire une série</div>
+      <ol class="steps" style="margin-top:.4rem">
+        <li><div class="num">1</div><div class="content">Appuyez sur le nom de l'atelier pour l'ouvrir.</div></li>
+        <li><div class="num">2</div><div class="content">L'application affiche la <strong>charge suggérée</strong> et le <strong>nombre de répétitions</strong> pour votre série. Si besoin, modifiez ces valeurs via le bouton "Modifier les paramètres".</div></li>
+        <li><div class="num">3</div><div class="content">Réalisez la série, puis indiquez votre <strong>ressenti</strong> en appuyant sur le bouton correspondant.</div></li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Les 4 boutons de ressenti</div>
+      <div class="ressenti-grid">
+        <div class="ressenti-badge td">
+          <div class="label">TD — Très Difficile</div>
+          <p>Vous avez réussi mais c'était à la limite. La charge est parfaitement adaptée.</p>
+        </div>
+        <div class="ressenti-badge f">
+          <div class="label">F — Facile</div>
+          <p>Vous auriez pu faire beaucoup plus. L'application va augmenter la charge.</p>
+        </div>
+        <div class="ressenti-badge d">
+          <div class="label">D — Difficile</div>
+          <p>C'était dur mais vous avez réussi. L'application ajuste légèrement.</p>
+        </div>
+        <div class="ressenti-badge e">
+          <div class="label">E — Échec</div>
+          <p>Vous n'avez pas réussi à finir la série. La charge sera réduite.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🧍 Ateliers spéciaux (Lombaires, Abdo Sol, Gainage sol)</div>
+      <p>Pour ces ateliers, il n'y a pas de charge à régler. Après chaque série, indiquez simplement <strong>Ok</strong> si vous avez réussi, ou <strong>Échec</strong> si vous n'avez pas pu terminer.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✅ Atelier validé</div>
+      <p>Après <strong>4 séries réussies</strong> sur un atelier, il est validé. Un message "Bravo ! Atelier Validé !" s'affiche, et l'encadré de l'atelier passe en <strong style="color:var(--blue)">bleu</strong> pour indiquer qu'il a été fait dans cette séance.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Couleur des ateliers</div>
+      <div class="color-legend">
+        <div class="color-item"><div class="color-dot" style="background:var(--muted)"></div>Atelier non encore travaillé</div>
+        <div class="color-item"><div class="color-dot" style="background:var(--green)"></div>Atelier validé lors d'une séance précédente</div>
+        <div class="color-item"><div class="color-dot" style="background:var(--blue)"></div>Atelier validé lors de la séance en cours</div>
+      </div>
+    </div>
+
+    <div class="alert">
+      <strong>⚠️ Maxi incorrect ?</strong> Si l'application détecte que votre maxi est trop faible ou trop élevé (résultats anormaux sur plusieurs séries), elle vous demandera de le recalculer. L'atelier concerné sera bloqué jusqu'à la mise à jour du maxi.
+    </div>
+  </div>
+
+  <!-- ══ ÉTAPE 5 : Fin de séance & Badges ══ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-num">5</span> 🏅 Fin de séance &amp; Badges
+    </div>
+    <div class="card">
+      <div class="card-title">Terminer la séance</div>
+      <p>Dès que vous avez validé <strong>4 ateliers ou plus</strong>, le bouton <strong>"✅ Terminer ma séance"</strong> apparaît en haut de la page Séance. Appuyez dessus pour valider votre bilan et recevoir votre badge.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Les badges</div>
+      <div class="color-legend" style="gap:.6rem">
+        <div class="color-item"><div class="color-dot" style="background:#cd7f32;border-radius:50%"></div><strong>Bronze</strong> — Moins de 5 ateliers validés</div>
+        <div class="color-item"><div class="color-dot" style="background:#c0c0c0;border-radius:50%"></div><strong>Argent</strong> — 5 ateliers validés</div>
+        <div class="color-item"><div class="color-dot" style="background:#ffd700;border-radius:50%"></div><strong>Or</strong> — 6 ateliers validés ou plus</div>
+      </div>
+    </div>
+    <div class="alert green">
+      <strong>💡 Conseil :</strong> Utilisez toujours le bouton "Terminer ma séance" avant de vous déconnecter, sinon votre badge de séance ne sera pas comptabilisé dans votre historique.
+    </div>
+    <div class="card">
+      <div class="card-title">🏅 Page Mes Badges</div>
+      <p>Consultez votre dernier badge et l'historique complet de vos badges (Bronze, Argent, Or) depuis le bouton <strong>Badges</strong> dans le menu du bas.</p>
+    </div>
+  </div>
+
+  <a class="print-btn" href="javascript:window.print()">🖨️ Télécharger / Imprimer ce guide en PDF</a>
+
+</div>
+</body>
+</html>
