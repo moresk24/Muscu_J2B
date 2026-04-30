@@ -1182,7 +1182,7 @@ function buildMaxis() {
   const maxisFilled = ATELIERS.filter(a => isMaxiValid(a, state.maxis[a.nom]) && state.maxis[a.nom] !== 'B').length;
   const allFilled = maxisAllFilled();
 
-  let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.5rem">📊 Vos Maxis <span style="color:var(--accent)">(1RM)</span></div>
+  let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.5rem">📊 Mes Maxis <span style="color:var(--accent)">(1RM)</span></div>
   <div style="font-size:.78rem;color:var(--muted);line-height:1.55;margin-bottom:.9rem">MAXI : c'est le poids maximum que vous pouvez soulever <strong style="color:var(--text)">une seule fois</strong> (1RM) sur un atelier, dans une exécution correcte. C'est votre référence personnelle pour calculer ensuite vos charges de travail en fonction de votre projet.</div>
   <div style="margin-bottom:.75rem">
     <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.35rem">
@@ -1197,8 +1197,6 @@ function buildMaxis() {
       <div class="congrats-banner-title">Bravo ! Tous vos maxis sont renseignés !</div>
       <div class="congrats-banner-sub">Vous pouvez maintenant choisir votre projet personnel de travail pour les prochaines séances.</div>
     </div>`;
-  } else {
-    html += `<div class="lock-msg">👆 Cliquez sur un atelier pour renseigner ou modifier votre maxi.</div>`;
   }
 
   let lastGroupe = null;
@@ -2165,7 +2163,11 @@ async function validateAtelier(nomAtelier) {
   // Mise à jour UI immédiate (optimiste)
   state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 1);
   delete state.serieLocale[nomAtelier];
-  if (!state.ateliersSeanceEnCours.includes(nomAtelier)) state.ateliersSeanceEnCours.push(nomAtelier);
+  if (!state.ateliersSeanceEnCours.includes(nomAtelier)) {
+    state.ateliersSeanceEnCours.push(nomAtelier);
+    const cardEl = document.getElementById('sa-' + nomAtelier.replace(/[^a-zA-Z]/g,'_'));
+    if (cardEl) { cardEl.classList.remove('validated-atelier'); cardEl.classList.add('seance-en-cours'); }
+  }
   state.compteurAteliersSeance++;
   localStorage.setItem('compteurAteliersSeance', state.compteurAteliersSeance);
   const _objectif = calculateSeuils(getNbDispo()).argent;
