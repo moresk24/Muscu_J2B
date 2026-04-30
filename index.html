@@ -290,6 +290,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .seance-atelier.open .seance-atelier-chevron{transform:rotate(180deg)}
 .seance-atelier.validated-atelier{border-color:var(--green)}
 .seance-atelier.validated-atelier .seance-atelier-header{background:rgba(46,204,113,.04)}
+.seance-atelier.seance-en-cours{border-color:var(--blue)}
+.seance-atelier.seance-en-cours .seance-atelier-header{background:rgba(61,139,255,.06)}
 .seance-atelier-body{display:none;padding:0 1rem 1rem}
 .seance-atelier.open .seance-atelier-body{display:block}
 
@@ -1156,7 +1158,7 @@ function doLogout() {
   $('screen-app').classList.remove('active');
   $('screen-dispensed').classList.remove('active');
   $('screen-login').classList.add('active');
-  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,statut:'',projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurAteliersSeance:0,sessionId:'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0,dernierBadge:'',comptCarton:0,comptBronze:0,comptArgent:0,comptOr:0,badgeCourant:'',badgeCourantNbAteliers:0};
+  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,statut:'',projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurAteliersSeance:0,sessionId:'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0,dernierBadge:'',comptCarton:0,comptBronze:0,comptArgent:0,comptOr:0,badgeCourant:'',badgeCourantNbAteliers:0,ateliersSeanceEnCours:[]};
   localStorage.setItem('compteurAteliersSeance', '0');
   $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
   $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
@@ -1180,7 +1182,8 @@ function buildMaxis() {
   const maxisFilled = ATELIERS.filter(a => isMaxiValid(a, state.maxis[a.nom]) && state.maxis[a.nom] !== 'B').length;
   const allFilled = maxisAllFilled();
 
-  let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.75rem">Vos Maxis <span style="color:var(--accent)">(1RM)</span></div>
+  let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.5rem">📊 Vos Maxis <span style="color:var(--accent)">(1RM)</span></div>
+  <div style="font-size:.78rem;color:var(--muted);line-height:1.55;margin-bottom:.9rem">MAXI : c'est le poids maximum que vous pouvez soulever <strong style="color:var(--text)">une seule fois</strong> (1RM) sur un atelier, dans une exécution correcte. C'est votre référence personnelle pour calculer ensuite vos charges de travail en fonction de votre projet.</div>
   <div style="margin-bottom:.75rem">
     <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.35rem">
       <span>Maxis renseignés</span><span style="color:var(--text);font-weight:700">${maxisFilled} / ${nbDispo}</span>
@@ -1268,6 +1271,7 @@ function maxisAllFilled() {
 
 // ── Navigation vers la page calcul maxi ────────────────────
 let _calcMode = 1;
+let _calcDrum = { charge: 40, reps: 10 };
 function goToMaxiCalc(idx) {
   state.currentCalcAtelier = idx;
   _calcMode = 1;
@@ -1283,6 +1287,9 @@ function buildMaxiCalc() {
   const type = getAtelierType(a.nom);
   const pg = $('page-maxi-calc');
 
+  const chargeValsCalc = Array.from({length: 150}, (_, i) => i + 1);
+  const repsValsCalc   = Array.from({length: 12},  (_, i) => i + 4);
+
   function render() {
     let formHtml = '';
 
@@ -1290,13 +1297,21 @@ function buildMaxiCalc() {
       // ── Mode Calcul ──
       if (type === 'standard') {
         formHtml = `
-          <div class="field">
-            <label class="field-label">Charge soulevée (kg)</label>
-            <input type="number" id="calc-charge" inputmode="decimal" step="0.5" min="0" placeholder="ex : 40">
-          </div>
-          <div class="field">
-            <label class="field-label">Nombre de répétitions (5 à 15)</label>
-            <input type="number" id="calc-reps" inputmode="numeric" step="1" min="5" max="15" placeholder="ex : 10">
+          <div class="drum-picker-wrap">
+            <div class="drum-picker-col">
+              <div class="field-label" style="margin-bottom:.3rem">Charge soulevée (kg)</div>
+              <div class="drum-picker" id="drum-calc-charge">
+                <div class="drum-highlight"></div>
+                <div class="drum-track"></div>
+              </div>
+            </div>
+            <div class="drum-picker-col">
+              <div class="field-label" style="margin-bottom:.3rem">Répétitions (4–15)</div>
+              <div class="drum-picker" id="drum-calc-reps">
+                <div class="drum-highlight"></div>
+                <div class="drum-track"></div>
+              </div>
+            </div>
           </div>
           <button class="btn" id="btn-calc">Calculer mon maxi théorique</button>
           <div class="calc-result" id="calc-result"></div>
@@ -1395,16 +1410,14 @@ function buildMaxiCalc() {
 
     if (_calcMode === 1) {
       if (type === 'standard') {
+        initDrumPicker('drum-calc-charge', chargeValsCalc, _calcDrum.charge, v => _calcDrum.charge = v);
+        initDrumPicker('drum-calc-reps',   repsValsCalc,   _calcDrum.reps,   v => _calcDrum.reps   = v);
         const btnCalc  = $('btn-calc');
         const btnValid = $('btn-valid-calc');
         const result   = $('calc-result');
         btnCalc.addEventListener('click', () => {
-          const charge = parseFloat($('calc-charge').value);
-          const reps   = parseInt($('calc-reps').value);
-          if (!charge || charge <= 0 || !reps || reps < 5 || reps > 15) {
-            toast('Indiquez une charge et un nombre de répétitions valides (5–15)', 'warn');
-            return;
-          }
+          const charge = _calcDrum.charge;
+          const reps   = _calcDrum.reps;
           const rm = Math.ceil(charge / (1.0278 - 0.0278 * reps));
           result.textContent = `${a.nom} : votre maxi théorique est ${rm} kg`;
           result.classList.add('visible');
@@ -1459,7 +1472,7 @@ function buildProjet() {
   const pg = $('page-projet');
   const allFilled = maxisAllFilled();
 
-  let html = '';
+  let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.75rem">🎯 Les Projets</div>`;
   if (!allFilled) {
     html += `<div class="lock-msg">🔒 Renseignez tous vos maxis pour débloquer le choix du projet !</div>`;
   }
@@ -1874,7 +1887,12 @@ function buildSeance() {
   const pct = Math.min((count/objectif)*100,100).toFixed(0);
   const readonlyBanner = !isEditable() ? `<div class="lock-msg" style="margin-bottom:1rem">🔒 Mode consultation — enregistrement disponible uniquement pendant le cours</div>` : '';
 
-  let html = `${readonlyBanner}
+  const _now = new Date();
+  const _dateStr = _now.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const _dateCap = _dateStr.charAt(0).toUpperCase() + _dateStr.slice(1);
+
+  let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.05em;margin-bottom:.75rem">🏋️ Votre séance du <span style="color:var(--accent)">${_dateCap}</span></div>
+  ${readonlyBanner}
     <!-- Barre de progression séance -->
     <div class="progress-bar-wrap">
       <div class="progress-bar-label"><span>Ateliers validés cette séance</span><span id="seance-count">${count} / ${objectif}</span></div>
@@ -1911,16 +1929,16 @@ function buildSeance() {
     }
     const maxi = parseFloat(state.maxis[a.nom])||0;
     const validations = parseInt(state.series[a.nom]||0);
-    const totalSeries = validations * 4;
     const validated = validations >= 1;
+    const seanceEnCours = state.ateliersSeanceEnCours.includes(a.nom);
     const localSeries = state.serieLocale[a.nom] || [];
 
-    html += `<div class="seance-atelier ${validated?'validated-atelier':''}" id="sa-${a.nom.replace(/[^a-zA-Z]/g,'_')}">
+    html += `<div class="seance-atelier ${seanceEnCours?'seance-en-cours':validated?'validated-atelier':''}" id="sa-${a.nom.replace(/[^a-zA-Z]/g,'_')}">
       <div class="seance-atelier-header" onclick="toggleAtelier('${a.nom.replace(/[^a-zA-Z]/g,'_')}')">
         <div class="atelier-icon ${a.groupe==='haut'?'icon-haut':'icon-bas'}">${a.icon}</div>
         <div class="seance-atelier-title">
           <div class="atelier-name">${a.nom}${validated?' ✓':''}</div>
-          <div class="atelier-maxi">Maxi : ${getAtelierType(a.nom)!=='standard' ? formatMaxiSeance(a) : `${maxi||'—'} ${a.unite}`} · ${totalSeries} série${totalSeries!==1?'s':''} au total</div>
+          <div class="atelier-maxi">Maxi : ${getAtelierType(a.nom)!=='standard' ? formatMaxiSeance(a) : `${maxi||'—'} ${a.unite}`} · ${validations} fois</div>
         </div>
         <div class="seance-atelier-chevron">▼</div>
       </div>
@@ -2147,6 +2165,7 @@ async function validateAtelier(nomAtelier) {
   // Mise à jour UI immédiate (optimiste)
   state.series[nomAtelier] = (parseInt(state.series[nomAtelier]||0) + 1);
   delete state.serieLocale[nomAtelier];
+  if (!state.ateliersSeanceEnCours.includes(nomAtelier)) state.ateliersSeanceEnCours.push(nomAtelier);
   state.compteurAteliersSeance++;
   localStorage.setItem('compteurAteliersSeance', state.compteurAteliersSeance);
   const _objectif = calculateSeuils(getNbDispo()).argent;

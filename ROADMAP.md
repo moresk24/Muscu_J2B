@@ -220,15 +220,6 @@ Nouveau handler `handleSaveBadge()` ; `loadEleve` renvoie maintenant `dernierBad
 - Suppression de l'encadré `calc-result` vide pour les ateliers spéciaux
 - Fix : listeners `tab-calc` / `tab-direct` et `calc-result` plantaient pour les ateliers spéciaux → bouton "Valider ce maxi" inopérant → corrigé
 
----
-
-## 🔜 À réfléchir — Validation atelier avec maxi sous-évalué
-
-Quand le maxi est détecté comme sous-évalué (warning "Maxi à revoir"), faut-il comptabiliser
-la validation de l'atelier ou l'annuler ? Les 4 séries ont été faites avec une charge trop faible
-pour être vraiment valides pédagogiquement. Décision en attente.
-
----
 
 ## 🔜 Évolution — Page dédiée par atelier (amélioration UX + contenu pédagogique)
 
