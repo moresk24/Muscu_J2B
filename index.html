@@ -1103,19 +1103,20 @@ async function autoConnect(saved, classes) {
       return;
     }
     // Connecter directement
-    state.classe       = saved.classe;
-    state.nom          = saved.nom;
-    state.prenom       = saved.prenom;
-    state.mdp          = saved.mdp;
-    state.statut       = d.statut  || '';
-    state.projet       = d.projet || '';
-    state.maxis        = d.maxis  || {};
-    state.series       = d.series || {};
-    state.dernierBadge = d.dernierBadge || '';
-    state.comptCarton  = d.comptCarton  || 0;
-    state.comptBronze  = d.comptBronze  || 0;
-    state.comptArgent  = d.comptArgent  || 0;
-    state.comptOr      = d.comptOr      || 0;
+    state.classe              = saved.classe;
+    state.nom                 = saved.nom;
+    state.prenom              = saved.prenom;
+    state.mdp                 = saved.mdp;
+    state.statut              = d.statut  || '';
+    state.projet              = d.projet || '';
+    state.maxis               = d.maxis  || {};
+    state.series              = d.series || {};
+    state.historiqueAteliers  = d.historique || {};
+    state.dernierBadge        = d.dernierBadge || '';
+    state.comptCarton         = d.comptCarton  || 0;
+    state.comptBronze         = d.comptBronze  || 0;
+    state.comptArgent         = d.comptArgent  || 0;
+    state.comptOr             = d.comptOr      || 0;
     const newSession = saved.classe + saved.nom + saved.prenom + new Date().toDateString();
     if (localStorage.getItem('sessionId') !== newSession) {
       localStorage.setItem('sessionId', newSession);
@@ -1212,20 +1213,21 @@ $('btn-login').addEventListener('click', async () => {
     }
 
     // Remplir state
-    state.classe       = cls;
-    state.nom          = eInfo.nom;
-    state.prenom       = eInfo.prenom;
-    state.mdp          = mdp;
-    state.statut       = d.statut  || '';
-    state.projet       = d.projet || '';
-    state.maxis        = d.maxis  || {};
-    state.series       = d.series || {};
-    state.isFirstLogin = !eInfo.hasMdp;
-    state.dernierBadge = d.dernierBadge || '';
-    state.comptCarton  = d.comptCarton  || 0;
-    state.comptBronze  = d.comptBronze  || 0;
-    state.comptArgent  = d.comptArgent  || 0;
-    state.comptOr      = d.comptOr      || 0;
+    state.classe              = cls;
+    state.nom                 = eInfo.nom;
+    state.prenom              = eInfo.prenom;
+    state.mdp                 = mdp;
+    state.statut              = d.statut  || '';
+    state.projet              = d.projet || '';
+    state.maxis               = d.maxis  || {};
+    state.series              = d.series || {};
+    state.historiqueAteliers  = d.historique || {};
+    state.isFirstLogin        = !eInfo.hasMdp;
+    state.dernierBadge        = d.dernierBadge || '';
+    state.comptCarton         = d.comptCarton  || 0;
+    state.comptBronze         = d.comptBronze  || 0;
+    state.comptArgent         = d.comptArgent  || 0;
+    state.comptOr             = d.comptOr      || 0;
 
     // Nouvelle session → reset compteur local
     const newSession = cls + eInfo.nom + eInfo.prenom + new Date().toDateString();
@@ -2337,8 +2339,12 @@ async function validateAtelier(nomAtelier) {
     if (btn) btn.style.display = 'block';
   }
 
+  // Sauvegarder les 4 séries dans l'historique local
+  const seriesDuJour = (state.serieLocale[nomAtelier] || []).slice(0,4).map(s=>({c:s.charge,r:s.reps,s:s.ressenti}));
+  state.historiqueAteliers[nomAtelier] = seriesDuJour;
+
   try {
-    const res = await apiPost({action:'validateAtelier', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier});
+    const res = await apiPost({action:'validateAtelier', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier, historique:JSON.stringify(seriesDuJour)});
     if (res && res.newCompteur !== undefined) state.compteur = res.newCompteur;
   } catch(e) { console.error(e); }
 }
@@ -2939,6 +2945,22 @@ function buildAtelierDetail() {
       </div>
     </div>
 
+    ${(()=>{
+      const hist = state.historiqueAteliers[nom];
+      if (!hist || !hist.length) return '';
+      const labels = {F:'Facile',D:'Difficile',TD:'Très Difficile',E:'Échec'};
+      const colors = {F:'var(--muted)',D:'var(--accent)',TD:'var(--green)',E:'var(--red,#e74c3c)'};
+      const rows = hist.map((s,i)=>`
+        <div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.2rem 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--muted);min-width:1.5rem">S${i+1}</span>
+          <span style="flex:1;color:var(--text)">${s.r} × ${s.c} kg</span>
+          <span style="font-weight:700;color:${colors[s.s]||'var(--muted)'}">${s.s||'—'}</span>
+        </div>`).join('');
+      return `<div style="background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:.65rem .85rem;margin-bottom:.5rem">
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">📋 Dernière séance validée</div>
+        ${rows}
+      </div>`;
+    })()}
     <div class="atelier-bloc-title">🏋️ Vos séries à cet atelier</div>
     <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
     ${type==='standard'?`<div class="suggestion-box" id="sug-${key}"></div>`:''}

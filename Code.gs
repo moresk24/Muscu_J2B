@@ -39,6 +39,7 @@ const COL_COMPTEUR_BRONZE  = 10;
 const COL_COMPTEUR_ARGENT  = 11;
 const COL_COMPTEUR_OR      = 12;
 const COL_ATELIERS_START   = 13; // à partir de là : maxi + séries faites (par paires)
+const COL_HISTORIQUE       = 45; // JSON : dernière séance validée par atelier
 
 // ════════════════════════════════════════════════════════════
 //  WEB APP — TOUT EN GET (évite les problèmes CORS)
@@ -115,6 +116,9 @@ function handleLoadEleve(classe, nom, prenom) {
     series[atelier] = row[colSeries] || 0;
   });
 
+  let historique = {};
+  try { historique = JSON.parse(row[COL_HISTORIQUE] || '{}'); } catch(e) {}
+
   return {
     success:       true,
     mdp:           row[COL_MDP]             || "",
@@ -128,7 +132,8 @@ function handleLoadEleve(classe, nom, prenom) {
     comptArgent:   parseInt(row[COL_COMPTEUR_ARGENT]) || 0,
     comptOr:       parseInt(row[COL_COMPTEUR_OR])     || 0,
     maxis,
-    series
+    series,
+    historique
   };
 }
 
@@ -297,6 +302,17 @@ function handleValidateAtelier(p) {
     const colSeries = COL_ATELIERS_START + atelierIndex * 2 + 1 + 1;
     const newSeries = (parseInt(row[COL_ATELIERS_START + atelierIndex * 2 + 1]) || 0) + 1;
     sheet.getRange(rowIndex + 1, colSeries).setValue(newSeries);
+  }
+
+  // Sauvegarder l'historique de la dernière séance pour cet atelier
+  if (p.historique) {
+    try {
+      const raw = row[COL_HISTORIQUE] || '{}';
+      let hist = {};
+      try { hist = JSON.parse(raw); } catch(e) {}
+      hist[p.atelier] = JSON.parse(p.historique);
+      sheet.getRange(rowIndex + 1, COL_HISTORIQUE + 1).setValue(JSON.stringify(hist));
+    } catch(e) {}
   }
 
   updateLastCo(sheet, rowIndex);
