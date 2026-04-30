@@ -1533,14 +1533,17 @@ function buildProjetDetail() {
   const canChoose = maxisAllFilled() && isEditable();
 
   let chooseBtn = '';
-  if (isCurrent) {
-    chooseBtn = `<div style="background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3);border-radius:12px;padding:.75rem 1rem;text-align:center;font-size:.9rem;color:var(--green);font-weight:600">✓ Votre projet actuel</div>`;
-  } else if (canChoose) {
+  if (!isCurrent && canChoose) {
     chooseBtn = `<button class="btn" style="width:100%" onclick="selectProjetFromDetail('${num}')">Choisir ce projet</button>`;
   }
 
+  const pageTitle = isCurrent
+    ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.75rem">🎯 Votre projet de travail</div>`
+    : '';
+
   pg.innerHTML = `
     <button onclick="showPage('projet')" style="background:none;border:none;color:var(--accent);font-size:.95rem;cursor:pointer;padding:0;margin-bottom:1rem">← Retour aux projets</button>
+    ${pageTitle}
     ${chooseBtn ? `<div style="margin-bottom:.75rem">${chooseBtn}</div>` : ''}
     <div class="projet-fiche">
       <div class="fiche-header">
@@ -1878,7 +1881,7 @@ function buildSeance() {
     return;
   }
   const p = PROJETS[state.projet];
-  if (!state.intensite) state.intensite = p.intensites[0];
+  if (!state.intensite || !p.intensites.includes(state.intensite)) state.intensite = p.intensites[0];
   if (!state.suggestionEnAttente) state.suggestionEnAttente = {};
 
   const count = state.compteurAteliersSeance;
