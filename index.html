@@ -2870,12 +2870,6 @@ function buildAtelierDetail() {
     <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
       <button class="calc-back-btn" onclick="showPage('seance')">← Séance</button>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;flex:1">${a.icon} ${a.nom}</div>
-      ${validations>0?`<div style="font-size:.75rem;color:var(--green);font-weight:700">✓ ${validations}×</div>`:''}
-    </div>
-
-    <div class="atelier-detail-muscles">
-      <div class="atelier-detail-muscles-label">💪 Muscles sollicités</div>
-      <div class="atelier-detail-muscles-val">${a.muscles}</div>
     </div>
 
     <div class="atelier-detail-maxi">
@@ -2889,42 +2883,42 @@ function buildAtelierDetail() {
       </div>
     </div>
 
-    <div class="atelier-detail-section">
-      <div class="atelier-detail-section-title">🏋️ Travail de la série</div>
-      <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
-      ${type==='standard'?`<div class="suggestion-box" id="sug-${key}"></div>`:''}
-      <div class="bravo-box" id="bravo-${key}">
-        <div class="bravo-emoji">🎉</div>
-        <div class="bravo-text">Bravo ! Atelier Validé !</div>
-        <div class="bravo-sub">4 séries effectuées sur cet atelier</div>
-        <div id="bravo-maxi-${key}" style="display:none;margin-top:.75rem;padding:.6rem .8rem;background:rgba(230,126,34,.12);border:1px solid var(--yellow);border-radius:8px;text-align:left">
-          <div style="font-size:.78rem;font-weight:700;color:var(--yellow);margin-bottom:.3rem">⚠️ Il faut corriger votre maxi à cet atelier !</div>
-          <div style="font-size:.75rem;color:var(--text);margin-bottom:.5rem">Vous devez le recalculer avant de continuer.</div>
-          <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000;font-size:.78rem;padding:.4rem .8rem" onclick="allerAuxMaxis('${nomEsc}')">💪 Recalculer mon maxi</button>
-        </div>
-        ${nom==='Gainage sol'?`
-        <div id="bravo-niveau-${key}" style="display:none;margin-top:.75rem;padding:.75rem;background:rgba(46,204,113,.08);border:1px solid var(--green);border-radius:10px;text-align:left">
-          <div style="font-size:.85rem;font-weight:700;color:var(--green);margin-bottom:.5rem">💪 Excellent travail !</div>
-          <div id="bravo-niveau-text-${key}" style="font-size:.8rem;color:var(--text);margin-bottom:.6rem"></div>
-          <div style="display:flex;gap:.5rem">
-            <button class="btn" style="flex:1;font-size:.8rem;padding:.5rem" onclick="accepterNiveauSup('${nomEsc}')">✓ Oui</button>
-            <button class="btn btn-outline" style="flex:1;font-size:.8rem;padding:.5rem" onclick="refuserNiveauSup('${nomEsc}')">✗ Non</button>
-          </div>
-        </div>`:''}
+    <div class="atelier-bloc-title">🏋️ Travail de la série</div>
+    <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
+    ${type==='standard'?`<div class="suggestion-box" id="sug-${key}"></div>`:''}
+    <div class="bravo-box" id="bravo-${key}" onclick="showPage('seance')" style="cursor:pointer">
+      <div class="bravo-emoji">🎉</div>
+      <div class="bravo-text">Bravo ! Atelier Validé !</div>
+      <div class="bravo-sub">4 séries effectuées sur cet atelier</div>
+      <div style="font-size:.72rem;color:var(--green);margin-top:.4rem;opacity:.7">Appuyez pour revenir à la séance →</div>
+      <div id="bravo-maxi-${key}" style="display:none;margin-top:.75rem;padding:.6rem .8rem;background:rgba(230,126,34,.12);border:1px solid var(--yellow);border-radius:8px;text-align:left" onclick="event.stopPropagation()">
+        <div style="font-size:.78rem;font-weight:700;color:var(--yellow);margin-bottom:.3rem">⚠️ Il faut corriger votre maxi à cet atelier !</div>
+        <div style="font-size:.75rem;color:var(--text);margin-bottom:.5rem">Vous devez le recalculer avant de continuer.</div>
+        <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000;font-size:.78rem;padding:.4rem .8rem" onclick="event.stopPropagation();allerAuxMaxis('${nomEsc}')">💪 Recalculer mon maxi</button>
       </div>
+      ${nom==='Gainage sol'?`
+      <div id="bravo-niveau-${key}" style="display:none;margin-top:.75rem;padding:.75rem;background:rgba(46,204,113,.08);border:1px solid var(--green);border-radius:10px;text-align:left" onclick="event.stopPropagation()">
+        <div style="font-size:.85rem;font-weight:700;color:var(--green);margin-bottom:.5rem">💪 Excellent travail !</div>
+        <div id="bravo-niveau-text-${key}" style="font-size:.8rem;color:var(--text);margin-bottom:.6rem"></div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn" style="flex:1;font-size:.8rem;padding:.5rem" onclick="event.stopPropagation();accepterNiveauSup('${nomEsc}')">✓ Oui</button>
+          <button class="btn btn-outline" style="flex:1;font-size:.8rem;padding:.5rem" onclick="event.stopPropagation();refuserNiveauSup('${nomEsc}')">✗ Non</button>
+        </div>
+      </div>`:''}
     </div>
 
-    <div class="atelier-detail-section">
-      <div class="atelier-detail-section-title">📋 Consignes d'exécution</div>
-      ${execHtml}
-    </div>
+    <hr class="atelier-bloc-sep">
 
-    <div class="atelier-detail-section">
-      <div class="atelier-detail-section-title">🛡️ Règles de sécurité</div>
-      ${secuHtml}
-    </div>
+    <div class="atelier-bloc-title">📋 Consignes d'exécution</div>
+    ${execHtml}
 
-    <div class="atelier-detail-video">
+    <div class="atelier-bloc-title">💪 Muscles sollicités</div>
+    <div style="font-size:.87rem;color:var(--text);padding:.3rem 0 .3rem .75rem;border-left:2px solid var(--blue);margin-bottom:.25rem;line-height:1.5">${a.muscles}</div>
+
+    <div class="atelier-bloc-title">🛡️ Règles de sécurité</div>
+    ${secuHtml}
+
+    <div class="atelier-detail-video" style="margin-top:1rem">
       <div style="font-size:1.4rem">🎬</div>
       <div style="flex:1">
         <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.2rem">Vidéo de démonstration</div>
