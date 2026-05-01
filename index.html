@@ -3001,9 +3001,9 @@ function buildAtelierDetail() {
     <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
     <div class="recup-timer" id="rt-${key}">
       <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.3rem">⏱ Récupération</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:1rem">
-        <div class="recup-timer-count" id="rt-count-${key}">—</div>
-        <button class="btn" style="padding:.3rem .9rem;font-size:.78rem" onclick="stopRecupTimer('${key}')">Passer →</button>
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <div class="recup-timer-count" id="rt-count-${key}" style="flex:1;text-align:center">—</div>
+        <button class="btn" style="flex:1;padding:.3rem .9rem;font-size:.78rem;background:var(--blue)" onclick="stopRecupTimer('${key}')">Passer →</button>
       </div>
     </div>
     ${type==='standard'?`<div class="suggestion-box" id="sug-${key}"></div>`:''}
