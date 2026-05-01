@@ -1365,7 +1365,7 @@ function buildMaxis() {
   const allFilled = maxisAllFilled();
 
   let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.5rem">💪 Mes Maxis <span style="color:var(--accent)">(1RM)</span></div>
-  <div style="font-size:.78rem;color:var(--muted);line-height:1.55;margin-bottom:.9rem">MAXI : c'est le poids maximum que vous pouvez soulever <strong style="color:var(--text)">une seule fois</strong> (1RM) sur un atelier, dans une exécution correcte. C'est votre référence personnelle pour calculer ensuite vos charges de travail en fonction de votre projet.</div>
+  <div style="font-size:.78rem;color:var(--muted);line-height:1.55;margin-bottom:.9rem"><strong style="color:var(--text)">MAXI :</strong> c'est le poids maximum que vous pouvez soulever <strong style="color:var(--text)">une seule fois</strong> (1RM) sur un atelier, dans une exécution correcte.<br>C'est votre référence personnelle pour calculer ensuite vos charges de travail en fonction de votre projet.</div>
   <div style="margin-bottom:.75rem">
     <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.35rem">
       <span>Maxis renseignés</span><span style="color:var(--text);font-weight:700">${maxisFilled} / ${nbDispo}</span>
@@ -1502,7 +1502,7 @@ function buildMaxiCalc() {
             <div style="font-size:.78rem;color:var(--muted);line-height:1.5">
               <strong style="color:var(--text)">1RM</strong> = charge maximale que tu peux soulever en une seule répétition.<br>
               <strong style="color:var(--text)">Poids</strong> = charge soulevée lors du test (kg).<br>
-              <strong style="color:var(--text)">Reps</strong> = nombre de répétitions réalisées (5 à 15).
+              <strong style="color:var(--text)">Reps</strong> = nombre de répétitions réalisées (4 à 15).
             </div>
           </div>`;
       } else if (type === 'lombaires') {
@@ -1575,7 +1575,7 @@ function buildMaxiCalc() {
       </div>
       ${type === 'standard' ? `<div class="calc-mode-tabs">
         <button class="calc-mode-tab ${_calcMode===1?'active':''}" id="tab-calc">Calculer mon maxi</button>
-        <button class="calc-mode-tab ${_calcMode===2?'active':''}" id="tab-direct">Saisie directe</button>
+        <button class="calc-mode-tab ${_calcMode===2?'active':''}" id="tab-direct">Saisie manuelle</button>
       </div>` : ''}
       ${formHtml}
       <div style="height:2rem"></div>`;
@@ -2034,7 +2034,7 @@ function buildMesBadges() {
       <div style="text-align:center;margin-bottom:1.5rem">
         <div style="color:var(--muted);font-size:.85rem;margin-bottom:.5rem">Dernier badge obtenu :</div>
         <img src="${badgeImgBig(badge)}" alt="${badge}" width="200" height="200" style="width:200px;height:200px;object-fit:contain">
-        <div style="margin-top:.5rem;font-size:1rem;font-weight:600">Badge : <span style="color:var(--accent)">${badge}</span> (Séance ${totalSeances})</div>
+        <div style="margin-top:.5rem;font-size:1rem;font-weight:600">Badge <span style="color:var(--accent)">${badge}</span> (Séance ${totalSeances})</div>
       </div>` : `
       <div style="text-align:center;margin-bottom:1.5rem;color:var(--muted)">Aucun badge obtenu pour l'instant.<br>Validez votre séance (au moins 4 ateliers) pour gagner votre premier badge !</div>`}
 
@@ -2051,8 +2051,7 @@ function buildMesBadges() {
           ${b.compt === 0 ? `<div style="font-weight:600;margin-bottom:.1rem;color:var(--muted)">${b.nom}</div><div style="color:var(--muted);font-size:.85rem">0 obtenu</div>` : ''}
         </div>`).join('')}
         ${total > 0 ? `
-        <div style="margin-top:1rem;text-align:center;color:var(--muted);font-size:.9rem">
-          Total : ${total} badge${total>1?'s':''} gagné${total>1?'s':''}
+        <div style="margin-top:1rem;text-align:center;color:var(--muted);font-size:.9rem">${total} badge${total>1?'s':''} gagné${total>1?'s':''}
         </div>` : ''}
       </div>
     </div>`;
