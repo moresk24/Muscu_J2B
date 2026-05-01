@@ -2042,7 +2042,7 @@ function buildBilanBadge() {
         const bilan = state.bilanSeance || {};
         const ateliersB = bilan.ateliers || [];
         const maxisF = bilan.maxisForces || [];
-        const rColors = {F:'var(--muted)',D:'var(--accent)',TD:'var(--green)',E:'var(--red,#e74c3c)'};
+        const rColors = {F:'#2980b9',D:'#27ae60',TD:'#f39c12',E:'#c0392b'};
         if (!ateliersB.length && !maxisF.length) return '';
 
         const rows = ateliersB.map(nom => {
@@ -3091,7 +3091,7 @@ function buildAtelierDetail() {
       // Masquer si projet différent ou si validé durant la séance actuelle
       if (hist.projet && hist.projet !== state.projet) return '';
       if (hist.seance === state.sessionNumber && state.sessionNumber > 0) return '';
-      const colors = {F:'var(--muted)',D:'var(--accent)',TD:'var(--green)',E:'var(--red,#e74c3c)'};
+      const colors = {F:'#2980b9',D:'#27ae60',TD:'#f39c12',E:'#c0392b'};
       // Série de référence pour le pré-remplissage S1
       const _dRef  = series.filter(s => s.c && !s.special && s.s === 'D');
       const _tdRef = series.filter(s => s.c && !s.special && s.s === 'TD');
