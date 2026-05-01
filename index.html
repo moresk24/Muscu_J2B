@@ -2063,10 +2063,11 @@ function buildBilanBadge() {
             </div>`;
           }
 
-          // Ligne ressentis S1→S4
-          const ressentiLine = local.slice(0,4).map((s,i) =>
-            `<span style="font-size:.68rem;font-weight:700;color:${rColors[s.ressenti]||'var(--muted)'}">S${i+1}&nbsp;${s.ressenti||'—'}</span>`
-          ).join('<span style="color:var(--border);margin:0 .2rem">·</span>');
+          // Ligne ressentis S1→S4 : petits carrés colorés
+          const ressentiLine = local.slice(0,4).map(s => {
+            const bg = rColors[s.ressenti] || '#444';
+            return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:1.6rem;height:1.4rem;border-radius:3px;background:${bg};color:#fff;font-size:.6rem;font-weight:700;padding:0 .2rem">${s.ressenti||'—'}</span>`;
+          }).join('');
 
           // Meilleure charge : TD (max) prioritaire, sinon D (max)
           const tdT = local.filter(s => s.ressenti === 'TD');
