@@ -2028,6 +2028,58 @@ function buildBilanBadge() {
         <div style="font-size:1rem;font-weight:600">Dernier badge obtenu : <span style="color:var(--accent)">${badge}</span></div>
       </div>
 
+      ${(()=>{
+        if (!state.ateliersSeanceEnCours.length) return '';
+        const rows = state.ateliersSeanceEnCours.map(nom => {
+          const ai = ATELIERS.find(x => x.nom === nom);
+          const icon = ai ? ai.icon : '🏋️';
+          const local = state.serieLocale[nom] || [];
+          const isSpecial = local.length && local[0] && local[0].special;
+          if (isSpecial) {
+            const nbOk = local.filter(s => s.resultat === 'ok').length;
+            return `<div style="display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-bottom:1px solid var(--border);font-size:.82rem">
+              <span style="min-width:1.5rem">${icon}</span>
+              <span style="flex:1;color:var(--text)">${nom}</span>
+              <span style="color:var(--green);font-weight:600">${nbOk}/4 ✓</span>
+            </div>`;
+          }
+          // Meilleure charge du jour : meilleur D (max), sinon TD le plus bas
+          const dT = local.filter(s => s.ressenti === 'D');
+          const tdT = local.filter(s => s.ressenti === 'TD');
+          let refToday = null;
+          if (dT.length > 0)       refToday = dT.reduce((b,s) => s.charge > b.charge ? s : b);
+          else if (tdT.length > 0) refToday = tdT.reduce((b,s) => s.charge < b.charge ? s : b);
+          // Meilleure charge de l'historique (même projet)
+          let histCharge = null;
+          const rawH = state.historiqueAteliers[nom];
+          if (rawH && !Array.isArray(rawH) && rawH.projet === state.projet) {
+            const hs = rawH.series || [];
+            const dH  = hs.filter(s => s.c && !s.special && s.s === 'D');
+            const tdH = hs.filter(s => s.c && !s.special && s.s === 'TD');
+            if (dH.length > 0)       histCharge = dH.reduce((b,s) => s.c > b.c ? s : b).c;
+            else if (tdH.length > 0) histCharge = tdH.reduce((b,s) => s.c < b.c ? s : b).c;
+          }
+          let arrow = '', arrowColor = 'var(--muted)';
+          if (refToday && histCharge !== null) {
+            if (refToday.charge > histCharge)      { arrow = ' ↑'; arrowColor = 'var(--green)'; }
+            else if (refToday.charge < histCharge) { arrow = ' ↓'; arrowColor = 'var(--red,#e74c3c)'; }
+            else                                   { arrow = ' ='; arrowColor = 'var(--muted)'; }
+          }
+          const chargeText = refToday
+            ? `${refToday.reps} × ${refToday.charge} kg${arrow ? `<span style="color:${arrowColor};font-weight:700">${arrow}</span>` : ''}`
+            : '—';
+          return `<div style="display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-bottom:1px solid var(--border);font-size:.82rem">
+            <span style="min-width:1.5rem">${icon}</span>
+            <span style="flex:1;color:var(--text)">${nom}</span>
+            <span style="color:var(--text)">${chargeText}</span>
+          </div>`;
+        }).join('');
+        return `<div style="border-top:1px solid var(--border);padding-top:1rem;margin-bottom:1rem">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.6rem">Bilan de la séance</div>
+          ${rows}
+        </div>`;
+      })()}
+
       <div style="border-top:1px solid var(--border);padding-top:1rem;margin-bottom:1rem">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.8rem">Historique de vos badges (cycle actuel)</div>
         <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;padding:.5rem 0">
@@ -2248,6 +2300,7 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
 
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
+    stopRecupTimer(key);
     validateAtelier(nomAtelier); // fire & forget
     if (state.propositionNiveauSup && state.propositionNiveauSup.atelier === nomAtelier) {
       const prop = state.propositionNiveauSup;
@@ -2504,6 +2557,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
     const bravo = document.getElementById('bravo-' + key);
     const sug   = document.getElementById('sug-' + key);
     if (sug) sug.classList.remove('visible');
+    stopRecupTimer(key);
     if (bravo) {
       bravo.classList.add('visible');
       const bravoText = bravo.querySelector('.bravo-text');
