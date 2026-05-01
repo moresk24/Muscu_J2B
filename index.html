@@ -447,7 +447,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 }
 .recup-timer{display:none;background:var(--s1);border:1px solid rgba(61,139,255,.35);border-radius:12px;padding:.75rem 1rem;margin:.4rem 0;text-align:center}
 .recup-timer.active{display:block}
-.recup-timer-count{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:.05em;color:var(--accent);line-height:1.1}
+.recup-timer-count{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:.05em;color:var(--blue);line-height:1.1}
 .seance-atelier-card{
   background:var(--s1);border:1px solid var(--border);border-radius:14px;
   margin-bottom:.6rem;display:flex;align-items:center;gap:.75rem;
@@ -541,7 +541,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   <div class="topbar">
     <div class="topbar-logo">Muscu</div>
     <div class="topbar-info">
-      <span id="tb-prenom" style="text-transform:uppercase">—</span> (<span id="tb-classe">—</span>)<span style="color:var(--blue)"> — </span><span id="tb-seance" style="color:var(--accent)">—</span> <span id="tb-lock" style="display:none;color:var(--muted);font-size:.9rem" title="Mode consultation">🔒</span>
+      <span id="tb-prenom" style="text-transform:uppercase">—</span><span id="tb-projet-header"></span><span style="color:var(--blue)"> — </span><span id="tb-seance" style="color:var(--accent)">—</span> <span id="tb-lock" style="display:none;color:var(--muted);font-size:.9rem" title="Mode consultation">🔒</span>
     </div>
     <button class="btn-sm" id="btn-logout" title="Se déconnecter" style="border:none;background:none;padding:.3rem .4rem;cursor:pointer;display:flex;align-items:center">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)">
@@ -1132,7 +1132,7 @@ async function autoConnect(saved, classes) {
       loadSerieLocale();
     }
     $('tb-prenom').textContent = saved.prenom;
-    $('tb-classe').textContent = saved.classe;
+    updateHeaderProjet();
     await loadConfig();
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
@@ -1250,7 +1250,7 @@ $('btn-login').addEventListener('click', async () => {
 
     // Afficher app
     $('tb-prenom').textContent = eInfo.prenom;
-    $('tb-classe').textContent = cls;
+    updateHeaderProjet();
     await loadConfig();
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
@@ -1347,6 +1347,12 @@ function doLogout() {
   localStorage.setItem('compteurAteliersSeance', '0');
   $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
   $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
+}
+
+function updateHeaderProjet() {
+  const el = $('tb-projet-header');
+  if (!el) return;
+  el.textContent = state.projet ? ` (${state.projet})` : '';
 }
 
 function updateNavLock() {
@@ -1571,6 +1577,15 @@ function buildMaxiCalc() {
       }
     }
 
+    const ac = ATELIERS_CONTENT[a.nom];
+    let pedagHtml = '';
+    if (ac) {
+      const execItems = (ac.exec||[]).map(s=>`<div class="atelier-detail-item">${s}</div>`).join('');
+      const secuItems = (ac.secu||[]).map(s=>`<div class="atelier-detail-item${s.startsWith('⚠️')?' atelier-detail-warn':''}">${s}</div>`).join('');
+      if (execItems) pedagHtml += `<div class="atelier-bloc-title" style="margin-top:1.25rem">📋 Consignes d'exécution</div>${execItems}`;
+      if (secuItems) pedagHtml += `<div class="atelier-bloc-title">🛡️ Règles de sécurité</div>${secuItems}`;
+    }
+
     pg.innerHTML = `
       <div class="calc-header">
         <button class="calc-back-btn" id="calc-back">← Retour</button>
@@ -1581,6 +1596,7 @@ function buildMaxiCalc() {
         <button class="calc-mode-tab ${_calcMode===2?'active':''}" id="tab-direct">Saisie manuelle</button>
       </div>` : ''}
       ${formHtml}
+      ${pedagHtml}
       <div style="height:2rem"></div>`;
 
     attachListeners();
@@ -1736,23 +1752,23 @@ function buildProjetDetail() {
         <p>${c.sousTitre}</p>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">En résumé</div>
+        <div class="atelier-bloc-title" style="margin:.3rem 0 .4rem">En résumé</div>
         <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.resume.replace(/\. /g,'.<br>')}</div>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">Ce que vous allez ressentir</div>
+        <div class="atelier-bloc-title" style="margin:.3rem 0 .4rem">Ce que vous allez ressentir</div>
         <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.sensations.replace(/\. /g,'.<br>')}</div>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem">Ce projet est fait pour vous si…</div>
+        <div class="atelier-bloc-title" style="margin:.3rem 0 .5rem">Ce projet est fait pour vous si…</div>
         ${c.profils.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--accent);margin-bottom:.35rem">→ ${s}</div>`).join('')}
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem">Ce que vous allez gagner</div>
+        <div class="atelier-bloc-title" style="margin:.3rem 0 .5rem">Ce que vous allez gagner</div>
         ${c.gains.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--green);margin-bottom:.35rem">✓ ${s}</div>`).join('')}
       </div>
       <div style="padding:.9rem 1.25rem">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.6rem">Paramètres de travail</div>
+        <div class="atelier-bloc-title" style="margin:.3rem 0 .6rem">Paramètres de travail</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
           <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
             <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Intensité</div>
@@ -1816,6 +1832,7 @@ async function confirmProjet(num) {
     const d = await apiPost({action:'saveProjet', classe:state.classe, nom:state.nom, prenom:state.prenom, projet:num});
     if (d.error) throw new Error(d.error);
     state.projet = num;
+    updateHeaderProjet();
     toast(`Projet ${PROJETS[num].nom} enregistré ✓`);
     showPage('projet');
   } catch(e) { toast('Erreur','error'); }
@@ -1842,23 +1859,23 @@ function buildFiche() {
         <p>${c.sousTitre}</p>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">En résumé</div>
+        <div class="atelier-bloc-title" style="margin:.3rem 0 .4rem">En résumé</div>
         <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.resume}</div>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">Ce que vous allez ressentir</div>
+        <div class="atelier-bloc-title" style="margin:.3rem 0 .4rem">Ce que vous allez ressentir</div>
         <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.sensations}</div>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem">Ce projet est fait pour vous si…</div>
+        <div class="atelier-bloc-title" style="margin:.3rem 0 .5rem">Ce projet est fait pour vous si…</div>
         ${c.profils.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--accent);margin-bottom:.35rem">→ ${s}</div>`).join('')}
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem">Ce que vous allez gagner</div>
+        <div class="atelier-bloc-title" style="margin:.3rem 0 .5rem">Ce que vous allez gagner</div>
         ${c.gains.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--green);margin-bottom:.35rem">✓ ${s}</div>`).join('')}
       </div>
       <div style="padding:.9rem 1.25rem">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.6rem">Paramètres de travail</div>
+        <div class="atelier-bloc-title" style="margin:.3rem 0 .6rem">Paramètres de travail</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
           <div style="background:var(--s2);border-radius:10px;padding:.6rem .75rem">
             <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Intensité</div>
@@ -2344,11 +2361,14 @@ async function validateAtelier(nomAtelier) {
   }
 
   // Sauvegarder les 4 séries dans l'historique local
-  const seriesDuJour = (state.serieLocale[nomAtelier] || []).slice(0,4).map(s=>({c:s.charge,r:s.reps,s:s.ressenti}));
-  state.historiqueAteliers[nomAtelier] = seriesDuJour;
+  const seriesDuJour = (state.serieLocale[nomAtelier] || []).slice(0,4).map(s =>
+    s.special ? {special:true, resultat:s.resultat} : {c:s.charge, r:s.reps, s:s.ressenti}
+  );
+  const histEntry = {series:seriesDuJour, projet:state.projet, seance:state.sessionNumber};
+  state.historiqueAteliers[nomAtelier] = histEntry;
 
   try {
-    const res = await apiPost({action:'validateAtelier', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier, historique:JSON.stringify(seriesDuJour)});
+    const res = await apiPost({action:'validateAtelier', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier, historique:JSON.stringify(histEntry)});
     if (res && res.newCompteur !== undefined) state.compteur = res.newCompteur;
   } catch(e) { console.error(e); }
 }
@@ -2372,9 +2392,13 @@ function startRecupTimer(key) {
   el.classList.add('active');
   _recupTimerInterval = setInterval(()=>{
     secs--;
-    if (secs <= 0) { stopRecupTimer(key); return; }
-    count.textContent = fmt(secs);
-    if (secs <= 5) count.style.color = 'var(--green)';
+    if (secs > 0) {
+      count.textContent = fmt(secs);
+      if (secs <= 5) count.style.color = 'var(--green)';
+    } else {
+      count.textContent = '-'+fmt(Math.abs(secs));
+      count.style.color = 'var(--red,#e74c3c)';
+    }
   }, 1000);
 }
 
@@ -2828,7 +2852,7 @@ function genChargeValues(maxi, projet) {
   return values;
 }
 
-function initDrumPicker(containerId, values, initialValue, onChange) {
+function initDrumPicker(containerId, values, initialValue, onChange, labelFn) {
   const ITEM_H = 40, PAD = 2;
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -2840,7 +2864,7 @@ function initDrumPicker(containerId, values, initialValue, onChange) {
   function render() {
     const rows = [];
     for (let i = 0; i < PAD; i++) rows.push('<div class="drum-item"></div>');
-    values.forEach((v, i) => rows.push(`<div class="drum-item${i===idx?' selected':''}">${v}</div>`));
+    values.forEach((v, i) => rows.push(`<div class="drum-item${i===idx?' selected':''}">${labelFn ? labelFn(v) : v}</div>`));
     for (let i = 0; i < PAD; i++) rows.push('<div class="drum-item"></div>');
     track.innerHTML = rows.join('');
   }
@@ -2916,8 +2940,11 @@ function modifierSuggestion(nomAtelier, key, unite, newCharge, newReps, newInten
       <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="annulerModification('${key}')">Annuler</button>
     </div>`;
 
+  const chargeLabelFn = maxi > 0
+    ? v => `${v} <span style="font-size:.62rem;color:var(--muted)">(${Math.round(v/maxi*100)}%)</span>`
+    : null;
   initDrumPicker('drum-reps-'+key,    repsVals,   newReps,   v => drumState[key].reps   = v);
-  initDrumPicker('drum-charge-'+key,  chargeVals, newCharge, v => drumState[key].charge = v);
+  initDrumPicker('drum-charge-'+key,  chargeVals, newCharge, v => drumState[key].charge = v, chargeLabelFn);
 }
 
 function annulerModification(key) {
@@ -2965,10 +2992,11 @@ function buildAtelierDetail() {
   const secuHtml = (c.secu||[]).map(s=>`<div class="atelier-detail-item${s.startsWith('⚠️')?' atelier-detail-warn':''}">${s}</div>`).join('');
 
   pg.innerHTML = `
-    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.2rem">
       <button class="calc-back-btn" onclick="showPage('seance')">← Séance</button>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;flex:1">${a.icon} ${a.nom}</div>
     </div>
+    <div style="font-size:.78rem;color:var(--muted);margin-bottom:.85rem;padding-left:.25rem">${a.muscles}</div>
 
     <div class="atelier-detail-maxi">
       <div>
@@ -2982,22 +3010,36 @@ function buildAtelierDetail() {
     </div>
 
     ${(()=>{
-      const hist = state.historiqueAteliers[nom];
-      if (!hist || !hist.length) return '';
-      const labels = {F:'Facile',D:'Difficile',TD:'Très Difficile',E:'Échec'};
+      const raw = state.historiqueAteliers[nom];
+      if (!raw) return '';
+      // Compatibilité ancien format (tableau simple) et nouveau format (objet)
+      const hist = Array.isArray(raw) ? {series:raw, projet:'', seance:-1} : raw;
+      const series = hist.series || [];
+      if (!series.length) return '';
+      // Masquer si validé durant la séance actuelle
+      if (hist.seance === state.sessionNumber && state.sessionNumber > 0) return '';
       const colors = {F:'var(--muted)',D:'var(--accent)',TD:'var(--green)',E:'var(--red,#e74c3c)'};
-      const rows = hist.map((s,i)=>`
-        <div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.2rem 0;border-bottom:1px solid var(--border)">
+      const rows = series.map((s,i)=>{
+        if (s.special) {
+          const ok = s.resultat === 'ok';
+          return `<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.2rem 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted);min-width:1.5rem">S${i+1}</span>
+            <span style="flex:1;font-weight:700;color:${ok?'var(--green)':'var(--red,#e74c3c)'}">${ok?'OK':'Échec'}</span>
+          </div>`;
+        }
+        return `<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.2rem 0;border-bottom:1px solid var(--border)">
           <span style="color:var(--muted);min-width:1.5rem">S${i+1}</span>
           <span style="flex:1;color:var(--text)">${s.r} × ${s.c} kg</span>
           <span style="font-weight:700;color:${colors[s.s]||'var(--muted)'}">${s.s||'—'}</span>
-        </div>`).join('');
+        </div>`;
+      }).join('');
+      const projetLabel = hist.projet ? ` — Projet ${hist.projet}` : '';
       return `<div style="background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:.65rem .85rem;margin-bottom:.5rem">
-        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">📋 Dernière séance validée</div>
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem">📋 Dernière validation à cet atelier${projetLabel}</div>
         ${rows}
       </div>`;
     })()}
-    <div class="atelier-bloc-title">🏋️ Vos séries aujourd'hui</div>
+    <div class="atelier-bloc-title">${state.historiqueAteliers[nom] && !Array.isArray(state.historiqueAteliers[nom]) && (state.historiqueAteliers[nom].seance !== state.sessionNumber || state.sessionNumber === 0) ? '🏋️ Aujourd\'hui :' : '🏋️ Vos séries à cet atelier'}</div>
     <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
     <div class="recup-timer" id="rt-${key}">
       <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.3rem">⏱ Récupération</div>
@@ -3033,9 +3075,6 @@ function buildAtelierDetail() {
     <div class="atelier-bloc-title">📋 Consignes d'exécution</div>
     ${execHtml}
 
-    <div class="atelier-bloc-title">💪 Muscles sollicités</div>
-    <div style="font-size:.87rem;color:var(--text);padding:.3rem 0 .3rem .75rem;border-left:2px solid var(--blue);margin-bottom:.25rem;line-height:1.5">${a.muscles}</div>
-
     <div class="atelier-bloc-title">🛡️ Règles de sécurité</div>
     ${secuHtml}
 
@@ -3056,6 +3095,21 @@ function buildAtelierDetail() {
   if (localSeries.length >= 4) {
     const bravo = $('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
+  }
+
+  // Pré-remplir S1 depuis la meilleure série D ou TD de la dernière validation
+  if (type === 'standard' && localSeries.length === 0) {
+    const raw = state.historiqueAteliers[nom];
+    if (raw && !Array.isArray(raw) && raw.series &&
+        (raw.seance !== state.sessionNumber || state.sessionNumber === 0)) {
+      const bestSerie = [...raw.series].reverse().find(s => s.s === 'D' || s.s === 'TD');
+      if (bestSerie) {
+        const p = PROJETS[state.projet];
+        const intensiteRef = state.intensite || (p && p.intensites[0]) || 60;
+        savedSuggestions[key] = '';
+        modifierSuggestion(nom, key, a.unite, bestSerie.c, bestSerie.r, intensiteRef);
+      }
+    }
   }
 }
 

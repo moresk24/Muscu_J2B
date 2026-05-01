@@ -190,9 +190,14 @@
       background: rgba(255,179,71,.08);
       border-color: rgba(255,179,71,.3);
     }
+    .alert.blue {
+      background: rgba(61,139,255,.08);
+      border-color: rgba(61,139,255,.3);
+    }
     .alert strong { color: var(--accent); }
     .alert.green strong { color: var(--green); }
     .alert.yellow strong { color: var(--accent2); }
+    .alert.blue strong { color: var(--blue); }
 
     /* ── Badges couleurs séance ── */
     .color-legend {
@@ -285,7 +290,7 @@
     <ol class="steps">
       <li><div class="num">1</div><div class="content"><strong>Connexion</strong> — Choisissez votre classe, votre nom et entrez votre mot de passe.</div></li>
       <li><div class="num">2</div><div class="content"><strong>Maxis (1RM)</strong> — Renseignez votre charge maximale sur chaque atelier.</div></li>
-      <li><div class="num">3</div><div class="content"><strong>Choix du projet</strong> — Choisissez votre objectif de travail pour le cycle ou pour une séance.</div></li>
+      <li><div class="num">3</div><div class="content"><strong>Choix du projet</strong> — Choisissez votre objectif de travail pour le cycle.</div></li>
       <li><div class="num">4</div><div class="content"><strong>Séances</strong> — L'application vous guide atelier par atelier pendant le cours.</div></li>
       <li><div class="num">5</div><div class="content"><strong>Badge</strong> — À chaque séance, obtenez un badge selon votre nombre d'ateliers validés.</div></li>
     </ol>
@@ -302,6 +307,9 @@
       <li><div class="num">3</div><div class="content">Saisissez votre <strong>mot de passe</strong> (6 à 10 lettres minuscules, sans accent). <em>Lors de votre première connexion, vous créez votre mot de passe — retenez-le.</em></div></li>
       <li><div class="num">4</div><div class="content">Appuyez sur <strong>Entrer</strong>.</div></li>
     </ol>
+    <div class="alert blue">
+      <strong>ℹ️ En-tête de l'application :</strong> Une fois connecté(e), votre prénom apparaît en haut de l'écran accompagné du numéro de votre projet entre parenthèses — par exemple <strong>LÉA (2)</strong>. Votre enseignant peut ainsi vérifier d'un coup d'œil votre projet de travail.
+    </div>
     <div class="alert yellow">
       <strong>⚠️ Mot de passe oublié ?</strong> Votre enseignant peut le réinitialiser depuis le tableau de bord.
     </div>
@@ -323,6 +331,7 @@
     <div class="card">
       <div class="card-title">⚡ Calculer mon maxi (méthode recommandée)</div>
       <p>Utilisez les <strong>roulettes</strong> pour indiquer le poids que vous avez soulevé et le nombre de répétitions réalisées. L'application calcule votre 1RM théorique grâce à la formule de Brzycki. Appuyez ensuite sur <strong>Valider ce maxi</strong>.</p>
+      <p style="margin-top:.4rem">Les <strong>consignes d'exécution</strong> et les <strong>règles de sécurité</strong> de l'atelier sont affichées sous la formule pour vous guider pendant la recherche de maxi.</p>
     </div>
     <div class="card">
       <div class="card-title">✏️ Saisie directe</div>
@@ -346,21 +355,21 @@
     <p style="margin-bottom:.75rem;font-size:.88rem">Choisissez <strong>un seul projet</strong> pour tout le cycle. Ce choix détermine l'intensité, le nombre de répétitions et le temps de récupération qui vous seront proposés pendant les séances.</p>
     <div class="card">
       <div class="card-title">⚡ Projet 1 — SPORTIF</div>
-      <p>Pour améliorer votre puissance et explosivité. Idéal si vous pratiquez un sport. Séries courtes (4–8 reps) à haute intensité (80–90% du maxi).</p>
+      <p>Pour améliorer votre puissance et explosivité. Idéal si vous pratiquez un sport. Séries courtes (4–8 reps) à haute intensité (80–90% du maxi). Récupération : 3 à 6 minutes.</p>
     </div>
     <div class="card">
       <div class="card-title">🏛️ Projet 2 — ESTHÉTIQUE</div>
-      <p>Pour développer le volume musculaire. Séries longues (10–20 reps) à intensité modérée (65–80% du maxi).</p>
+      <p>Pour développer le volume musculaire. Séries longues (10–20 reps) à intensité modérée (65–80% du maxi). Récupération : 1min30 à 2min30.</p>
     </div>
     <div class="card">
       <div class="card-title">🫀 Projet 3A — SANTÉ Endurance</div>
-      <p>Pour affiner la silhouette et dépenser de l'énergie. Séries très longues (25–35 reps) à faible intensité (40–50% du maxi).</p>
+      <p>Pour affiner la silhouette et dépenser de l'énergie. Séries très longues (25–35 reps) à faible intensité (40–50% du maxi). Récupération : 30s à 1 minute.</p>
     </div>
     <div class="card">
       <div class="card-title">⚖️ Projet 3B — SANTÉ Tonification</div>
-      <p>Pour entretenir et raffermir les muscles. Séries moyennes (15–25 reps) à intensité modérée (50–65% du maxi).</p>
+      <p>Pour entretenir et raffermir les muscles. Séries moyennes (15–25 reps) à intensité modérée (50–65% du maxi). Récupération : 30s à 1min30.</p>
     </div>
-    <p style="font-size:.82rem;color:var(--muted);margin-top:.5rem">Consultez le détail de chaque projet en cliquant dessus, puis appuyez sur <strong>Choisir ce projet</strong>. Vous pouvez changer de projet d'une séance à l'autre si vous le souhaitez.</p>
+    <p style="font-size:.82rem;color:var(--muted);margin-top:.5rem">Consultez le détail de chaque projet en cliquant dessus, puis appuyez sur <strong>Choisir ce projet</strong>.</p>
   </div>
 
   <!-- ══ ÉTAPE 4 : Séances ══ -->
@@ -371,20 +380,52 @@
 
     <div class="card">
       <div class="card-title">Déroulement général</div>
-      <p>La page Séance liste tous les ateliers disponibles. Choisissez l'atelier sur lequel vous voulez travailler, effectuez <strong>4 séries</strong>, et indiquez votre ressenti après chaque série. Répétez sur au moins 5 ateliers pour obtenir un badge.</p>
+      <p>La page Séance liste tous les ateliers disponibles. Appuyez sur un atelier pour ouvrir sa <strong>page dédiée</strong>. Effectuez vos <strong>4 séries</strong> et indiquez votre ressenti après chacune. Répétez sur au moins 5 ateliers pour obtenir un badge.</p>
     </div>
 
+    <!-- Page atelier-détail -->
     <div class="card">
-      <div class="card-title">Choisir l'intensité</div>
-      <p>En haut de la page, un menu vous permet de choisir votre intensité de travail pour votre première série dans la fourchette de votre projet. L'application vous indique automatiquement le nombre de répétitions correspondant.</p>
+      <div class="card-title">📄 Page détail d'un atelier</div>
+      <p>En appuyant sur un atelier, vous accédez à sa page complète. Elle contient dans l'ordre :</p>
+      <ol class="steps" style="margin-top:.6rem">
+        <li><div class="num">1</div><div class="content">Le <strong>nom de l'atelier</strong> avec les muscles sollicités en dessous.</div></li>
+        <li><div class="num">2</div><div class="content">Votre <strong>maxi (1RM)</strong> et votre nombre de validations.</div></li>
+        <li><div class="num">3</div><div class="content">La <strong>dernière validation à cet atelier</strong> — vos 4 séries de la fois précédente avec les charges, répétitions et ressentis. Utile pour calibrer l'effort du jour.</div></li>
+        <li><div class="num">4</div><div class="content">La <strong>grille de vos séries du jour</strong> avec les suggestions de l'application.</div></li>
+        <li><div class="num">5</div><div class="content">Le <strong>chronomètre de récupération</strong> (entre chaque série).</div></li>
+        <li><div class="num">6</div><div class="content">Les <strong>consignes d'exécution</strong> et les <strong>règles de sécurité</strong>.</div></li>
+        <li><div class="num">7</div><div class="content">Un lien vers la <strong>vidéo de démonstration</strong> (si disponible).</div></li>
+      </ol>
     </div>
 
+    <!-- Historique -->
+    <div class="card">
+      <div class="card-title">📋 Dernière validation à cet atelier</div>
+      <p>Si vous avez déjà travaillé cet atelier lors d'une séance précédente, l'application affiche vos 4 séries : charge × répétitions et ressenti (F / D / TD / E), ainsi que le projet utilisé ce jour-là.</p>
+      <p style="margin-top:.4rem">Cet encadré <strong>n'apparaît pas</strong> si la validation date de la séance en cours — il sert uniquement de référence pour la séance suivante.</p>
+    </div>
+
+    <!-- Timer -->
+    <div class="card">
+      <div class="card-title">⏱ Chronomètre de récupération</div>
+      <p>Après chaque série, un chronomètre se déclenche automatiquement selon votre projet :</p>
+      <ul style="margin:.5rem 0 .5rem 1rem;font-size:.85rem;color:var(--muted)">
+        <li>Projet 1 — Sportif : <strong style="color:var(--text)">3 minutes</strong></li>
+        <li>Projet 2 — Esthétique : <strong style="color:var(--text)">1 min 30</strong></li>
+        <li>Projet 3A — Santé Endurance : <strong style="color:var(--text)">45 secondes</strong></li>
+        <li>Projet 3B — Santé Tonification : <strong style="color:var(--text)">1 minute</strong></li>
+      </ul>
+      <p>Le chrono passe au <strong style="color:var(--green)">vert</strong> dans les 5 dernières secondes, puis continue en <strong style="color:#e74c3c">rouge négatif</strong> si vous dépassez le temps. Appuyez sur <strong>Passer</strong> pour l'ignorer et enchaîner directement.</p>
+    </div>
+
+    <!-- Faire une série -->
     <div class="card">
       <div class="card-title">Faire une série</div>
       <ol class="steps" style="margin-top:.4rem">
-        <li><div class="num">1</div><div class="content">Appuyez sur le nom de l'atelier pour l'ouvrir.</div></li>
-        <li><div class="num">2</div><div class="content">L'application affiche la <strong>charge suggérée</strong> et le <strong>nombre de répétitions</strong> pour votre série. Si besoin, modifiez ces valeurs via le bouton "Modifier les paramètres".</div></li>
+        <li><div class="num">1</div><div class="content">L'application affiche la <strong>charge suggérée</strong> et le <strong>nombre de répétitions</strong>. Si une séance précédente existe, la première série est pré-remplie avec vos meilleurs paramètres (D ou TD) de la dernière fois.</div></li>
+        <li><div class="num">2</div><div class="content">Si besoin, modifiez les paramètres via le bouton <strong>✏️ Modifier</strong>. La roulette des poids affiche le <strong>pourcentage du maxi</strong> en regard de chaque charge, pour vous aider à choisir.</div></li>
         <li><div class="num">3</div><div class="content">Réalisez la série, puis indiquez votre <strong>ressenti</strong> en appuyant sur le bouton correspondant.</div></li>
+        <li><div class="num">4</div><div class="content">Le chronomètre de récupération se lance. La suggestion pour la série suivante apparaît.</div></li>
       </ol>
     </div>
 
@@ -417,11 +458,11 @@
 
     <div class="card">
       <div class="card-title">✅ Atelier validé</div>
-      <p>Après <strong>4 séries réussies</strong> sur un atelier, il est validé. Un message "Bravo ! Atelier Validé !" s'affiche, et l'encadré de l'atelier passe en <strong style="color:var(--blue)">bleu</strong> pour indiquer qu'il a été fait dans cette séance.</p>
+      <p>Après <strong>4 séries réussies</strong>, l'atelier est validé. Un message "Bravo ! Atelier Validé !" s'affiche. Sur la page Séance, la carte de l'atelier passe en <strong style="color:var(--blue)">bleu</strong> pour indiquer qu'il a été fait dans cette séance.</p>
     </div>
 
     <div class="card">
-      <div class="card-title">Couleur des ateliers</div>
+      <div class="card-title">Couleur des ateliers sur la page Séance</div>
       <div class="color-legend">
         <div class="color-item"><div class="color-dot" style="background:var(--muted)"></div>Atelier non encore travaillé</div>
         <div class="color-item"><div class="color-dot" style="background:var(--green)"></div>Atelier validé lors d'une séance précédente</div>
@@ -441,7 +482,7 @@
     </div>
     <div class="card">
       <div class="card-title">Terminer la séance</div>
-      <p>Dès que vous avez validé <strong>4 ateliers ou plus</strong>, le bouton <strong>"✅ Terminer ma séance"</strong> apparaît en haut de la page Séance. Appuyez dessus pour valider votre bilan et recevoir votre badge.</p>
+      <p>Dès que vous avez validé <strong>4 ateliers ou plus</strong>, le bouton <strong>"✅ Terminer ma séance"</strong> apparaît en haut de la page Séance. Appuyez dessus, puis confirmez pour valider votre bilan et recevoir votre badge.</p>
     </div>
     <div class="card">
       <div class="card-title">Les badges</div>
