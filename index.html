@@ -2119,18 +2119,11 @@ function buildBilanBadge() {
         });
 
         return `<div style="border-top:1px solid var(--border);padding-top:1rem;margin-bottom:1rem">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.6rem">Bilan de la séance</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.15rem">Bilan de la séance</div>
+          <div style="font-size:.7rem;color:var(--muted);margin-bottom:.6rem;font-style:italic">Meilleure série TD ou D · ↑↓= vs séance précédente</div>
           ${rows.join('')}
         </div>`;
       })()}
-
-      <div style="border-top:1px solid var(--border);padding-top:1rem;margin-bottom:1rem">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.8rem">Historique de vos badges (cycle actuel)</div>
-        <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;padding:.5rem 0">
-          ${historiqueHTML || '<span style="color:var(--muted);font-size:.9rem">Aucun badge pour l\'instant</span>'}
-        </div>
-        ${total > 0 ? `<div style="text-align:center;margin-top:1rem;color:var(--muted);font-size:.9rem">Total : ${total} badge${total>1?'s':''} gagné${total>1?'s':''}</div>` : ''}
-      </div>
 
       <button class="btn" style="width:100%;margin-top:.5rem" onclick="showPage('seance')">← Retour aux Séances</button>
     </div>`;
