@@ -2941,7 +2941,7 @@ function modifierSuggestion(nomAtelier, key, unite, newCharge, newReps, newInten
     </div>`;
 
   const chargeLabelFn = maxi > 0
-    ? v => `${v} <span style="font-size:.62rem;color:var(--muted)">(${Math.round(v/maxi*100)}%)</span>`
+    ? v => `${v} <span style="font-size:.62rem;color:var(--muted)"> (${Math.round(v/maxi*100)}%)</span>`
     : null;
   initDrumPicker('drum-reps-'+key,    repsVals,   newReps,   v => drumState[key].reps   = v);
   initDrumPicker('drum-charge-'+key,  chargeVals, newCharge, v => drumState[key].charge = v, chargeLabelFn);
@@ -3016,7 +3016,8 @@ function buildAtelierDetail() {
       const hist = Array.isArray(raw) ? {series:raw, projet:'', seance:-1} : raw;
       const series = hist.series || [];
       if (!series.length) return '';
-      // Masquer si validé durant la séance actuelle
+      // Masquer si projet différent ou si validé durant la séance actuelle
+      if (hist.projet && hist.projet !== state.projet) return '';
       if (hist.seance === state.sessionNumber && state.sessionNumber > 0) return '';
       const colors = {F:'var(--muted)',D:'var(--accent)',TD:'var(--green)',E:'var(--red,#e74c3c)'};
       const rows = series.map((s,i)=>{
@@ -3101,6 +3102,7 @@ function buildAtelierDetail() {
   if (type === 'standard' && localSeries.length === 0) {
     const raw = state.historiqueAteliers[nom];
     if (raw && !Array.isArray(raw) && raw.series &&
+        (!raw.projet || raw.projet === state.projet) &&
         (raw.seance !== state.sessionNumber || state.sessionNumber === 0)) {
       const dSeries  = raw.series.filter(s => s.c && !s.special && s.s === 'D');
       const tdSeries = raw.series.filter(s => s.c && !s.special && s.s === 'TD');
