@@ -3020,6 +3020,13 @@ function buildAtelierDetail() {
       if (hist.projet && hist.projet !== state.projet) return '';
       if (hist.seance === state.sessionNumber && state.sessionNumber > 0) return '';
       const colors = {F:'var(--muted)',D:'var(--accent)',TD:'var(--green)',E:'var(--red,#e74c3c)'};
+      // Série de référence pour le pré-remplissage S1
+      const _dRef  = series.filter(s => s.c && !s.special && s.s === 'D');
+      const _tdRef = series.filter(s => s.c && !s.special && s.s === 'TD');
+      let _ref = null;
+      if (_dRef.length > 0)       _ref = _dRef.reduce((b,s) => s.c > b.c ? s : b);
+      else if (_tdRef.length > 0) _ref = _tdRef.reduce((b,s) => s.c < b.c ? s : b);
+      const refIdx = _ref ? series.indexOf(_ref) : -1;
       const rows = series.map((s,i)=>{
         if (s.special) {
           const ok = s.resultat === 'ok';
@@ -3028,9 +3035,10 @@ function buildAtelierDetail() {
             <span style="flex:1;font-weight:700;color:${ok?'var(--green)':'var(--red,#e74c3c)'}">${ok?'OK':'Échec'}</span>
           </div>`;
         }
+        const chargeColor = i === refIdx ? 'var(--red,#e74c3c)' : 'var(--text)';
         return `<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.2rem 0;border-bottom:1px solid var(--border)">
           <span style="color:var(--muted);min-width:1.5rem">S${i+1}</span>
-          <span style="flex:1;color:var(--text)">${s.r} × ${s.c} kg</span>
+          <span style="flex:1;color:${chargeColor};font-weight:${i===refIdx?'700':'400'}">${s.r} × ${s.c} kg</span>
           <span style="font-weight:700;color:${colors[s.s]||'var(--muted)'}">${s.s||'—'}</span>
         </div>`;
       }).join('');
