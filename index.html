@@ -2054,7 +2054,7 @@ function buildMesBadges() {
       <div style="text-align:center;margin-bottom:1.5rem">
         <div style="color:var(--muted);font-size:.85rem;margin-bottom:.5rem">Dernier badge obtenu :</div>
         <img src="${badgeImgBig(badge)}" alt="${badge}" width="200" height="200" style="width:200px;height:200px;object-fit:contain">
-        <div style="margin-top:.5rem;font-size:1rem;font-weight:600">Badge <span style="color:var(--accent)">${badge}</span> (Séance ${totalSeances})</div>
+        <div style="margin-top:.5rem;font-size:1rem;font-weight:600">Badge <span style="color:var(--accent)">${badge}</span> <span style="font-size:.78rem;font-weight:400;color:var(--muted)">(Séance ${totalSeances})</span></div>
       </div>` : `
       <div style="text-align:center;margin-bottom:1.5rem;color:var(--muted)">Aucun badge obtenu pour l'instant.<br>Validez votre séance (au moins 4 ateliers) pour gagner votre premier badge !</div>`}
 
@@ -2686,7 +2686,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
 
     case 'fd-max-intensite':
       sugBox.innerHTML = `
-        <div class="suggestion-title">💡 Série ${nextSerie + 1}</div>
+        <div class="suggestion-title">💡 Proposition pour Série ${nextSerie + 1}</div>
         <div class="suggestion-text">Intensité au maximum — augmentez les répétitions.<br>
           Série conseillée : <strong>${params.newReps} reps <span style="color:var(--blue)">×</span> ${params.charge} ${unite}</strong>
         </div>
@@ -2712,7 +2712,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
 
     case 'fd-choix':
       sugBox.innerHTML = `
-        <div class="suggestion-title">💡 Série ${nextSerie + 1} — Augmenter l'effort</div>
+        <div class="suggestion-title">💡 Proposition pour Série ${nextSerie + 1} — Augmenter l'effort</div>
         <div class="suggestion-text">Vous souhaitez augmenter l'effort en faisant varier :</div>
         <div class="suggestion-actions" style="margin-top:.6rem">
           <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↑ La charge</button>
