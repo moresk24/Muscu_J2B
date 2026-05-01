@@ -954,6 +954,7 @@ let state = {
   badgeCourantNbAteliers: 0,
   statut: "",
   ateliersSeanceEnCours: [],
+  maxisForces: [],
   currentAtelierDetail: ""
 };
 
@@ -1955,7 +1956,8 @@ async function saveBadge() {
   state.bilanSeance = {
     ateliers:    state.ateliersSeanceEnCours.slice(),
     serieLocale: JSON.parse(JSON.stringify(state.serieLocale)),
-    historique:  state.historiqueAteLiersInitial || {}
+    historique:  state.historiqueAteLiersInitial || {},
+    maxisForces: state.maxisForces.slice()
   };
 
   state.compteurAteliersSeance = 0;
@@ -2039,54 +2041,86 @@ function buildBilanBadge() {
       ${(()=>{
         const bilan = state.bilanSeance || {};
         const ateliersB = bilan.ateliers || [];
-        if (!ateliersB.length) return '';
+        const maxisF = bilan.maxisForces || [];
+        const rColors = {F:'var(--muted)',D:'var(--accent)',TD:'var(--green)',E:'var(--red,#e74c3c)'};
+        if (!ateliersB.length && !maxisF.length) return '';
+
         const rows = ateliersB.map(nom => {
           const ai = ATELIERS.find(x => x.nom === nom);
           const icon = ai ? ai.icon : '🏋️';
           const local = (bilan.serieLocale || {})[nom] || [];
           const isSpecial = local.length && local[0] && local[0].special;
+          const maxiForcé = maxisF.includes(nom);
+
           if (isSpecial) {
             const nbOk = local.filter(s => s.resultat === 'ok').length;
-            return `<div style="display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-bottom:1px solid var(--border);font-size:.82rem">
-              <span style="min-width:1.5rem">${icon}</span>
-              <span style="flex:1;color:var(--text)">${nom}</span>
-              <span style="color:var(--green);font-weight:600">${nbOk}/4 ✓</span>
+            return `<div style="padding:.4rem 0;border-bottom:1px solid var(--border)">
+              <div style="display:flex;align-items:center;gap:.5rem;font-size:.82rem">
+                <span>${icon}</span>
+                <span style="flex:1;color:var(--text)">${nom}</span>
+                <span style="color:var(--green);font-weight:600">${nbOk}/4 ✓</span>
+              </div>
             </div>`;
           }
-          // Meilleure charge du jour : meilleur D (max), sinon TD le plus bas
-          const dT = local.filter(s => s.ressenti === 'D');
+
+          // Ligne ressentis S1→S4
+          const ressentiLine = local.slice(0,4).map((s,i) =>
+            `<span style="font-size:.68rem;font-weight:700;color:${rColors[s.ressenti]||'var(--muted)'}">S${i+1}&nbsp;${s.ressenti||'—'}</span>`
+          ).join('<span style="color:var(--border);margin:0 .2rem">·</span>');
+
+          // Meilleure charge : TD (max) prioritaire, sinon D (max)
           const tdT = local.filter(s => s.ressenti === 'TD');
+          const dT  = local.filter(s => s.ressenti === 'D');
           let refToday = null;
-          if (dT.length > 0)       refToday = dT.reduce((b,s) => s.charge > b.charge ? s : b);
-          else if (tdT.length > 0) refToday = tdT.reduce((b,s) => s.charge < b.charge ? s : b);
-          // Meilleure charge de l'historique initial (même projet, avant la séance)
+          if (tdT.length > 0)     refToday = tdT.reduce((b,s) => s.charge > b.charge ? s : b);
+          else if (dT.length > 0) refToday = dT.reduce((b,s) => s.charge > b.charge ? s : b);
+
+          // Comparaison historique initial
           let histCharge = null;
           const rawH = (bilan.historique || {})[nom];
           if (rawH && !Array.isArray(rawH) && rawH.projet === state.projet) {
             const hs = rawH.series || [];
             const dH  = hs.filter(s => s.c && !s.special && s.s === 'D');
             const tdH = hs.filter(s => s.c && !s.special && s.s === 'TD');
-            if (dH.length > 0)       histCharge = dH.reduce((b,s) => s.c > b.c ? s : b).c;
-            else if (tdH.length > 0) histCharge = tdH.reduce((b,s) => s.c < b.c ? s : b).c;
+            if (tdH.length > 0)      histCharge = tdH.reduce((b,s) => s.c > b.c ? s : b).c;
+            else if (dH.length > 0)  histCharge = dH.reduce((b,s) => s.c > b.c ? s : b).c;
           }
           let arrow = '', arrowColor = 'var(--muted)';
           if (refToday && histCharge !== null) {
-            if (refToday.charge > histCharge)      { arrow = ' ↑'; arrowColor = 'var(--green)'; }
-            else if (refToday.charge < histCharge) { arrow = ' ↓'; arrowColor = 'var(--red,#e74c3c)'; }
-            else                                   { arrow = ' ='; arrowColor = 'var(--muted)'; }
+            if (refToday.charge > histCharge)      { arrow = '↑'; arrowColor = 'var(--green)'; }
+            else if (refToday.charge < histCharge) { arrow = '↓'; arrowColor = 'var(--red,#e74c3c)'; }
+            else                                   { arrow = '='; arrowColor = 'var(--muted)'; }
           }
           const chargeText = refToday
-            ? `${refToday.reps} × ${refToday.charge} kg${arrow ? `<span style="color:${arrowColor};font-weight:700">${arrow}</span>` : ''}`
+            ? `${refToday.reps} × ${refToday.charge} kg ${arrow ? `<span style="color:${arrowColor};font-weight:700">${arrow}</span>` : ''}`
             : '—';
-          return `<div style="display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-bottom:1px solid var(--border);font-size:.82rem">
-            <span style="min-width:1.5rem">${icon}</span>
-            <span style="flex:1;color:var(--text)">${nom}</span>
-            <span style="color:var(--text)">${chargeText}</span>
+
+          return `<div style="padding:.4rem 0;border-bottom:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;margin-bottom:.2rem">
+              <span>${icon}</span>
+              <span style="flex:1;color:var(--text)">${nom}${maxiForcé ? ' <span style="font-size:.65rem;color:var(--yellow)">🔄 nouveau maxi</span>' : ''}</span>
+              <span>${chargeText}</span>
+            </div>
+            <div style="display:flex;gap:.3rem;padding-left:1.6rem">${ressentiLine}</div>
           </div>`;
-        }).join('');
+        });
+
+        // Ateliers avec maxi forcé mais non revalidés
+        maxisF.filter(nom => !ateliersB.includes(nom)).forEach(nom => {
+          const ai = ATELIERS.find(x => x.nom === nom);
+          const icon = ai ? ai.icon : '🏋️';
+          rows.push(`<div style="padding:.4rem 0;border-bottom:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:.5rem;font-size:.82rem">
+              <span>${icon}</span>
+              <span style="flex:1;color:var(--muted)">${nom}</span>
+              <span style="font-size:.72rem;color:var(--yellow)">🔄 nouveau maxi calculé</span>
+            </div>
+          </div>`);
+        });
+
         return `<div style="border-top:1px solid var(--border);padding-top:1rem;margin-bottom:1rem">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.6rem">Bilan de la séance</div>
-          ${rows}
+          ${rows.join('')}
         </div>`;
       })()}
 
@@ -2526,6 +2560,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   if (interruption.interrompu) {
     delete state.serieLocale[nomAtelier];
     saveSerieLocale();
+    if (!state.maxisForces.includes(nomAtelier)) state.maxisForces.push(nomAtelier);
     if (state.suggestionEnAttente) delete state.suggestionEnAttente[nomAtelier];
     if (state.suggestionEnCours) state.suggestionEnCours[nomAtelier] = false;
     if (sgEl && a) sgEl.innerHTML = buildSeriesHTML(a, 0, []);
