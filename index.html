@@ -1114,7 +1114,8 @@ async function autoConnect(saved, classes) {
     state.projet              = d.projet || '';
     state.maxis               = d.maxis  || {};
     state.series              = d.series || {};
-    state.historiqueAteliers  = d.historique || {};
+    state.historiqueAteliers        = d.historique || {};
+    state.historiqueAteLiersInitial = JSON.parse(JSON.stringify(d.historique || {}));
     state.dernierBadge        = d.dernierBadge || '';
     state.comptCarton         = d.comptCarton  || 0;
     state.comptBronze         = d.comptBronze  || 0;
@@ -1224,7 +1225,8 @@ $('btn-login').addEventListener('click', async () => {
     state.projet              = d.projet || '';
     state.maxis               = d.maxis  || {};
     state.series              = d.series || {};
-    state.historiqueAteliers  = d.historique || {};
+    state.historiqueAteliers        = d.historique || {};
+    state.historiqueAteLiersInitial = JSON.parse(JSON.stringify(d.historique || {}));
     state.isFirstLogin        = !eInfo.hasMdp;
     state.dernierBadge        = d.dernierBadge || '';
     state.comptCarton         = d.comptCarton  || 0;
@@ -1950,6 +1952,12 @@ async function saveBadge() {
     });
   } catch(e) { console.error('saveBadge error', e); }
 
+  state.bilanSeance = {
+    ateliers:    state.ateliersSeanceEnCours.slice(),
+    serieLocale: JSON.parse(JSON.stringify(state.serieLocale)),
+    historique:  state.historiqueAteLiersInitial || {}
+  };
+
   state.compteurAteliersSeance = 0;
   localStorage.setItem('compteurAteliersSeance', '0');
   state.serieLocale = {};
@@ -2029,11 +2037,13 @@ function buildBilanBadge() {
       </div>
 
       ${(()=>{
-        if (!state.ateliersSeanceEnCours.length) return '';
-        const rows = state.ateliersSeanceEnCours.map(nom => {
+        const bilan = state.bilanSeance || {};
+        const ateliersB = bilan.ateliers || [];
+        if (!ateliersB.length) return '';
+        const rows = ateliersB.map(nom => {
           const ai = ATELIERS.find(x => x.nom === nom);
           const icon = ai ? ai.icon : '🏋️';
-          const local = state.serieLocale[nom] || [];
+          const local = (bilan.serieLocale || {})[nom] || [];
           const isSpecial = local.length && local[0] && local[0].special;
           if (isSpecial) {
             const nbOk = local.filter(s => s.resultat === 'ok').length;
@@ -2049,9 +2059,9 @@ function buildBilanBadge() {
           let refToday = null;
           if (dT.length > 0)       refToday = dT.reduce((b,s) => s.charge > b.charge ? s : b);
           else if (tdT.length > 0) refToday = tdT.reduce((b,s) => s.charge < b.charge ? s : b);
-          // Meilleure charge de l'historique (même projet)
+          // Meilleure charge de l'historique initial (même projet, avant la séance)
           let histCharge = null;
-          const rawH = state.historiqueAteliers[nom];
+          const rawH = (bilan.historique || {})[nom];
           if (rawH && !Array.isArray(rawH) && rawH.projet === state.projet) {
             const hs = rawH.series || [];
             const dH  = hs.filter(s => s.c && !s.special && s.s === 'D');
@@ -2794,18 +2804,8 @@ function appliquerChoixCharge(nomAtelier, key, unite, ressenti, currentCharge, c
 
   const newIntensite = ints[newIdx];
   const newCharge = maxi ? Math.round(maxi * newIntensite / 100 * 2) / 2 : currentCharge;
-  const arrow = ressenti === 'E' ? '↓' : '↑';
 
-  const sugBox = document.getElementById('sug-' + key);
-  sugBox.innerHTML = `
-    <div class="suggestion-title">💡 Charge modifiée</div>
-    <div class="suggestion-text">${arrow} Intensité : ${intensiteRef}% → ${newIntensite}%<br>
-      Série conseillée : <strong>${currentReps} reps <span style="color:var(--blue)">×</span> ${newCharge} ${unite}</strong>
-    </div>
-    <div class="suggestion-actions">
-      <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${newIntensite},${newCharge},${currentReps})">✓ Accepter</button>
-      <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${newCharge},${currentReps},${newIntensite})">✏️ Modifier</button>
-    </div>`;
+  applySuggestion(nomAtelier, newIntensite, newCharge, currentReps);
 }
 
 function appliquerChoixReps(nomAtelier, key, unite, ressenti, currentCharge, currentReps, currentIntensite) {
@@ -2816,17 +2816,7 @@ function appliquerChoixReps(nomAtelier, key, unite, ressenti, currentCharge, cur
   else if (ressenti === 'D') newReps = Math.min(Math.ceil(currentReps * 1.15), p.repsMax);
   else                       newReps = Math.max(Math.ceil(currentReps * 0.85), p.repsMin);
 
-  const arrow = ressenti === 'E' ? '↓' : '↑';
-  const sugBox = document.getElementById('sug-' + key);
-  sugBox.innerHTML = `
-    <div class="suggestion-title">💡 Répétitions modifiées</div>
-    <div class="suggestion-text">${arrow} Reps : ${currentReps} → ${newReps}<br>
-      Série conseillée : <strong>${newReps} reps <span style="color:var(--blue)">×</span> ${currentCharge} ${unite}</strong>
-    </div>
-    <div class="suggestion-actions">
-      <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${intensiteRef},${currentCharge},${newReps})">✓ Accepter</button>
-      <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="modifierSuggestion('${nomAtelier}','${key}','${unite}',${currentCharge},${newReps},${intensiteRef})">✏️ Modifier</button>
-    </div>`;
+  applySuggestion(nomAtelier, intensiteRef, currentCharge, newReps);
 }
 
 function allerAuxMaxis(nomAtelier) {
