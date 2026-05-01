@@ -991,7 +991,7 @@ function startSessionCheck() {
       state.isActive = d.isActive;
       if (wasActive && !state.isActive && state.compteurAteliersSeance > 0) {
         saveBadgeQuietly();
-        toast('⏰ La séance est terminée. Votre badge a été enregistré automatiquement.', 'warn');
+        toast('⏰ La séance est terminée.<br/>Votre badge a été enregistré automatiquement.', 'warn');
       }
     } catch(e) { console.error('sessionCheck error', e); }
   }, 10 * 60 * 1000);
@@ -1036,7 +1036,7 @@ const $ = id => document.getElementById(id);
 let toastTimer;
 function toast(msg, type='ok') {
   const t = $('toast');
-  t.innerHTML = msg;
+  t.textContent = msg;
   t.className = 'toast' + (type==='error'?' error':type==='warn'?' warn':'');
   clearTimeout(toastTimer);
   setTimeout(()=>t.classList.add('show'),10);
@@ -1336,7 +1336,7 @@ function doLogout() {
   stopSessionCheck();
   if (state.compteurAteliersSeance > 0 && isEditable()) {
     saveBadgeQuietly();
-    toast('⚠️ Votre travail a été enregistré sans attribution de badge. Utilisez "Fin de Séance" pour valider votre bilan.', 'warn');
+    toast('⚠️ Votre travail a été enregistré sans attribution de badge.<br>Utilisez "Fin de Séance" pour valider votre bilan.', 'warn');
   }
   localStorage.removeItem('muscu_login');
   localStorage.removeItem('muscu_serieLocale');
