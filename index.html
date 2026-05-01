@@ -3069,7 +3069,9 @@ function buildAtelierDetail() {
       <button class="calc-back-btn" onclick="showPage('seance')">← Séance</button>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;flex:1">${a.icon} ${a.nom}</div>
     </div>
-    <div style="font-size:.78rem;color:var(--muted);margin-bottom:.85rem;padding-left:.25rem">${a.muscles}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem">
+      ${a.muscles.split(' · ').map(m=>`<span style="display:inline-block;background:rgba(255,107,43,.12);border:1px solid rgba(255,107,43,.3);color:var(--accent2);font-size:.72rem;font-weight:600;border-radius:20px;padding:.15rem .6rem">${m}</span>`).join('')}
+    </div>
 
     <div class="atelier-detail-maxi">
       <div>
