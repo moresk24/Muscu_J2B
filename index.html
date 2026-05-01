@@ -2960,7 +2960,7 @@ function buildAtelierDetail() {
         ${rows}
       </div>`;
     })()}
-    <div class="atelier-bloc-title">🏋️ Vos séries à cet atelier</div>
+    <div class="atelier-bloc-title">🏋️ Vos séries aujourd'hui</div>
     <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
     ${type==='standard'?`<div class="suggestion-box" id="sug-${key}"></div>`:''}
     <div class="bravo-box" id="bravo-${key}" onclick="showPage('seance')" style="cursor:pointer">
