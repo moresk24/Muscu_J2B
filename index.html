@@ -3108,10 +3108,11 @@ function buildAtelierDetail() {
           </div>`;
         }
         const chargeColor = i === refIdx ? 'var(--red,#e74c3c)' : 'var(--text)';
+        const bg = colors[s.s] || '#444';
         return `<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.2rem 0;border-bottom:1px solid var(--border)">
           <span style="color:var(--muted);min-width:1.5rem">S${i+1}</span>
           <span style="flex:1;color:${chargeColor};font-weight:${i===refIdx?'700':'400'}">${s.r} × ${s.c} kg</span>
-          <span style="font-weight:700;color:${colors[s.s]||'var(--muted)'}">${s.s||'—'}</span>
+          <span style="display:inline-flex;align-items:center;justify-content:center;min-width:1.6rem;height:1.4rem;border-radius:3px;background:${bg};color:#fff;font-size:.6rem;font-weight:700;padding:0 .2rem">${s.s||'—'}</span>
         </div>`;
       }).join('');
       const projetLabel = hist.projet ? ` — Projet ${hist.projet}` : '';
