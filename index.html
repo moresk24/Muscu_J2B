@@ -3097,17 +3097,22 @@ function buildAtelierDetail() {
     if (bravo) bravo.classList.add('visible');
   }
 
-  // Pré-remplir S1 depuis la meilleure série D ou TD de la dernière validation
+  // Pré-remplir S1 : meilleur D (charge max), ou à défaut TD le plus bas
   if (type === 'standard' && localSeries.length === 0) {
     const raw = state.historiqueAteliers[nom];
     if (raw && !Array.isArray(raw) && raw.series &&
         (raw.seance !== state.sessionNumber || state.sessionNumber === 0)) {
-      const bestSerie = [...raw.series].reverse().find(s => s.s === 'D' || s.s === 'TD');
-      if (bestSerie) {
-        const p = PROJETS[state.projet];
-        const intensiteRef = state.intensite || (p && p.intensites[0]) || 60;
-        savedSuggestions[key] = '';
-        modifierSuggestion(nom, key, a.unite, bestSerie.c, bestSerie.r, intensiteRef);
+      const dSeries  = raw.series.filter(s => s.c && !s.special && s.s === 'D');
+      const tdSeries = raw.series.filter(s => s.c && !s.special && s.s === 'TD');
+      let bestSerie = null;
+      if (dSeries.length > 0) {
+        bestSerie = dSeries.reduce((best, s) => s.c > best.c ? s : best);
+      } else if (tdSeries.length > 0) {
+        bestSerie = tdSeries.reduce((best, s) => s.c < best.c ? s : best);
+      }
+      if (bestSerie && maxi > 0) {
+        const histIntensite = Math.round(bestSerie.c / maxi * 100);
+        applySuggestion(nom, histIntensite, bestSerie.c, bestSerie.r);
       }
     }
   }
