@@ -445,6 +445,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   background:var(--s2);border:1px solid var(--border);border-radius:12px;
   padding:.75rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem;
 }
+.recup-timer{display:none;background:var(--s1);border:1px solid rgba(61,139,255,.35);border-radius:12px;padding:.75rem 1rem;margin:.4rem 0;text-align:center}
+.recup-timer.active{display:block}
+.recup-timer-count{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:.05em;color:var(--accent);line-height:1.1}
 .seance-atelier-card{
   background:var(--s1);border:1px solid var(--border);border-radius:14px;
   margin-bottom:.6rem;display:flex;align-items:center;gap:.75rem;
@@ -2238,6 +2241,8 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
         bloc.style.display = 'block';
       }
     }
+  } else {
+    startRecupTimer(key);
   }
 }
 
@@ -2346,6 +2351,37 @@ async function validateAtelier(nomAtelier) {
     const res = await apiPost({action:'validateAtelier', classe:state.classe, nom:state.nom, prenom:state.prenom, atelier:nomAtelier, historique:JSON.stringify(seriesDuJour)});
     if (res && res.newCompteur !== undefined) state.compteur = res.newCompteur;
   } catch(e) { console.error(e); }
+}
+
+let _recupTimerInterval = null;
+
+function getRecupSeconds() {
+  const map = {"1":180,"2":90,"3A":45,"3B":60};
+  return map[state.projet] || 60;
+}
+
+function startRecupTimer(key) {
+  stopRecupTimer(key);
+  const el = document.getElementById('rt-'+key);
+  const count = document.getElementById('rt-count-'+key);
+  if (!el || !count) return;
+  let secs = getRecupSeconds();
+  function fmt(s) { return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60; }
+  count.textContent = fmt(secs);
+  count.style.color = '';
+  el.classList.add('active');
+  _recupTimerInterval = setInterval(()=>{
+    secs--;
+    if (secs <= 0) { stopRecupTimer(key); return; }
+    count.textContent = fmt(secs);
+    if (secs <= 5) count.style.color = 'var(--green)';
+  }, 1000);
+}
+
+function stopRecupTimer(key) {
+  if (_recupTimerInterval) { clearInterval(_recupTimerInterval); _recupTimerInterval = null; }
+  const el = document.getElementById('rt-'+key);
+  if (el) el.classList.remove('active');
 }
 
 function clearAtelierIncomplet(nomAtelier) {
@@ -2467,8 +2503,9 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
     return;
   }
 
-  // 5. Suggestion série suivante
+  // 5. Suggestion série suivante + timer récupération
   showSuggestion(nomAtelier, key, unite, ressenti, serieIndex + 1, charge, reps, serieIntensite || state.intensite);
+  startRecupTimer(key);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2962,6 +2999,11 @@ function buildAtelierDetail() {
     })()}
     <div class="atelier-bloc-title">🏋️ Vos séries aujourd'hui</div>
     <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
+    <div class="recup-timer" id="rt-${key}">
+      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.3rem">⏱ Récupération</div>
+      <div class="recup-timer-count" id="rt-count-${key}">—</div>
+      <button class="btn btn-outline" style="margin-top:.6rem;padding:.3rem .9rem;font-size:.78rem" onclick="stopRecupTimer('${key}')">Passer →</button>
+    </div>
     ${type==='standard'?`<div class="suggestion-box" id="sug-${key}"></div>`:''}
     <div class="bravo-box" id="bravo-${key}" onclick="showPage('seance')" style="cursor:pointer">
       <div class="bravo-emoji">🎉</div>
