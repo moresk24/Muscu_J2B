@@ -1256,6 +1256,7 @@ async function autoConnect(saved, classes) {
     state.nom                 = saved.nom;
     state.prenom              = saved.prenom;
     state.mdp                 = saved.mdp;
+    state.guidage             = d.guidage !== false;
     state.statut              = d.statut  || '';
     state.projet              = d.projet || '';
     state.maxis               = d.maxis  || {};
@@ -1409,6 +1410,7 @@ $('btn-login').addEventListener('click', async () => {
     state.nom                 = eInfo.nom;
     state.prenom              = eInfo.prenom;
     state.mdp                 = mdp;
+    state.guidage             = d.guidage !== false;
     state.statut              = d.statut  || '';
     state.projet              = d.projet || '';
     state.maxis               = d.maxis  || {};

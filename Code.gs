@@ -29,17 +29,18 @@ const COL_NOM              = 0;
 const COL_PRENOM           = 1;
 const COL_CLASSE           = 2;  // classe de l'élève
 const COL_MDP              = 3;
-const COL_STATUT           = 4;  // "" | "D" (dispensé) | "B" (blessé)
-const COL_PROJET           = 5;
-const COL_COMPTEUR         = 6;  // compteur global d'ateliers validés (cycle entier)
-const COL_LAST_CO          = 7;  // dernière connexion
-const COL_DERNIER_BADGE    = 8;  // "Carton" | "Bronze" | "Argent" | "Or" | ""
-const COL_COMPTEUR_CARTON  = 9;
-const COL_COMPTEUR_BRONZE  = 10;
-const COL_COMPTEUR_ARGENT  = 11;
-const COL_COMPTEUR_OR      = 12;
-const COL_ATELIERS_START   = 13; // à partir de là : maxi + séries faites (par paires)
-const COL_HISTORIQUE       = 45; // JSON : dernière séance validée par atelier
+const COL_GUIDAGE          = 4;  // case à cocher : TRUE = guidé, FALSE = autonome
+const COL_STATUT           = 5;  // "" | "D" (dispensé) | "B" (blessé)
+const COL_PROJET           = 6;
+const COL_COMPTEUR         = 7;  // compteur global d'ateliers validés (cycle entier)
+const COL_LAST_CO          = 8;  // dernière connexion
+const COL_DERNIER_BADGE    = 9;  // "Carton" | "Bronze" | "Argent" | "Or" | ""
+const COL_COMPTEUR_CARTON  = 10;
+const COL_COMPTEUR_BRONZE  = 11;
+const COL_COMPTEUR_ARGENT  = 12;
+const COL_COMPTEUR_OR      = 13;
+const COL_ATELIERS_START   = 14; // à partir de là : maxi + séries faites (par paires)
+const COL_HISTORIQUE       = 46; // JSON : dernière séance validée par atelier
 
 // ════════════════════════════════════════════════════════════
 //  WEB APP — TOUT EN GET (évite les problèmes CORS)
@@ -122,6 +123,7 @@ function handleLoadEleve(classe, nom, prenom) {
   return {
     success:       true,
     mdp:           row[COL_MDP]             || "",
+    guidage:       row[COL_GUIDAGE] !== false, // TRUE (case cochée) = guidé
     statut:        row[COL_STATUT]          || "",
     projet:        row[COL_PROJET]          || "",
     compteur:      row[COL_COMPTEUR]        || 0,
