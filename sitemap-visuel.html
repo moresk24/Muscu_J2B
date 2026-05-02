@@ -259,6 +259,34 @@
     display: inline-block;
   }
 
+  /* ── MENU GLOBAL ── */
+  .global-wrap {
+    background: rgba(255,255,255,.02);
+    border: 1px dashed var(--border);
+    border-radius: 18px;
+    padding: 1.2rem 1rem;
+    width: 100%;
+    max-width: 860px;
+    margin-top: .5rem;
+  }
+  .global-title {
+    text-align: center;
+    font-size: .75rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  .global-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    justify-content: center;
+  }
+  .box.global-c { border-color: var(--muted); width: 140px; opacity: .85; }
+  .box.global-c:hover { opacity: 1; }
+
   /* ── LÉGENDE ── */
   .legend {
     display: flex;
@@ -450,12 +478,52 @@
     </div>
   </div>
 
+  <!-- MENU GLOBAL -->
+  <div class="arrow-down"></div>
+  <div class="global-wrap">
+    <div class="global-title">☰ Menu — accessible depuis toutes les pages</div>
+    <div class="global-grid">
+
+      <div class="box global-c">
+        <span class="icon">📖</span>
+        <div class="label">Lexique</div>
+        <div class="desc">Vocabulaire de la musculation</div>
+      </div>
+
+      <div class="box global-c">
+        <span class="icon">🦴</span>
+        <div class="label">Anatomie</div>
+        <div class="desc">Groupes musculaires</div>
+      </div>
+
+      <div class="box global-c">
+        <span class="icon">❓</span>
+        <div class="label">Guide</div>
+        <div class="desc">Guide d'utilisation</div>
+      </div>
+
+      <div class="box global-c">
+        <span class="icon">🌙</span>
+        <div class="label">Thème</div>
+        <div class="desc">Clair / Sombre</div>
+      </div>
+
+      <div class="box global-c">
+        <span class="icon">↩️</span>
+        <div class="label">Déconnexion</div>
+        <div class="desc">Quitter la session</div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- LÉGENDE -->
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Maxis</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Les Projets</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Séances</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Mes Badges</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--muted);opacity:.6"></div> Menu ☰ (global)</div>
     <div class="legend-item" style="color:var(--accent2)">🔒 = débloqué une fois tous les maxis renseignés</div>
   </div>
 
