@@ -521,8 +521,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .muscle-card-fonction{font-size:.85rem;color:var(--text);line-height:1.6}
 .ressource-intro{background:var(--s1);border-left:3px solid var(--accent);border-radius:8px;padding:.9rem 1rem;margin-bottom:1.5rem;font-size:.9rem;line-height:1.7}
 .ressource-img{width:100%;max-width:520px;margin:0 auto 2rem;display:block;border-radius:12px;border:1px solid var(--border)}
-.lexique-search{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.55rem 1rem;outline:none;margin-bottom:1.25rem}
+.lexique-search{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.55rem 1rem;outline:none;margin-bottom:1rem}
 .lexique-search:focus{border-color:var(--accent)}
+.lex-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem}
+.lex-pill{background:var(--s1);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:.78rem;font-weight:600;padding:.3rem .75rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.lex-pill:hover{border-color:var(--accent);color:var(--accent)}
 .lexique-noresult{text-align:center;color:var(--muted);padding:2rem 0;display:none}
 
 .toast{
@@ -2303,9 +2306,17 @@ function buildLexique() {
         <div class="ressource-title">📖 Lexique</div>
       </div>
       <input class="lexique-search" id="lex-search" type="text" placeholder="🔍  Rechercher un terme…" oninput="lexiqueFiltrer(this.value)">
+      <div class="lex-pills" id="lex-pills">
+        <button class="lex-pill" onclick="lexiqueGoTo('lex-s1')">🦴 Anatomie</button>
+        <button class="lex-pill" onclick="lexiqueGoTo('lex-s2')">💪 Travail musculaire</button>
+        <button class="lex-pill" onclick="lexiqueGoTo('lex-s3')">🔄 Les mouvements</button>
+        <button class="lex-pill" onclick="lexiqueGoTo('lex-s4')">🏋️ L'entraînement</button>
+        <button class="lex-pill" onclick="lexiqueGoTo('lex-s5')">🩹 Les traumatismes</button>
+        <button class="lex-pill" onclick="lexiqueGoTo('lex-s6')">🥗 Alimentation</button>
+      </div>
       <div class="lexique-noresult" id="lex-noresult">Aucun terme ne correspond.</div>
 
-      <div class="ressource-section" data-section>
+      <div class="ressource-section" id="lex-s1" data-section>
         <div class="ressource-section-title">🦴 1 — Anatomie</div>
         <div class="terme-card" data-terme="Articulation"><div class="terme-card-nom">Articulation</div><div class="terme-card-def">Lieu de réunion de deux ou plusieurs os.</div></div>
         <div class="terme-card" data-terme="Muscle"><div class="terme-card-nom">Muscle</div><div class="terme-card-def">Organe chargé de convertir l'énergie chimique en énergie mécanique. Les séances de musculation sollicitent les muscles striés squelettiques.</div></div>
@@ -2318,7 +2329,7 @@ function buildLexique() {
         <div class="terme-card" data-terme="Ceinture Pelvienne"><div class="terme-card-nom">Ceinture Pelvienne</div><div class="terme-card-def">Ensemble des os du bassin.</div></div>
       </div>
 
-      <div class="ressource-section" data-section>
+      <div class="ressource-section" id="lex-s2" data-section>
         <div class="ressource-section-title">💪 2 — Travail musculaire</div>
         <div class="terme-card" data-terme="Contraction"><div class="terme-card-nom">Contraction</div><div class="terme-card-def">En musculation, désigne le travail musculaire. Ne pas réduire à la seule contraction concentrique.</div></div>
         <div class="terme-card" data-terme="Contraction Concentrique"><div class="terme-card-nom">Contraction Concentrique</div><div class="terme-card-def">Contraction d'un muscle entraînant un mouvement lié à son <strong>raccourcissement</strong>.</div></div>
@@ -2329,7 +2340,7 @@ function buildLexique() {
         <div class="terme-card" data-terme="Étirement"><div class="terme-card-nom">Étirement</div><div class="terme-card-def">Action d'étirer un muscle au-delà de sa position de repos, en vue de détente et de régénération.</div></div>
       </div>
 
-      <div class="ressource-section" data-section>
+      <div class="ressource-section" id="lex-s3" data-section>
         <div class="ressource-section-title">🔄 3 — Les mouvements</div>
         <div class="terme-card" data-terme="Expiration"><div class="terme-card-nom">Expiration</div><div class="terme-card-def">Faire sortir l'air des poumons. Se place au moment de l'effort principal (contraction concentrique).</div></div>
         <div class="terme-card" data-terme="Inspiration"><div class="terme-card-nom">Inspiration</div><div class="terme-card-def">Faire entrer de l'air dans les poumons.</div></div>
@@ -2343,7 +2354,7 @@ function buildLexique() {
         <div class="terme-card" data-terme="Muscle Antagoniste"><div class="terme-card-nom">Muscle Antagoniste</div><div class="terme-card-def">Muscle qui exécute le mouvement <strong>opposé</strong> au mouvement considéré.</div></div>
       </div>
 
-      <div class="ressource-section" data-section>
+      <div class="ressource-section" id="lex-s4" data-section>
         <div class="ressource-section-title">🏋️ 4 — L'entraînement</div>
         <div class="terme-card" data-terme="Charge Maxi CM"><div class="terme-card-nom">Charge Maxi (CM)</div><div class="terme-card-def">Charge maximale que vous pouvez soulever, tirer ou pousser en <strong>1 seule répétition</strong>.</div></div>
         <div class="terme-card" data-terme="Répétition"><div class="terme-card-nom">Répétition</div><div class="terme-card-def">Un mouvement complet : une flexion et une extension.</div></div>
@@ -2360,7 +2371,7 @@ function buildLexique() {
         <div class="terme-card" data-terme="Surcompensation"><div class="terme-card-nom">Surcompensation</div><div class="terme-card-def"><em>Phase 1</em> — Réalisation d’un effort important entraînant une baisse temporaire des capacités.<br><em>Phase 2</em> — Récupération : l’organisme répare et reconstitue ses ressources.<br><em>Phase 3</em> — L’organisme dépasse son niveau initial : c’est la phase de surcompensation. C’est à ce moment qu’il faut planifier la prochaine séance.</div></div>
         </div>
 
-      <div class="ressource-section" data-section>
+      <div class="ressource-section" id="lex-s5" data-section>
         <div class="ressource-section-title">🩹 5 — Les traumatismes</div>
         <div class="terme-card" data-terme="Courbature"><div class="terme-card-nom">Courbature</div><div class="terme-card-def">Fines mais douloureuses micro-lésions des fibres musculaires. Souvent (à tort) imputées aux acides lactiques.</div></div>
         <div class="terme-card" data-terme="Crampe"><div class="terme-card-nom">Crampe</div><div class="terme-card-def">Contraction involontaire, brutale, intense et douloureuse d'un muscle.</div></div>
@@ -2372,7 +2383,7 @@ function buildLexique() {
         <div class="terme-card" data-terme="Prévention des blessures"><div class="terme-card-nom">Prévention — Échauffement et progressivité</div><div class="terme-card-def">Deux éléments fondamentaux : (1) échauffement de 5 à 10 minutes avant la séance pour préparer muscles, tendons et articulations ; (2) augmentation progressive des charges — ne jamais augmenter de plus de 5 à 10 % d'une séance à l'autre.</div></div>
       </div>
 
-      <div class="ressource-section" data-section>
+      <div class="ressource-section" id="lex-s6" data-section>
         <div class="ressource-section-title">🥗 6 — Alimentation et énergie</div>
         <div class="terme-card" data-terme="IMC Indice de Masse Corporelle"><div class="terme-card-nom">IMC — Indice de Masse Corporelle</div><div class="terme-card-def">Poids (kg) ÷ Taille² (m²).</div></div>
         <div class="terme-card" data-terme="Protéine"><div class="terme-card-nom">Protéine</div><div class="terme-card-def">Molécule composée d'une chaîne d'acides aminés. D'origine animale (viande, poisson, œufs) ou végétale (fruits, légumes, céréales). La myosine est une protéine jouant un rôle fondamental dans la contraction musculaire.</div></div>
@@ -2391,11 +2402,17 @@ function buildLexique() {
   if (input) input.addEventListener('input', () => lexiqueFiltrer(input.value));
 }
 
+function lexiqueGoTo(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
 function lexiqueFiltrer(q) {
   q = q.trim().toLowerCase();
   const pg = $('page-lexique');
   const cartes = pg.querySelectorAll('.terme-card');
   const sections = pg.querySelectorAll('[data-section]');
+  const pills = pg.querySelector('#lex-pills');
   let total = 0;
   cartes.forEach(c => {
     const match = !q || (c.dataset.terme||'').toLowerCase().includes(q) || c.textContent.toLowerCase().includes(q);
@@ -2406,6 +2423,7 @@ function lexiqueFiltrer(q) {
     const visible = [...s.querySelectorAll('.terme-card')].some(c => c.style.display !== 'none');
     s.style.display = visible ? '' : 'none';
   });
+  if (pills) pills.style.display = q ? 'none' : '';
   const nr = pg.querySelector('#lex-noresult');
   if (nr) nr.style.display = total === 0 ? 'block' : 'none';
 }
