@@ -1903,6 +1903,16 @@ function goToProjetDetail(num) {
   showPage('projet-detail');
 }
 
+function getProjetGradient(num) {
+  const map = {
+    "1":  "linear-gradient(135deg,#ff6b2b,#ffb347)",
+    "2":  "linear-gradient(135deg,#3d8bff,#1a6ee0)",
+    "3A": "linear-gradient(135deg,#2ecc71,#1fa055)",
+    "3B": "linear-gradient(135deg,#ffb347,#e8922a)"
+  };
+  return map[num] || map["1"];
+}
+
 function buildProjetDetail() {
   const pg = $('page-projet-detail');
   const num = currentProjetDetail;
@@ -1928,8 +1938,8 @@ function buildProjetDetail() {
     ${pageTitle}
     ${chooseBtn ? `<div style="margin-bottom:.75rem">${chooseBtn}</div>` : ''}
     <div class="projet-fiche">
-      <div class="fiche-header">
-        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.3rem">${c.badge}</div>
+      <div class="fiche-header" style="background:${getProjetGradient(num)}">
+        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.75);margin-bottom:.3rem">${c.badge}</div>
         <h2>${c.icon} ${c.titre}</h2>
         <p>${c.sousTitre}</p>
       </div>
@@ -2035,8 +2045,8 @@ function buildFiche() {
 
   pg.innerHTML = `
     <div class="projet-fiche">
-      <div class="fiche-header">
-        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.3rem">${c.badge}</div>
+      <div class="fiche-header" style="background:${getProjetGradient(state.projet)}">
+        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.75);margin-bottom:.3rem">${c.badge}</div>
         <h2>${c.icon} ${c.titre}</h2>
         <p>${c.sousTitre}</p>
       </div>
