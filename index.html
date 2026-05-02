@@ -1248,6 +1248,7 @@ async function autoConnect(saved, classes) {
     state.historiqueAteliers        = d.historique || {};
     state.historiqueAteLiersInitial = JSON.parse(JSON.stringify(d.historique || {}));
     state.dernierBadge        = d.dernierBadge || '';
+    state.compteur            = parseInt(d.compteur) || 0;
     state.comptCarton         = d.comptCarton  || 0;
     state.comptBronze         = d.comptBronze  || 0;
     state.comptArgent         = d.comptArgent  || 0;
@@ -1401,6 +1402,7 @@ $('btn-login').addEventListener('click', async () => {
     state.historiqueAteLiersInitial = JSON.parse(JSON.stringify(d.historique || {}));
     state.isFirstLogin        = !eInfo.hasMdp;
     state.dernierBadge        = d.dernierBadge || '';
+    state.compteur            = parseInt(d.compteur) || 0;
     state.comptCarton         = d.comptCarton  || 0;
     state.comptBronze         = d.comptBronze  || 0;
     state.comptArgent         = d.comptArgent  || 0;
@@ -2337,8 +2339,19 @@ function buildMesBadges() {
       </div>` : `
       <div style="text-align:center;margin-bottom:1.5rem;color:var(--muted)">Aucun badge obtenu pour l'instant.<br>Validez votre séance (au moins 4 ateliers) pour gagner votre premier badge !</div>`}
 
+      <div style="border-top:1px solid var(--border);padding-top:1rem;margin-bottom:1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.75rem">Récapitulatif du cycle</div>
+        <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem;display:flex;align-items:center;gap:.85rem;margin-bottom:1rem">
+          <div style="font-size:2rem;line-height:1">🏋️</div>
+          <div>
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.15rem">Ateliers validés depuis le début du cycle</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.04em;color:var(--accent)">${state.compteur || 0}</div>
+          </div>
+        </div>
+      </div>
+
       <div style="border-top:1px solid var(--border);padding-top:1rem">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:1rem">Récapitulatif du cycle</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:1rem">Badges obtenus</div>
         ${[{nom:'Carton',compt:state.comptCarton},{nom:'Bronze',compt:state.comptBronze},{nom:'Argent',compt:state.comptArgent},{nom:'Or',compt:state.comptOr}].map((b,idx,arr) => `
         <div style="padding:.8rem 0;${idx < arr.length-1 ? 'border-bottom:1px solid var(--border);' : ''}">
           <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">
