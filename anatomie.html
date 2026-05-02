@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anatomie — Muscu à J2B</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0a0a0f;
+      --s1:      #12121a;
+      --s2:      #1a1a26;
+      --border:  #2a2a40;
+      --accent:  #ff6b2b;
+      --accent2: #ffb347;
+      --blue:    #3d8bff;
+      --green:   #2ecc71;
+      --text:    #f0f0f8;
+      --muted:   #6b6b8a;
+    }
+    [data-theme="light"] {
+      --bg:      #f2f2f7;
+      --s1:      #ffffff;
+      --s2:      #e8e8f0;
+      --border:  #ccccde;
+      --accent:  #e8581a;
+      --accent2: #f0963a;
+      --blue:    #2570e8;
+      --green:   #1fa055;
+      --text:    #1a1a2e;
+      --muted:   #7070a0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .93rem;
+      line-height: 1.65;
+      padding: 1.5rem 1rem 4rem;
+      transition: background .2s, color .2s;
+    }
+
+    .page { max-width: 860px; margin: 0 auto; }
+
+    /* ── En-tête ── */
+    .doc-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .doc-header .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem;
+      letter-spacing: .06em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .doc-header .subtitle {
+      font-size: .82rem;
+      color: var(--muted);
+      margin-top: .2rem;
+    }
+    .doc-header .doc-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: .05em;
+      color: var(--text);
+      margin-top: .9rem;
+    }
+
+    /* ── Barre d'outils ── */
+    .toolbar {
+      display: flex;
+      gap: .6rem;
+      margin-bottom: 1.75rem;
+      align-items: center;
+    }
+    .btn-back {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .82rem;
+      padding: .5rem .8rem;
+      cursor: pointer;
+      text-decoration: none;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+    .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Intro ── */
+    .intro-text {
+      background: var(--s1);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 1rem 1.1rem;
+      margin-bottom: 2rem;
+      font-size: .92rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    /* ── Image ── */
+    .anatomie-image {
+      width: 100%;
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+      display: block;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── Sections ── */
+    .anatomie-section { margin-bottom: 2.5rem; }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: .05em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      padding-bottom: .5rem;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    /* ── Groupes musculaires ── */
+    .muscle-group {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .85rem 1rem;
+      margin-bottom: .6rem;
+      transition: border-color .15s;
+    }
+    .muscle-group:hover { border-color: var(--accent); }
+
+    .muscle-group-title {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: .95rem;
+      margin-bottom: .35rem;
+    }
+    .muscle-group-muscles {
+      font-size: .85rem;
+      color: var(--muted);
+      margin-bottom: .3rem;
+    }
+    .muscle-group-muscles strong { color: var(--text); }
+    .muscle-group-function {
+      font-size: .87rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .muscle-group-function strong { color: var(--text); font-weight: 600; }
+
+    /* ── Footer ── */
+    .doc-footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .78rem;
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- En-tête -->
+  <div class="doc-header">
+    <div class="logo">Muscu à J2B</div>
+    <div class="subtitle">Lycée Jay de Beaufort · 2025–2026</div>
+    <div class="doc-title">🦴 Anatomie — Les muscles sollicités</div>
+  </div>
+
+
+  <!-- Intro -->
+  <div class="intro-text">
+    <strong>Les muscles moteurs du corps</strong> sont responsables de tous vos mouvements. Ils travaillent en groupes pour créer des actions coordonnées. En musculation, vous allez solliciter ces différents groupes selon votre projet. Comprendre où ils se situent et leur fonction vous aide à mieux ressentir votre travail et à progresser plus efficacement.
+  </div>
+
+  <!-- Schéma -->
+  <img src="anatomie-muscles.png" alt="Anatomie musculaire — Vue antérieure et postérieure" class="anatomie-image">
+
+  <!-- HAUT DU CORPS -->
+  <div class="anatomie-section">
+    <div class="section-title">🔴 Haut du corps</div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Pectoraux</div>
+      <div class="muscle-group-muscles"><strong>Muscles :</strong> Grand Pectoral, Petit Pectoral</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Rapprochent les bras vers la poitrine, les abaissent et les tournent vers l'intérieur (adduction et rotation interne).<br><strong>Ateliers :</strong> Développé Couché, Développé Incliné, Butterfly.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Dorsaux</div>
+      <div class="muscle-group-muscles"><strong>Muscles :</strong> Grand Dorsal, Petit Dorsal, Grand Rond</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Tirent les bras vers le bas et l'arrière, permettent la traction. Essentiels pour l'épaisseur du dos.<br><strong>Ateliers :</strong> Pull-Down Nuque, Pull-Down Poitrine, Banc Tirage.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Biceps</div>
+      <div class="muscle-group-muscles"><strong>Muscle :</strong> Biceps Brachial</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Fléchit l'avant-bras vers le bras, permet de soulever des charges.<br><strong>Ateliers :</strong> Pull-Down Nuque, Pull-Down Poitrine, Machine Biceps, Banc Tirage.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Triceps</div>
+      <div class="muscle-group-muscles"><strong>Muscle :</strong> Triceps Brachial</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Étend l'avant-bras (mouvement inverse du biceps), repousse les charges.<br><strong>Ateliers :</strong> Développé Couché, Développé Incliné.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Deltoïdes</div>
+      <div class="muscle-group-muscles"><strong>Muscles :</strong> Deltoïde Antérieur, Latéral, Postérieur</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Élèvent et font pivoter les bras dans toutes les directions. Essentiels pour l'amplitude d'épaule.<br><strong>Ateliers :</strong> Développé Couché, Développé Incliné, Butterfly, Deltoïdes (haltères), Banc Tirage.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Trapèzes</div>
+      <div class="muscle-group-muscles"><strong>Muscle :</strong> Trapèze (3 portions)</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Élèvent les épaules, rapprochent les omoplates, stabilisent la ceinture scapulaire.<br><strong>Ateliers :</strong> Pull-Down Nuque, Pull-Down Poitrine, Banc Tirage, Deltoïdes (haltères).</div>
+    </div>
+  </div>
+
+  <!-- TRONC -->
+  <div class="anatomie-section">
+    <div class="section-title">🟡 Tronc et sangle abdominale</div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Abdominaux</div>
+      <div class="muscle-group-muscles"><strong>Muscles :</strong> Grand Droit, Transverses, Obliques</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Fléchissent le buste vers l'avant, permettent la rotation du tronc, stabilisent l'ensemble.<br><strong>Atelier :</strong> Abdo Sol.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Lombaires</div>
+      <div class="muscle-group-muscles"><strong>Muscles :</strong> Érecteurs du rachis, muscles paravertébraux</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Étendent le buste vers l'arrière, stabilisent la colonne vertébrale. Essentiels pour la prévention des douleurs dorsales.<br><strong>Atelier :</strong> Banc à Lombaires.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Gainage</div>
+      <div class="muscle-group-muscles"><strong>Muscles impliqués :</strong> Grand Droit, Transverses, Lombaires, Fessiers</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Stabilisent l'ensemble du tronc, maintiennent une bonne posture, protègent la colonne vertébrale.<br><strong>Atelier :</strong> Gainage Sol.</div>
+    </div>
+  </div>
+
+  <!-- BAS DU CORPS -->
+  <div class="anatomie-section">
+    <div class="section-title">🔵 Bas du corps et jambes</div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Quadriceps</div>
+      <div class="muscle-group-muscles"><strong>Muscles :</strong> Vaste Latéral, Vaste Médial, Vaste Intermédiaire, Droit Fémoral</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Étendent la jambe (redressent le genou), permettent de repousser. Parmi les plus puissants du corps.<br><strong>Ateliers :</strong> Chaise à Quadriceps, Presse Inclinée.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Ischio-jambiers</div>
+      <div class="muscle-group-muscles"><strong>Muscles :</strong> Biceps Fémoral, Semi-membraneux, Semi-tendineux</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Fléchissent la jambe (replient le genou), étendent la hanche. Antagonistes du quadriceps.<br><strong>Atelier :</strong> Banc Ischio-Jambiers.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Fessiers</div>
+      <div class="muscle-group-muscles"><strong>Muscle :</strong> Grand Fessier</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Étendent et font pivoter la hanche, permettent de se relever, de sauter. Essentiels pour la puissance des jambes.<br><strong>Ateliers :</strong> Presse Inclinée, Chaise à Abducteurs.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Adducteurs</div>
+      <div class="muscle-group-muscles"><strong>Muscles :</strong> Grand, Long et Court Adducteur</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Rapprochent les jambes (adduction), stabilisent le bassin.<br><strong>Atelier :</strong> Chaise à Adducteurs.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Abducteurs</div>
+      <div class="muscle-group-muscles"><strong>Muscles :</strong> Moyen et Petit Fessier, Tenseur du Fascia Lata</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Écartent les jambes (abduction), stabilisent la hanche. Importants pour la stabilité latérale.<br><strong>Atelier :</strong> Chaise à Abducteurs.</div>
+    </div>
+
+    <div class="muscle-group">
+      <div class="muscle-group-title">Jumeaux (Mollets)</div>
+      <div class="muscle-group-muscles"><strong>Muscles :</strong> Gastrocnémien, Soléaire</div>
+      <div class="muscle-group-function"><strong>Fonction :</strong> Pointent les pieds vers le bas (flexion plantaire), permettent de marcher et de sauter.</div>
+    </div>
+  </div>
+
+  <div class="doc-footer">Document produit par M. Cuvelier · Lycée Jay de Beaufort · 2025–2026</div>
+
+</div>
+<script>
+  document.documentElement.dataset.theme = localStorage.getItem('muscu_theme') || 'dark';
+</script>
+</body>
+</html>

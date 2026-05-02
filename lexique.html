@@ -250,14 +250,11 @@
     <div class="doc-title">📖 Lexique — Termes et notions à connaître</div>
   </div>
  
-  <!-- Barre d'outils -->
-  <div class="toolbar">
-    <a href="index.html" class="btn-back">← App</a>
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="search" placeholder="Rechercher un terme…" oninput="filtrer(this.value)">
-    </div>
-    <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Changer le thème">🌙</button>
+  <!-- Barre de recherche -->
+  <div style="position:relative;margin-bottom:1.5rem">
+    <span style="position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none">🔍</span>
+    <input type="text" id="search" placeholder="Rechercher un terme…" oninput="filtrer(this.value)"
+      style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.55rem .9rem .55rem 2.2rem;outline:none">
   </div>
  
   <!-- Navigation rapide -->
@@ -609,16 +606,7 @@
  
 <script>
   // ── Thème ──
-  function applyTheme(t) {
-    document.documentElement.dataset.theme = t;
-    document.getElementById('btn-theme').textContent = t === 'light' ? '☀️' : '🌙';
-  }
-  function toggleTheme() {
-    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
-    localStorage.setItem('muscu_theme', next);
-    applyTheme(next);
-  }
-  applyTheme(localStorage.getItem('muscu_theme') || 'dark');
+  document.documentElement.dataset.theme = localStorage.getItem('muscu_theme') || 'dark';
  
   // ── Recherche ──
   function filtrer(q) {

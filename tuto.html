@@ -541,10 +541,7 @@
 
 </div>
 <script>
-  (function() {
-    const t = localStorage.getItem('muscu_theme') || 'dark';
-    document.documentElement.dataset.theme = t;
-  })();
+  document.documentElement.dataset.theme = localStorage.getItem('muscu_theme') || 'dark';
 </script>
 </body>
 </html>

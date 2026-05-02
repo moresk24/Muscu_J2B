@@ -503,6 +503,28 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 /* ═══════════════════════════════════════════
    TOAST
 ═══════════════════════════════════════════ */
+/* ── Pages ressources (Lexique & Anatomie) ── */
+.ressource-header{display:flex;align-items:center;gap:.5rem;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
+.ressource-back{background:none;border:none;color:var(--accent);font-size:.9rem;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif}
+.ressource-back:hover{text-decoration:underline}
+.ressource-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.05em}
+.ressource-section{margin-bottom:2rem}
+.ressource-section-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.05em;color:var(--accent);margin-bottom:.75rem;padding-bottom:.4rem;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:.4rem}
+.terme-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;margin-bottom:.5rem}
+.terme-card-nom{font-weight:700;color:var(--accent);font-size:.93rem;margin-bottom:.2rem}
+.terme-card-def{color:var(--text);font-size:.85rem;line-height:1.6}
+.terme-card-def em{color:var(--muted);font-style:italic}
+.muscle-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem;margin-bottom:.5rem}
+.muscle-card-nom{font-weight:700;color:var(--accent);font-size:.93rem;margin-bottom:.3rem}
+.muscle-card-muscles{font-size:.82rem;color:var(--muted);margin-bottom:.25rem}
+.muscle-card-muscles strong{color:var(--text)}
+.muscle-card-fonction{font-size:.85rem;color:var(--text);line-height:1.6}
+.ressource-intro{background:var(--s1);border-left:3px solid var(--accent);border-radius:8px;padding:.9rem 1rem;margin-bottom:1.5rem;font-size:.9rem;line-height:1.7}
+.ressource-img{width:100%;max-width:520px;margin:0 auto 2rem;display:block;border-radius:12px;border:1px solid var(--border)}
+.lexique-search{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.55rem 1rem;outline:none;margin-bottom:1.25rem}
+.lexique-search:focus{border-color:var(--accent)}
+.lexique-noresult{text-align:center;color:var(--muted);padding:2rem 0;display:none}
+
 .toast{
   position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-80px);
   background:var(--green);color:#fff;font-weight:700;font-size:.9rem;
@@ -595,9 +617,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <span id="hmenu-theme-icon">🌙</span><span id="hmenu-theme-label">Thème sombre</span>
       </button>
       <div class="hmenu-separator"></div>
-      <a class="hmenu-item" href="lexique.html" target="_blank">📖 Lexique</a>
-      <a class="hmenu-item" href="anatomie.html" target="_blank">🦴 Anatomie</a>
-      <a class="hmenu-item" href="tuto.html" target="_blank">❓ Guide d'utilisation</a>
+      <button class="hmenu-item" onclick="showPage('lexique');closeHamburger()">📖 Lexique</button>
+      <button class="hmenu-item" onclick="showPage('anatomie');closeHamburger()">🦴 Anatomie</button>
+      <a class="hmenu-item" href="tuto.html" target="_blank" onclick="closeHamburger()">❓ Guide d'utilisation</a>
       <div class="hmenu-separator"></div>
       <button class="hmenu-item" id="btn-logout" style="color:var(--muted)">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -620,6 +642,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   <div id="page-atelier-detail" class="scroll" style="display:none"></div>
   <div id="page-bilan-badge" class="scroll" style="display:none"></div>
   <div id="page-mes-badges" class="scroll" style="display:none"></div>
+  <div id="page-lexique" class="scroll" style="display:none"></div>
+  <div id="page-anatomie" class="scroll" style="display:none"></div>
 
   <!-- Bottom nav -->
   <div class="bottom-nav">
@@ -1363,7 +1387,7 @@ $('btn-login').addEventListener('click', async () => {
 // ═══════════════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════════════
-const PAGES = ['maxis','maxi-calc','projet','projet-detail','fiche','seance','atelier-detail','bilan-badge','mes-badges'];
+const PAGES = ['maxis','maxi-calc','projet','projet-detail','fiche','seance','atelier-detail','bilan-badge','mes-badges','lexique','anatomie'];
 function showPage(name) {
   // Rediriger fiche vers projet-detail si un projet est sélectionné
   if (name === 'fiche' && state.projet) {
@@ -1390,6 +1414,8 @@ function showPage(name) {
   if (name==='atelier-detail') buildAtelierDetail();
   if (name==='bilan-badge')    buildBilanBadge();
   if (name==='mes-badges')     buildMesBadges();
+  if (name==='lexique')        buildLexique();
+  if (name==='anatomie')       buildAnatomie();
 }
 document.querySelectorAll('.nav-btn').forEach(b => {
   b.addEventListener('click', ()=>showPage(b.dataset.page));
@@ -2258,6 +2284,155 @@ function buildMesBadges() {
           ${b.compt === 0 ? `<div style="font-weight:600;margin-bottom:.1rem;color:var(--muted)">${b.nom}</div><div style="color:var(--muted);font-size:.85rem">0 obtenu</div>` : ''}
         </div>`).join('')}
       </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+//  PAGES RESSOURCES
+// ═══════════════════════════════════════════════════
+function buildLexique() {
+  const pg = $('page-lexique');
+  pg.innerHTML = `
+    <div style="padding:1rem">
+      <div class="ressource-header">
+        <button class="ressource-back" onclick="history.back()">←</button>
+        <div class="ressource-title">📖 Lexique</div>
+      </div>
+      <input class="lexique-search" id="lex-search" type="text" placeholder="🔍  Rechercher un terme…" oninput="lexiqueFiltrer(this.value)">
+      <div class="lexique-noresult" id="lex-noresult">Aucun terme ne correspond.</div>
+
+      <div class="ressource-section" data-section>
+        <div class="ressource-section-title">🦴 1 — Anatomie</div>
+        <div class="terme-card" data-terme="Articulation"><div class="terme-card-nom">Articulation</div><div class="terme-card-def">Lieu de réunion de deux ou plusieurs os.</div></div>
+        <div class="terme-card" data-terme="Muscle"><div class="terme-card-nom">Muscle</div><div class="terme-card-def">Organe chargé de convertir l'énergie chimique en énergie mécanique. Les séances de musculation sollicitent les muscles striés squelettiques.</div></div>
+        <div class="terme-card" data-terme="Tissu conjonctif"><div class="terme-card-nom">Tissu conjonctif</div><div class="terme-card-def">Ensemble de cellules de même constitution. Constitué de fibres de collagène (résistance) et de fibres élastiques.</div></div>
+        <div class="terme-card" data-terme="Cartilage"><div class="terme-card-nom">Cartilage</div><div class="terme-card-def">Tissu conjonctif élastique recouvrant les surfaces osseuses. Rôle important d'amortissement.</div></div>
+        <div class="terme-card" data-terme="Tendon"><div class="terme-card-nom">Tendon</div><div class="terme-card-def">Tissu conjonctif très solide et peu élastique à l'extrémité du muscle, qui attache le muscle à l'os.</div></div>
+        <div class="terme-card" data-terme="Ligament"><div class="terme-card-nom">Ligament</div><div class="terme-card-def">Tissu conjonctif qui relie les os entre eux dans une articulation.</div></div>
+        <div class="terme-card" data-terme="Insertion"><div class="terme-card-nom">Insertion</div><div class="terme-card-def">Point d'attache du tendon sur l'os.</div></div>
+        <div class="terme-card" data-terme="Ceinture Scapulaire"><div class="terme-card-nom">Ceinture Scapulaire</div><div class="terme-card-def">Ensemble des os formant les épaules : sternum, clavicule, omoplate et os coracoïde.</div></div>
+        <div class="terme-card" data-terme="Ceinture Pelvienne"><div class="terme-card-nom">Ceinture Pelvienne</div><div class="terme-card-def">Ensemble des os du bassin.</div></div>
+      </div>
+
+      <div class="ressource-section" data-section>
+        <div class="ressource-section-title">💪 2 — Travail musculaire</div>
+        <div class="terme-card" data-terme="Contraction"><div class="terme-card-nom">Contraction</div><div class="terme-card-def">En musculation, désigne le travail musculaire. Ne pas réduire à la seule contraction concentrique.</div></div>
+        <div class="terme-card" data-terme="Contraction Concentrique"><div class="terme-card-nom">Contraction Concentrique</div><div class="terme-card-def">Contraction d'un muscle entraînant un mouvement lié à son <strong>raccourcissement</strong>.</div></div>
+        <div class="terme-card" data-terme="Contraction Excentrique"><div class="terme-card-nom">Contraction Excentrique</div><div class="terme-card-def">Travail d'un muscle accompagné de son <strong>allongement</strong> au lieu du raccourcissement normal.</div></div>
+        <div class="terme-card" data-terme="Contraction Isométrique"><div class="terme-card-nom">Contraction Isométrique</div><div class="terme-card-def">Contraction musculaire <strong>sans mouvement</strong>. Travail en statique. <em>Exemple : le gainage.</em></div></div>
+        <div class="terme-card" data-terme="Pliométrie"><div class="terme-card-nom">Pliométrie</div><div class="terme-card-def">Enchaînement d'une contraction excentrique et d'une contraction concentrique pour produire un mouvement plus puissant.</div></div>
+        <div class="terme-card" data-terme="Relâchement"><div class="terme-card-nom">Relâchement</div><div class="terme-card-def">Fin de la contraction et de la congestion du muscle.</div></div>
+        <div class="terme-card" data-terme="Étirement"><div class="terme-card-nom">Étirement</div><div class="terme-card-def">Action d'étirer un muscle au-delà de sa position de repos, en vue de détente et de régénération.</div></div>
+      </div>
+
+      <div class="ressource-section" data-section>
+        <div class="ressource-section-title">🔄 3 — Les mouvements</div>
+        <div class="terme-card" data-terme="Expiration"><div class="terme-card-nom">Expiration</div><div class="terme-card-def">Faire sortir l'air des poumons. Se place au moment de l'effort principal (contraction concentrique).</div></div>
+        <div class="terme-card" data-terme="Inspiration"><div class="terme-card-nom">Inspiration</div><div class="terme-card-def">Faire entrer de l'air dans les poumons.</div></div>
+        <div class="terme-card" data-terme="Extension"><div class="terme-card-nom">Extension</div><div class="terme-card-def">Mouvement qui <strong>éloigne</strong> un segment du corps par rapport à l'autre. Opposé de la flexion.</div></div>
+        <div class="terme-card" data-terme="Flexion"><div class="terme-card-nom">Flexion</div><div class="terme-card-def">Mouvement qui <strong>rapproche</strong> un segment du corps sur un autre. Opposé de l'extension.</div></div>
+        <div class="terme-card" data-terme="Adduction"><div class="terme-card-nom">Adduction</div><div class="terme-card-def">Mouvement qui <strong>rapproche</strong> un membre de l'axe du corps.</div></div>
+        <div class="terme-card" data-terme="Abduction"><div class="terme-card-nom">Abduction</div><div class="terme-card-def">Mouvement qui <strong>écarte</strong> un membre de l'axe du corps.</div></div>
+        <div class="terme-card" data-terme="Pronation"><div class="terme-card-nom">Pronation</div><div class="terme-card-def">Position de la paume des mains <strong>vers le bas</strong>.</div></div>
+        <div class="terme-card" data-terme="Supination"><div class="terme-card-nom">Supination</div><div class="terme-card-def">Position de la paume des mains <strong>vers le haut</strong>.</div></div>
+        <div class="terme-card" data-terme="Muscle Agoniste"><div class="terme-card-nom">Muscle Agoniste</div><div class="terme-card-def">Muscle qui <strong>exécute</strong> le mouvement considéré.</div></div>
+        <div class="terme-card" data-terme="Muscle Antagoniste"><div class="terme-card-nom">Muscle Antagoniste</div><div class="terme-card-def">Muscle qui exécute le mouvement <strong>opposé</strong> au mouvement considéré.</div></div>
+      </div>
+
+      <div class="ressource-section" data-section>
+        <div class="ressource-section-title">🏋️ 4 — L'entraînement</div>
+        <div class="terme-card" data-terme="Charge Maxi CM"><div class="terme-card-nom">Charge Maxi (CM)</div><div class="terme-card-def">Charge maximale que vous pouvez soulever, tirer ou pousser en <strong>1 seule répétition</strong>.</div></div>
+        <div class="terme-card" data-terme="Répétition"><div class="terme-card-nom">Répétition</div><div class="terme-card-def">Un mouvement complet : une flexion et une extension.</div></div>
+        <div class="terme-card" data-terme="Série"><div class="terme-card-nom">Série</div><div class="terme-card-def">Nombre précis de répétitions sans repos. Se définit par : une charge, un nombre de répétitions, une vitesse, un temps de repos.</div></div>
+        <div class="terme-card" data-terme="Surcompensation"><div class="terme-card-nom">Surcompensation</div><div class="terme-card-def"><em>Phase 1</em> — Effort important. <em>Phase 2</em> — Récupération et désadaptation. <em>Phase 3</em> — L'organisme dépasse ses capacités initiales : c'est la surcompensation. C'est à ce moment qu'il faut placer la prochaine séance.</div></div>
+        <div class="terme-card" data-terme="Brûlure musculaire"><div class="terme-card-nom">Brûlure musculaire</div><div class="terme-card-def">Causée par l'accumulation de déchets et le manque d'oxygène. Disparaît très rapidement à l'arrêt.</div></div>
+        <div class="terme-card" data-terme="Acide Lactique"><div class="terme-card-nom">Acide Lactique</div><div class="terme-card-def">Acide provenant de la dégradation anaérobie du glucose. Son accumulation provoque une sensation de brûlure.</div></div>
+        <div class="terme-card" data-terme="Récupération Active"><div class="terme-card-nom">Récupération Active</div><div class="terme-card-def">Activité modérée entre les séries pour accélérer la récupération et améliorer la série suivante.</div></div>
+        <div class="terme-card" data-terme="Repos Passif"><div class="terme-card-nom">Repos Passif</div><div class="terme-card-def">Pause complète entre les séries. Permet aux muscles de se recharger en oxygène.</div></div>
+      </div>
+
+      <div class="ressource-section" data-section>
+        <div class="ressource-section-title">🩹 5 — Les traumatismes</div>
+        <div class="terme-card" data-terme="Courbature"><div class="terme-card-nom">Courbature</div><div class="terme-card-def">Micro-lésions douloureuses des fibres musculaires (souvent à tort attribuées aux acides lactiques).</div></div>
+        <div class="terme-card" data-terme="Crampe"><div class="terme-card-nom">Crampe</div><div class="terme-card-def">Contraction involontaire, brutale, intense et douloureuse d'un muscle.</div></div>
+        <div class="terme-card" data-terme="Contracture"><div class="terme-card-nom">Contracture</div><div class="terme-card-def">Contraction involontaire, spontanée, <strong>durable</strong> et douloureuse d'un muscle.</div></div>
+        <div class="terme-card" data-terme="Élongation"><div class="terme-card-nom">Élongation</div><div class="terme-card-def">Étirement ou déchirure d'un muscle ou d'un tendon.</div></div>
+        <div class="terme-card" data-terme="Déchirure claquage"><div class="terme-card-nom">Déchirure (claquage)</div><div class="terme-card-def">Rupture de continuité des fibres musculaires. Provoque une douleur intense, une immobilisation et parfois un hématome.</div></div>
+      </div>
+
+      <div class="ressource-section" data-section>
+        <div class="ressource-section-title">🥗 6 — Alimentation et énergie</div>
+        <div class="terme-card" data-terme="IMC"><div class="terme-card-nom">IMC</div><div class="terme-card-def">Indice de Masse Corporelle = Poids (kg) ÷ Taille² (m²).</div></div>
+        <div class="terme-card" data-terme="Protéine"><div class="terme-card-nom">Protéine</div><div class="terme-card-def">Molécule composée d'acides aminés. D'origine animale ou végétale. La myosine joue un rôle fondamental dans la contraction musculaire.</div></div>
+        <div class="terme-card" data-terme="Lipide"><div class="terme-card-nom">Lipide</div><div class="terme-card-def">Matière grasse. Source d'énergie principale lors d'efforts modérés de plus de 30 minutes.</div></div>
+        <div class="terme-card" data-terme="Glucide hydrate de carbone"><div class="terme-card-nom">Glucide</div><div class="terme-card-def">Source d'énergie pour l'organisme. Le glucose produit de l'ATP, intermédiaire énergétique essentiel pour toutes les cellules.</div></div>
+      </div>
+      <div style="height:1rem"></div>
+    </div>`;
+
+  const input = pg.querySelector('#lex-search');
+  if (input) input.addEventListener('input', () => lexiqueFiltrer(input.value));
+}
+
+function lexiqueFiltrer(q) {
+  q = q.trim().toLowerCase();
+  const pg = $('page-lexique');
+  const cartes = pg.querySelectorAll('.terme-card');
+  const sections = pg.querySelectorAll('[data-section]');
+  let total = 0;
+  cartes.forEach(c => {
+    const match = !q || (c.dataset.terme||'').toLowerCase().includes(q) || c.textContent.toLowerCase().includes(q);
+    c.style.display = match ? '' : 'none';
+    if (match) total++;
+  });
+  sections.forEach(s => {
+    const visible = [...s.querySelectorAll('.terme-card')].some(c => c.style.display !== 'none');
+    s.style.display = visible ? '' : 'none';
+  });
+  const nr = pg.querySelector('#lex-noresult');
+  if (nr) nr.style.display = total === 0 ? 'block' : 'none';
+}
+
+function buildAnatomie() {
+  const pg = $('page-anatomie');
+  pg.innerHTML = `
+    <div style="padding:1rem">
+      <div class="ressource-header">
+        <button class="ressource-back" onclick="history.back()">←</button>
+        <div class="ressource-title">🦴 Anatomie</div>
+      </div>
+      <div class="ressource-intro">
+        <strong>Les muscles moteurs du corps</strong> sont responsables de tous vos mouvements. Comprendre où ils se situent et leur fonction vous aide à mieux ressentir votre travail et à progresser plus efficacement.
+      </div>
+      <img src="anatomie-muscles.png" alt="Anatomie musculaire" class="ressource-img">
+
+      <div class="ressource-section">
+        <div class="ressource-section-title">🔴 Haut du corps</div>
+        <div class="muscle-card"><div class="muscle-card-nom">Pectoraux</div><div class="muscle-card-muscles"><strong>Muscles :</strong> Grand Pectoral, Petit Pectoral</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Rapprochent les bras vers la poitrine (adduction, rotation interne).<br><strong>Ateliers :</strong> Développé Couché, Développé Incliné, Butterfly.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Dorsaux</div><div class="muscle-card-muscles"><strong>Muscles :</strong> Grand Dorsal, Petit Dorsal, Grand Rond</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Tirent les bras vers le bas et l'arrière, permettent la traction.<br><strong>Ateliers :</strong> Pull-Down Nuque, Pull-Down Poitrine, Banc Tirage.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Biceps</div><div class="muscle-card-muscles"><strong>Muscle :</strong> Biceps Brachial</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Fléchit l'avant-bras vers le bras.<br><strong>Ateliers :</strong> Pull-Down Nuque, Pull-Down Poitrine, Machine Biceps, Banc Tirage.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Triceps</div><div class="muscle-card-muscles"><strong>Muscle :</strong> Triceps Brachial</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Étend l'avant-bras, repousse les charges.<br><strong>Ateliers :</strong> Développé Couché, Développé Incliné.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Deltoïdes</div><div class="muscle-card-muscles"><strong>Muscles :</strong> Deltoïde Antérieur, Latéral, Postérieur</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Élèvent et font pivoter les bras dans toutes les directions.<br><strong>Ateliers :</strong> Développé Couché, Développé Incliné, Butterfly, Deltoïdes (haltères), Banc Tirage.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Trapèzes</div><div class="muscle-card-muscles"><strong>Muscle :</strong> Trapèze (3 portions)</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Élèvent les épaules, rapprochent les omoplates, stabilisent la ceinture scapulaire.<br><strong>Ateliers :</strong> Pull-Down Nuque, Pull-Down Poitrine, Banc Tirage, Deltoïdes (haltères).</div></div>
+      </div>
+
+      <div class="ressource-section">
+        <div class="ressource-section-title">🟡 Tronc et sangle abdominale</div>
+        <div class="muscle-card"><div class="muscle-card-nom">Abdominaux</div><div class="muscle-card-muscles"><strong>Muscles :</strong> Grand Droit, Transverses, Obliques</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Fléchissent le buste, permettent la rotation du tronc, stabilisent l'ensemble.<br><strong>Atelier :</strong> Abdo Sol.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Lombaires</div><div class="muscle-card-muscles"><strong>Muscles :</strong> Érecteurs du rachis, muscles paravertébraux</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Étendent le buste vers l'arrière, stabilisent la colonne vertébrale.<br><strong>Atelier :</strong> Banc à Lombaires.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Gainage</div><div class="muscle-card-muscles"><strong>Muscles :</strong> Grand Droit, Transverses, Lombaires, Fessiers</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Stabilisent le tronc, maintiennent la posture, protègent la colonne.<br><strong>Atelier :</strong> Gainage Sol.</div></div>
+      </div>
+
+      <div class="ressource-section">
+        <div class="ressource-section-title">🔵 Bas du corps et jambes</div>
+        <div class="muscle-card"><div class="muscle-card-nom">Quadriceps</div><div class="muscle-card-muscles"><strong>Muscles :</strong> Vaste Latéral, Vaste Médial, Vaste Intermédiaire, Droit Fémoral</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Étendent la jambe (redressent le genou). Parmi les plus puissants du corps.<br><strong>Ateliers :</strong> Chaise à Quadriceps, Presse Inclinée.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Ischio-jambiers</div><div class="muscle-card-muscles"><strong>Muscles :</strong> Biceps Fémoral, Semi-membraneux, Semi-tendineux</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Fléchissent la jambe, étendent la hanche. Antagonistes du quadriceps.<br><strong>Atelier :</strong> Banc Ischio-Jambiers.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Fessiers</div><div class="muscle-card-muscles"><strong>Muscle :</strong> Grand Fessier</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Étendent et font pivoter la hanche, essentiels pour la puissance des jambes.<br><strong>Ateliers :</strong> Presse Inclinée, Chaise à Abducteurs.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Adducteurs</div><div class="muscle-card-muscles"><strong>Muscles :</strong> Grand, Long et Court Adducteur</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Rapprochent les jambes, stabilisent le bassin.<br><strong>Atelier :</strong> Chaise à Adducteurs.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Abducteurs</div><div class="muscle-card-muscles"><strong>Muscles :</strong> Moyen et Petit Fessier, Tenseur du Fascia Lata</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Écartent les jambes, stabilisent la hanche.<br><strong>Atelier :</strong> Chaise à Abducteurs.</div></div>
+        <div class="muscle-card"><div class="muscle-card-nom">Jumeaux (Mollets)</div><div class="muscle-card-muscles"><strong>Muscles :</strong> Gastrocnémien, Soléaire</div><div class="muscle-card-fonction"><strong>Fonction :</strong> Pointent les pieds vers le bas, permettent de marcher et de sauter.</div></div>
+      </div>
+      <div style="height:1rem"></div>
     </div>`;
 }
 

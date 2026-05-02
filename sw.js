@@ -1,5 +1,6 @@
-const CACHE = 'muscu-j2b-v7';
+const CACHE = 'muscu-j2b-v8';
 const ASSETS = ['./', './index.html', './manifest.json',
+  './tuto.html', './lexique.html', './anatomie.html', './anatomie-muscles.png',
   './favicon-16x16.png', './favicon-32x32.png', './apple-touch-icon.png',
   './android-chrome-192x192.png', './android-chrome-512x512.png', './favicon.ico'];
 
