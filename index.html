@@ -70,7 +70,33 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
   border-bottom:1px solid var(--border);
   flex-shrink:0;
   gap:.5rem;
+  position:relative;
 }
+.hamburger-btn{
+  border:none;background:none;padding:.3rem .4rem;cursor:pointer;
+  display:flex;flex-direction:column;justify-content:center;gap:4px;
+}
+.hamburger-btn span{
+  display:block;width:18px;height:2px;background:var(--muted);
+  border-radius:2px;transition:background .2s;
+}
+.hamburger-btn:hover span{background:var(--accent)}
+.hamburger-menu{
+  display:none;position:absolute;top:calc(100% + 4px);right:.5rem;
+  background:var(--s1);border:1px solid var(--border);border-radius:14px;
+  min-width:190px;padding:.4rem;z-index:200;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+.hamburger-menu.open{display:block}
+.hmenu-item{
+  display:flex;align-items:center;gap:.65rem;
+  padding:.6rem .8rem;border-radius:10px;cursor:pointer;
+  font-size:.88rem;color:var(--text);text-decoration:none;
+  background:none;border:none;width:100%;text-align:left;
+  font-family:'DM Sans',sans-serif;
+}
+.hmenu-item:hover{background:var(--s2);color:var(--accent)}
+.hmenu-separator{height:1px;background:var(--border);margin:.3rem 0}
 .topbar-logo{
   font-family:'Bebas Neue',sans-serif;
   font-size:1.5rem;letter-spacing:.05em;
@@ -259,7 +285,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   padding:1rem 1.25rem;
 }
 .fiche-header h2{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.05em;color:#fff}
-.fiche-header p{font-size:.9rem;color:rgba(255,255,255,.8);margin-top:.25rem}
+.fiche-header p{font-size:.9rem;color:rgba(255,255,255,.9);margin-top:.25rem}
 .fiche-body{padding:1rem 1.25rem}
 .fiche-row{display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--border)}
 .fiche-row:last-child{border-bottom:none}
@@ -561,14 +587,27 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     <div class="topbar-info">
       <span id="tb-prenom" style="text-transform:uppercase">—</span><span id="tb-projet-header"></span><span style="color:var(--blue)"> — </span><span id="tb-seance" style="color:var(--accent)">—</span> <span id="tb-lock" style="display:none;color:var(--muted);font-size:.9rem" title="Mode consultation">🔒</span>
     </div>
-    <button id="btn-theme-topbar" onclick="toggleTheme()" title="Changer le thème" style="border:none;background:none;padding:.3rem .4rem;cursor:pointer;font-size:1.1rem;line-height:1">🌙</button>
-    <button class="btn-sm" id="btn-logout" title="Se déconnecter" style="border:none;background:none;padding:.3rem .4rem;cursor:pointer;display:flex;align-items:center">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-        <polyline points="16 17 21 12 16 7"/>
-        <line x1="21" y1="12" x2="9" y2="12"/>
-      </svg>
+    <button class="hamburger-btn" id="btn-hamburger" onclick="toggleHamburger()" title="Menu">
+      <span></span><span></span><span></span>
     </button>
+    <div class="hamburger-menu" id="hamburger-menu">
+      <button class="hmenu-item" onclick="toggleTheme();closeHamburger()">
+        <span id="hmenu-theme-icon">🌙</span><span id="hmenu-theme-label">Thème sombre</span>
+      </button>
+      <div class="hmenu-separator"></div>
+      <a class="hmenu-item" href="lexique.html" target="_blank">📖 Lexique</a>
+      <a class="hmenu-item" href="anatomie.html" target="_blank">🦴 Anatomie</a>
+      <a class="hmenu-item" href="tuto.html" target="_blank">❓ Guide d'utilisation</a>
+      <div class="hmenu-separator"></div>
+      <button class="hmenu-item" id="btn-logout" style="color:var(--muted)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Se déconnecter
+      </button>
+    </div>
   </div>
 
   <!-- Pages -->
@@ -648,10 +687,14 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 // ═══════════════════════════════════════════════════
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
-  const icon = theme === 'light' ? '☀️' : '🌙';
-  const t = document.getElementById('btn-theme-topbar');
+  const isLight = theme === 'light';
+  const icon = isLight ? '☀️' : '🌙';
+  const label = isLight ? 'Thème clair' : 'Thème sombre';
+  const i = document.getElementById('hmenu-theme-icon');
+  const lb = document.getElementById('hmenu-theme-label');
   const l = document.getElementById('btn-theme-login');
-  if (t) t.textContent = icon;
+  if (i) i.textContent = icon;
+  if (lb) lb.textContent = label;
   if (l) l.textContent = icon;
 }
 function toggleTheme() {
@@ -659,6 +702,19 @@ function toggleTheme() {
   localStorage.setItem('muscu_theme', next);
   applyTheme(next);
 }
+function toggleHamburger() {
+  document.getElementById('hamburger-menu').classList.toggle('open');
+}
+function closeHamburger() {
+  document.getElementById('hamburger-menu').classList.remove('open');
+}
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('hamburger-menu');
+  const btn = document.getElementById('btn-hamburger');
+  if (menu && !menu.contains(e.target) && btn && !btn.contains(e.target)) {
+    menu.classList.remove('open');
+  }
+});
 (function() {
   const saved = localStorage.getItem('muscu_theme') || 'dark';
   applyTheme(saved);
@@ -1791,25 +1847,25 @@ function buildProjetDetail() {
     ${chooseBtn ? `<div style="margin-bottom:.75rem">${chooseBtn}</div>` : ''}
     <div class="projet-fiche">
       <div class="fiche-header">
-        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.6);margin-bottom:.3rem">${c.badge}</div>
+        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.3rem">${c.badge}</div>
         <h2>${c.icon} ${c.titre}</h2>
         <p>${c.sousTitre}</p>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
         <div class="atelier-bloc-title" style="margin:.3rem 0 .4rem">En résumé</div>
-        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.resume.replace(/\. /g,'.<br>')}</div>
+        <div style="font-size:.88rem;color:var(--text);line-height:1.55">${c.resume.replace(/\. /g,'.<br>')}</div>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
         <div class="atelier-bloc-title" style="margin:.3rem 0 .4rem">Ce que vous allez ressentir</div>
-        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.sensations.replace(/\. /g,'.<br>')}</div>
+        <div style="font-size:.88rem;color:var(--text);line-height:1.55">${c.sensations.replace(/\. /g,'.<br>')}</div>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
         <div class="atelier-bloc-title" style="margin:.3rem 0 .5rem">Ce projet est fait pour vous si…</div>
-        ${c.profils.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--accent);margin-bottom:.35rem">→ ${s}</div>`).join('')}
+        ${c.profils.map(s=>`<div style="font-size:.87rem;color:var(--text);padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--accent);margin-bottom:.35rem">→ ${s}</div>`).join('')}
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
         <div class="atelier-bloc-title" style="margin:.3rem 0 .5rem">Ce que vous allez gagner</div>
-        ${c.gains.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--green);margin-bottom:.35rem">✓ ${s}</div>`).join('')}
+        ${c.gains.map(s=>`<div style="font-size:.87rem;color:var(--text);padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--green);margin-bottom:.35rem">✓ ${s}</div>`).join('')}
       </div>
       <div style="padding:.9rem 1.25rem">
         <div class="atelier-bloc-title" style="margin:.3rem 0 .6rem">Paramètres de travail</div>
@@ -1898,25 +1954,25 @@ function buildFiche() {
   pg.innerHTML = `
     <div class="projet-fiche">
       <div class="fiche-header">
-        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.6);margin-bottom:.3rem">${c.badge}</div>
+        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.3rem">${c.badge}</div>
         <h2>${c.icon} ${c.titre}</h2>
         <p>${c.sousTitre}</p>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
         <div class="atelier-bloc-title" style="margin:.3rem 0 .4rem">En résumé</div>
-        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.resume}</div>
+        <div style="font-size:.88rem;color:var(--text);line-height:1.55">${c.resume}</div>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
         <div class="atelier-bloc-title" style="margin:.3rem 0 .4rem">Ce que vous allez ressentir</div>
-        <div style="font-size:.88rem;color:#e8e8f0;line-height:1.55">${c.sensations}</div>
+        <div style="font-size:.88rem;color:var(--text);line-height:1.55">${c.sensations}</div>
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
         <div class="atelier-bloc-title" style="margin:.3rem 0 .5rem">Ce projet est fait pour vous si…</div>
-        ${c.profils.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--accent);margin-bottom:.35rem">→ ${s}</div>`).join('')}
+        ${c.profils.map(s=>`<div style="font-size:.87rem;color:var(--text);padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--accent);margin-bottom:.35rem">→ ${s}</div>`).join('')}
       </div>
       <div style="padding:.9rem 1.25rem;border-bottom:1px solid var(--border)">
         <div class="atelier-bloc-title" style="margin:.3rem 0 .5rem">Ce que vous allez gagner</div>
-        ${c.gains.map(s=>`<div style="font-size:.87rem;color:#e8e8f0;padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--green);margin-bottom:.35rem">✓ ${s}</div>`).join('')}
+        ${c.gains.map(s=>`<div style="font-size:.87rem;color:var(--text);padding:.25rem 0 .25rem .8rem;border-left:2px solid var(--green);margin-bottom:.35rem">✓ ${s}</div>`).join('')}
       </div>
       <div style="padding:.9rem 1.25rem">
         <div class="atelier-bloc-title" style="margin:.3rem 0 .6rem">Paramètres de travail</div>

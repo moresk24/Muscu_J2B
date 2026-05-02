@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lexique — Muscu à J2B</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0a0a0f;
+      --s1:      #12121a;
+      --s2:      #1a1a26;
+      --border:  #2a2a40;
+      --accent:  #ff6b2b;
+      --accent2: #ffb347;
+      --blue:    #3d8bff;
+      --green:   #2ecc71;
+      --text:    #f0f0f8;
+      --muted:   #6b6b8a;
+    }
+    [data-theme="light"] {
+      --bg:      #f2f2f7;
+      --s1:      #ffffff;
+      --s2:      #e8e8f0;
+      --border:  #ccccde;
+      --accent:  #e8581a;
+      --accent2: #f0963a;
+      --blue:    #2570e8;
+      --green:   #1fa055;
+      --text:    #1a1a2e;
+      --muted:   #7070a0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .93rem;
+      line-height: 1.65;
+      padding: 1.5rem 1rem 4rem;
+      transition: background .2s, color .2s;
+    }
+
+    .page { max-width: 760px; margin: 0 auto; }
+
+    /* ── En-tête ── */
+    .doc-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .doc-header .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem;
+      letter-spacing: .06em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .doc-header .subtitle {
+      font-size: .82rem;
+      color: var(--muted);
+      margin-top: .2rem;
+    }
+    .doc-header .doc-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: .05em;
+      color: var(--text);
+      margin-top: .9rem;
+    }
+
+    /* ── Barre d'outils ── */
+    .toolbar {
+      display: flex;
+      gap: .6rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+    }
+    .search-wrap {
+      flex: 1;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%;
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      padding: .55rem .9rem .55rem 2.2rem;
+      outline: none;
+    }
+    .search-wrap input::placeholder { color: var(--muted); }
+    .search-wrap input:focus { border-color: var(--accent); }
+    .search-icon {
+      position: absolute;
+      left: .7rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: .9rem;
+      pointer-events: none;
+    }
+    .btn-theme {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .5rem .7rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .btn-back {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .82rem;
+      padding: .5rem .8rem;
+      cursor: pointer;
+      text-decoration: none;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+    }
+    .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Navigation sections ── */
+    .nav-sections {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-bottom: 1.75rem;
+    }
+    .nav-pill {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .3rem .75rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .15s;
+    }
+    .nav-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Sections ── */
+    .section { margin-bottom: 2.5rem; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.45rem;
+      letter-spacing: .05em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      padding-bottom: .5rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .section-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Termes ── */
+    .terme {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .75rem 1rem;
+      margin-bottom: .6rem;
+      transition: border-color .15s;
+    }
+    .terme:hover { border-color: var(--accent); }
+    .terme-nom {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: .95rem;
+      margin-bottom: .25rem;
+    }
+    .terme-def {
+      color: var(--text);
+      font-size: .87rem;
+      line-height: 1.6;
+    }
+    .terme-def em {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* ── Terme mis en avant (surcompensation) ── */
+    .terme-highlight {
+      border-left: 3px solid var(--accent);
+    }
+
+    /* ── Résultats vides ── */
+    .no-results {
+      text-align: center;
+      color: var(--muted);
+      padding: 2rem 0;
+      display: none;
+    }
+
+    /* ── Footer ── */
+    .doc-footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .78rem;
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Highlight recherche ── */
+    mark {
+      background: rgba(255, 107, 43, .3);
+      color: inherit;
+      border-radius: 3px;
+      padding: 0 2px;
+    }
+    [data-theme="light"] mark { background: rgba(232, 88, 26, .2); }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- En-tête -->
+  <div class="doc-header">
+    <div class="logo">Muscu à J2B</div>
+    <div class="subtitle">Lycée Jay de Beaufort · 2025–2026</div>
+    <div class="doc-title">📖 Lexique — Termes et notions à connaître</div>
+  </div>
+
+  <!-- Barre d'outils -->
+  <div class="toolbar">
+    <a href="index.html" class="btn-back">← App</a>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search" placeholder="Rechercher un terme…" oninput="filtrer(this.value)">
+    </div>
+    <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Changer le thème">🌙</button>
+  </div>
+
+  <!-- Navigation rapide -->
+  <div class="nav-sections" id="nav-sections">
+    <a href="#anatomie"      class="nav-pill">🦴 Anatomie</a>
+    <a href="#musculaire"    class="nav-pill">💪 Travail musculaire</a>
+    <a href="#mouvements"    class="nav-pill">🔄 Les mouvements</a>
+    <a href="#entrainement"  class="nav-pill">🏋️ L'entraînement</a>
+    <a href="#traumatismes"  class="nav-pill">🩹 Les traumatismes</a>
+    <a href="#alimentation"  class="nav-pill">🥗 Alimentation</a>
+  </div>
+
+  <div class="no-results" id="no-results">Aucun terme ne correspond à votre recherche.</div>
+
+  <!-- 1. Anatomie -->
+  <div class="section" id="anatomie">
+    <div class="section-header">
+      <div class="section-icon">🦴</div>
+      1 — Anatomie
+    </div>
+
+    <div class="terme" data-terme="Articulation">
+      <div class="terme-nom">Articulation</div>
+      <div class="terme-def">Désigne le lieu de réunion de deux ou plusieurs os.</div>
+    </div>
+
+    <div class="terme" data-terme="Muscle">
+      <div class="terme-nom">Muscle</div>
+      <div class="terme-def">Organe chargé de convertir l'énergie chimique en énergie mécanique. On distingue les muscles striés (squelettique et cardiaque) des muscles lisses. Ce sont les muscles striés squelettiques que les séances de musculation sollicitent.</div>
+    </div>
+
+    <div class="terme" data-terme="Tissu conjonctif">
+      <div class="terme-nom">Tissu conjonctif</div>
+      <div class="terme-def">Ensemble de cellules de même constitution exerçant une même fonction. Constitué notamment de fibres de collagène (très résistantes à la traction) et de fibres élastiques.</div>
+    </div>
+
+    <div class="terme" data-terme="Cartilage">
+      <div class="terme-nom">Cartilage</div>
+      <div class="terme-def">Tissu conjonctif élastique recouvrant les surfaces osseuses des articulations. Remplit une fonction importante d'amortissement.</div>
+    </div>
+
+    <div class="terme" data-terme="Tendon">
+      <div class="terme-nom">Tendon</div>
+      <div class="terme-def">Tissu conjonctif très solide et peu élastique situé à l'extrémité du muscle. Le tendon attache le muscle à l'os.</div>
+    </div>
+
+    <div class="terme" data-terme="Ligament">
+      <div class="terme-nom">Ligament</div>
+      <div class="terme-def">Tissu conjonctif qui relie les os entre eux dans une articulation.</div>
+    </div>
+
+    <div class="terme" data-terme="Insertion">
+      <div class="terme-nom">Insertion</div>
+      <div class="terme-def">En anatomie : point d'attache du tendon sur l'os.</div>
+    </div>
+
+    <div class="terme" data-terme="Ceinture Scapulaire">
+      <div class="terme-nom">Ceinture Scapulaire</div>
+      <div class="terme-def">Ensemble des os formant les épaules : sternum, clavicule, omoplate et os coracoïde.</div>
+    </div>
+
+    <div class="terme" data-terme="Ceinture Pelvienne">
+      <div class="terme-nom">Ceinture Pelvienne</div>
+      <div class="terme-def">Ensemble des os du bassin.</div>
+    </div>
+  </div>
+
+  <!-- 2. Travail musculaire -->
+  <div class="section" id="musculaire">
+    <div class="section-header">
+      <div class="section-icon">💪</div>
+      2 — Travail musculaire
+    </div>
+
+    <div class="terme" data-terme="Contraction">
+      <div class="terme-nom">Contraction</div>
+      <div class="terme-def">En musculation, désigne le travail musculaire. Ne pas réduire à la seule contraction concentrique.</div>
+    </div>
+
+    <div class="terme" data-terme="Contraction Concentrique">
+      <div class="terme-nom">Contraction Concentrique</div>
+      <div class="terme-def">Contraction d'un muscle entraînant un mouvement lié à son <strong>raccourcissement</strong>.</div>
+    </div>
+
+    <div class="terme" data-terme="Contraction Excentrique">
+      <div class="terme-nom">Contraction Excentrique</div>
+      <div class="terme-def">Travail d'un muscle accompagné de son <strong>allongement</strong> au lieu du raccourcissement normal.</div>
+    </div>
+
+    <div class="terme" data-terme="Contraction Isométrique">
+      <div class="terme-nom">Contraction Isométrique</div>
+      <div class="terme-def">Contraction musculaire <strong>sans mouvement</strong> : ni flexion, ni extension. Travail en statique. <em>Exemple : le gainage.</em></div>
+    </div>
+
+    <div class="terme" data-terme="Pliométrie">
+      <div class="terme-nom">Pliométrie</div>
+      <div class="terme-def">Enchaînement d'une contraction excentrique et d'une contraction concentrique. Permet de décupler la capacité à produire un mouvement puissant sur une période très courte.</div>
+    </div>
+
+    <div class="terme" data-terme="Relâchement">
+      <div class="terme-nom">Relâchement</div>
+      <div class="terme-def">Fin de la contraction et de la congestion du muscle.</div>
+    </div>
+
+    <div class="terme" data-terme="Étirement">
+      <div class="terme-nom">Étirement</div>
+      <div class="terme-def">Action d'étirer un muscle au-delà de sa position de repos, en vue de détente et de régénération.</div>
+    </div>
+  </div>
+
+  <!-- 3. Les mouvements -->
+  <div class="section" id="mouvements">
+    <div class="section-header">
+      <div class="section-icon">🔄</div>
+      3 — Les mouvements
+    </div>
+
+    <div class="terme" data-terme="Expiration">
+      <div class="terme-nom">Expiration</div>
+      <div class="terme-def">Action de faire sortir l'air des poumons. Doit se placer au moment de l'effort principal, généralement lors de la phase de contraction concentrique.</div>
+    </div>
+
+    <div class="terme" data-terme="Inspiration">
+      <div class="terme-nom">Inspiration</div>
+      <div class="terme-def">Action de faire entrer de l'air dans les poumons.</div>
+    </div>
+
+    <div class="terme" data-terme="Extension">
+      <div class="terme-nom">Extension</div>
+      <div class="terme-def">Mouvement qui consiste à <strong>éloigner</strong> un segment du corps par rapport à l'autre. Opposé de la flexion.</div>
+    </div>
+
+    <div class="terme" data-terme="Flexion">
+      <div class="terme-nom">Flexion</div>
+      <div class="terme-def">Mouvement qui <strong>rapproche</strong> un segment du corps sur un autre. Opposé de l'extension.</div>
+    </div>
+
+    <div class="terme" data-terme="Adduction">
+      <div class="terme-nom">Adduction</div>
+      <div class="terme-def">Mouvement qui <strong>rapproche</strong> un membre de l'axe du corps.</div>
+    </div>
+
+    <div class="terme" data-terme="Abduction">
+      <div class="terme-nom">Abduction</div>
+      <div class="terme-def">Mouvement qui <strong>écarte</strong> un membre de l'axe du corps.</div>
+    </div>
+
+    <div class="terme" data-terme="Pronation">
+      <div class="terme-nom">Pronation</div>
+      <div class="terme-def">Position de la paume des mains <strong>vers le bas</strong>.</div>
+    </div>
+
+    <div class="terme" data-terme="Supination">
+      <div class="terme-nom">Supination</div>
+      <div class="terme-def">Position de la paume des mains <strong>vers le haut</strong>.</div>
+    </div>
+
+    <div class="terme" data-terme="Muscle Agoniste">
+      <div class="terme-nom">Muscle Agoniste</div>
+      <div class="terme-def">Muscle qui <strong>exécute</strong> le mouvement considéré.</div>
+    </div>
+
+    <div class="terme" data-terme="Muscle Antagoniste">
+      <div class="terme-nom">Muscle Antagoniste</div>
+      <div class="terme-def">Muscle qui exécute le mouvement <strong>opposé</strong> au mouvement considéré.</div>
+    </div>
+  </div>
+
+  <!-- 4. L'entraînement -->
+  <div class="section" id="entrainement">
+    <div class="section-header">
+      <div class="section-icon">🏋️</div>
+      4 — L'entraînement
+    </div>
+
+    <div class="terme" data-terme="Charge Maxi CM">
+      <div class="terme-nom">Charge Maxi (CM)</div>
+      <div class="terme-def">Charge maximale que vous pouvez soulever, tirer ou pousser en <strong>1 seule répétition</strong>.</div>
+    </div>
+
+    <div class="terme" data-terme="Répétition">
+      <div class="terme-nom">Répétition</div>
+      <div class="terme-def">Un mouvement complet : une flexion et une extension.</div>
+    </div>
+
+    <div class="terme" data-terme="Série">
+      <div class="terme-nom">Série</div>
+      <div class="terme-def">Un nombre précis de répétitions sans temps de repos. Une série se définit par : une charge, un nombre de répétitions, une vitesse d'exécution, un temps de repos et un type de repos.</div>
+    </div>
+
+    <div class="terme terme-highlight" data-terme="Surcompensation">
+      <div class="terme-nom">Surcompensation</div>
+      <div class="terme-def">Phénomène en 3 phases :<br>
+        <em>Phase 1</em> — Réalisation d'un effort important.<br>
+        <em>Phase 2</em> — Récupération : fatigue et désadaptation transitoire.<br>
+        <em>Phase 3</em> — L'organisme récupère ses capacités initiales (compensation), puis les dépasse (surcompensation). C'est à ce moment qu'il faut planifier la prochaine séance.
+      </div>
+    </div>
+
+    <div class="terme" data-terme="Brûlure musculaire">
+      <div class="terme-nom">Brûlure musculaire</div>
+      <div class="terme-def">Sensation de brûlure après avoir poussé le muscle jusqu'à sa limite. Causée par l'accumulation de déchets et le manque d'oxygène. Disparaît très rapidement à l'arrêt de l'exercice.</div>
+    </div>
+
+    <div class="terme" data-terme="Acide Lactique">
+      <div class="terme-nom">Acide Lactique</div>
+      <div class="terme-def">Acide organique provenant de la dégradation anaérobie du glucose (effort long : au-delà d'une minute). Son accumulation dans le muscle provoque une sensation de brûlure.</div>
+    </div>
+
+    <div class="terme" data-terme="Récupération Active repos actif">
+      <div class="terme-nom">Récupération Active <em>(repos actif)</em></div>
+      <div class="terme-def">Récupération réalisée avec une activité modérée pour accélérer les mécanismes de récupération. Permet de continuer l'exercice plus efficacement sur la série suivante.</div>
+    </div>
+
+    <div class="terme" data-terme="Repos Passif">
+      <div class="terme-nom">Repos Passif</div>
+      <div class="terme-def">Temps de pause complet entre les séries. Permet aux muscles de se recharger en oxygène et en créatine phosphate.</div>
+    </div>
+  </div>
+
+  <!-- 5. Les traumatismes -->
+  <div class="section" id="traumatismes">
+    <div class="section-header">
+      <div class="section-icon">🩹</div>
+      5 — Les traumatismes
+    </div>
+
+    <div class="terme" data-terme="Courbature">
+      <div class="terme-nom">Courbature</div>
+      <div class="terme-def">Fines mais douloureuses micro-lésions des fibres musculaires. Souvent (à tort) imputées aux acides lactiques.</div>
+    </div>
+
+    <div class="terme" data-terme="Crampe">
+      <div class="terme-nom">Crampe</div>
+      <div class="terme-def">Contraction involontaire, brutale, intense et douloureuse d'un muscle.</div>
+    </div>
+
+    <div class="terme" data-terme="Contracture">
+      <div class="terme-nom">Contracture</div>
+      <div class="terme-def">Contraction involontaire, spontanée, <strong>durable</strong> et douloureuse d'un muscle.</div>
+    </div>
+
+    <div class="terme" data-terme="Élongation">
+      <div class="terme-nom">Élongation</div>
+      <div class="terme-def">Étirement ou déchirure d'un muscle ou d'un tendon.</div>
+    </div>
+
+    <div class="terme" data-terme="Déchirure claquage">
+      <div class="terme-nom">Déchirure <em>(ou claquage)</em></div>
+      <div class="terme-def">Rupture de continuité des fibres musculaires. Survient lors d'une sollicitation trop importante et brusque. Provoque une douleur intense, une immobilisation, et parfois un hématome.</div>
+    </div>
+  </div>
+
+  <!-- 6. Alimentation et énergie -->
+  <div class="section" id="alimentation">
+    <div class="section-header">
+      <div class="section-icon">🥗</div>
+      6 — Alimentation et énergie
+    </div>
+
+    <div class="terme" data-terme="IMC Indice de Masse Corporelle">
+      <div class="terme-nom">IMC — Indice de Masse Corporelle</div>
+      <div class="terme-def">Poids (kg) ÷ Taille² (m²).</div>
+    </div>
+
+    <div class="terme" data-terme="Protéine">
+      <div class="terme-nom">Protéine</div>
+      <div class="terme-def">Molécule composée d'une chaîne d'acides aminés. D'origine animale (viande, poisson, œufs) ou végétale (fruits, légumes, céréales). La myosine est une protéine jouant un rôle fondamental dans la contraction musculaire.</div>
+    </div>
+
+    <div class="terme" data-terme="Lipide">
+      <div class="terme-nom">Lipide</div>
+      <div class="terme-def">Matière grasse des êtres vivants. Lors d'efforts modérés de plus de 30 minutes, les lipides constituent la principale source d'énergie.</div>
+    </div>
+
+    <div class="terme" data-terme="Glucide hydrate de carbone">
+      <div class="terme-nom">Glucide <em>(hydrate de carbone)</em></div>
+      <div class="terme-def">Source d'énergie pour l'organisme. Le glucose (forme de glucide) est utilisé par toutes les cellules pour produire de l'ATP (Adénosine TriPhosphate), intermédiaire énergétique essentiel, notamment pour les cellules nerveuses.</div>
+    </div>
+  </div>
+
+  <div class="doc-footer">Document produit par M. Cuvelier · Lycée Jay de Beaufort</div>
+</div>
+
+<script>
+  // ── Thème ──
+  function applyTheme(t) {
+    document.documentElement.dataset.theme = t;
+    document.getElementById('btn-theme').textContent = t === 'light' ? '☀️' : '🌙';
+  }
+  function toggleTheme() {
+    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    localStorage.setItem('muscu_theme', next);
+    applyTheme(next);
+  }
+  applyTheme(localStorage.getItem('muscu_theme') || 'dark');
+
+  // ── Recherche ──
+  function filtrer(q) {
+    q = q.trim().toLowerCase();
+    const termes = document.querySelectorAll('.terme');
+    const sections = document.querySelectorAll('.section');
+    const nav = document.getElementById('nav-sections');
+    let total = 0;
+
+    // Réinitialiser les highlights
+    termes.forEach(t => {
+      const nom = t.querySelector('.terme-nom');
+      const def = t.querySelector('.terme-def');
+      nom.innerHTML = nom.textContent;
+      def.innerHTML = def.innerHTML.replace(/<mark>/g,'').replace(/<\/mark>/g,'');
+    });
+
+    if (!q) {
+      termes.forEach(t => t.style.display = '');
+      sections.forEach(s => s.style.display = '');
+      nav.style.display = '';
+      document.getElementById('no-results').style.display = 'none';
+      return;
+    }
+
+    nav.style.display = 'none';
+
+    sections.forEach(section => {
+      let visible = 0;
+      section.querySelectorAll('.terme').forEach(t => {
+        const key = (t.dataset.terme || '').toLowerCase();
+        const nom = t.querySelector('.terme-nom');
+        const def = t.querySelector('.terme-def');
+        const match = key.includes(q) || nom.textContent.toLowerCase().includes(q) || def.textContent.toLowerCase().includes(q);
+        t.style.display = match ? '' : 'none';
+        if (match) {
+          visible++;
+          total++;
+          // Highlight dans le nom
+          nom.innerHTML = nom.textContent.replace(new RegExp(`(${q})`, 'gi'), '<mark>$1</mark>');
+        }
+      });
+      section.style.display = visible > 0 ? '' : 'none';
+      if (visible > 0) {
+        // Cacher le header de section si recherche active mais garder le contenu
+      }
+    });
+
+    document.getElementById('no-results').style.display = total === 0 ? 'block' : 'none';
+  }
+</script>
+</body>
+</html>
