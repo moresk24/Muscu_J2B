@@ -619,6 +619,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <span></span><span></span><span></span>
     </button>
     <div class="hamburger-menu" id="hamburger-menu">
+      <button class="hmenu-item" id="hmenu-fin-seance" style="color:var(--accent);font-weight:700" onclick="closeHamburger();confirmerFinSeance()">✅ Enregistrer ma séance</button>
+      <div class="hmenu-separator"></div>
       <button class="hmenu-item" onclick="toggleTheme();closeHamburger()">
         <span id="hmenu-theme-icon">🌙</span><span id="hmenu-theme-label">Thème sombre</span>
       </button>
@@ -712,8 +714,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 
 <div class="modal-bg hidden" id="modal-fin-seance-bg">
   <div class="modal">
-    <h3>Terminer la séance ?</h3>
-    <p>Êtes-vous sûr(e) de vouloir mettre fin à la séance en cours ?<br>Votre badge sera attribué et vous ne pourrez plus valider d'ateliers supplémentaires.</p>
+    <h3>Enregistrer ma séance ?</h3>
+    <p>Êtes-vous sûr(e) ?<br>Vous ne pourrez plus valider d'atelier pour cette séance.</p>
     <div class="modal-actions">
       <button class="btn btn-outline" id="modal-fin-cancel">Annuler</button>
       <button class="btn" id="modal-fin-confirm">Oui, terminer</button>
@@ -2638,12 +2640,6 @@ function buildSeance() {
         </select>
         <div class="intensite-badge" id="badge-reps">${calcReps(state.projet,state.intensite)} reps</div>
       </div>
-      <div id="fin-seance-btn" style="margin-top:.8rem;display:${count >= 4 && (isEditable() || state.isAdmin) ? 'block' : 'none'}">
-        <button class="btn" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em" onclick="confirmerFinSeance()">
-          ✅ Terminer ma séance
-        </button>
-        <div style="text-align:center;font-size:.75rem;color:#fff;margin-top:.35rem">Ne cliquez pas si vous souhaitez continuer votre séance</div>
-      </div>
     </div>
   `;
 
@@ -2875,10 +2871,6 @@ async function validateAtelier(nomAtelier) {
   if (bar) bar.style.width = pct+'%';
   if (msg) msg.textContent = progressMsg(state.compteurAteliersSeance);
   if (cnt) cnt.textContent = state.compteurAteliersSeance + ' / ' + _objectif;
-  if (state.compteurAteliersSeance >= 4 && (isEditable() || state.isAdmin)) {
-    const btn = $('fin-seance-btn');
-    if (btn) btn.style.display = 'block';
-  }
 
   // Sauvegarder les 4 séries dans l'historique local
   const seriesDuJour = (state.serieLocale[nomAtelier] || []).slice(0,4).map(s =>
