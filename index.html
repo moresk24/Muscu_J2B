@@ -521,8 +521,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .muscle-card-fonction{font-size:.85rem;color:var(--text);line-height:1.6}
 .ressource-intro{background:var(--s1);border-left:3px solid var(--accent);border-radius:8px;padding:.9rem 1rem;margin-bottom:1.5rem;font-size:.9rem;line-height:1.7}
 .ressource-img{width:100%;max-width:520px;margin:0 auto 2rem;display:block;border-radius:12px;border:1px solid var(--border)}
-.lexique-search{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.55rem 1rem;outline:none;margin-bottom:1rem}
+.lexique-search-wrap{position:relative;margin-bottom:1rem}
+.lexique-search{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.55rem 2.2rem .55rem 1rem;outline:none}
 .lexique-search:focus{border-color:var(--accent)}
+.lex-clear{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;line-height:1;display:none;padding:0}
+.lex-clear:hover{color:var(--text)}
 .lex-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem}
 .lex-pill{background:var(--s1);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:.78rem;font-weight:600;padding:.3rem .75rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .lex-pill:hover{border-color:var(--accent);color:var(--accent)}
@@ -2305,7 +2308,10 @@ function buildLexique() {
         <button class="ressource-back" onclick="showPage(_previousPage)">←</button>
         <div class="ressource-title">📖 Lexique</div>
       </div>
-      <input class="lexique-search" id="lex-search" type="text" placeholder="🔍  Rechercher un terme…" oninput="lexiqueFiltrer(this.value)">
+      <div class="lexique-search-wrap">
+        <input class="lexique-search" id="lex-search" type="text" placeholder="🔍  Rechercher un terme…" oninput="lexiqueFiltrer(this.value)">
+        <button class="lex-clear" id="lex-clear" onclick="lexiqueEffacer()" title="Effacer">✕</button>
+      </div>
       <div class="lex-pills" id="lex-pills">
         <button class="lex-pill" onclick="lexiqueGoTo('lex-s1')">🦴 Anatomie</button>
         <button class="lex-pill" onclick="lexiqueGoTo('lex-s2')">💪 Travail musculaire</button>
@@ -2407,12 +2413,19 @@ function lexiqueGoTo(id) {
   if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
+function lexiqueEffacer() {
+  const input = document.getElementById('lex-search');
+  if (input) { input.value = ''; input.focus(); }
+  lexiqueFiltrer('');
+}
+
 function lexiqueFiltrer(q) {
   q = q.trim().toLowerCase();
   const pg = $('page-lexique');
   const cartes = pg.querySelectorAll('.terme-card');
   const sections = pg.querySelectorAll('[data-section]');
   const pills = pg.querySelector('#lex-pills');
+  const btn = pg.querySelector('#lex-clear');
   let total = 0;
   cartes.forEach(c => {
     const match = !q || (c.dataset.terme||'').toLowerCase().includes(q) || c.textContent.toLowerCase().includes(q);
@@ -2424,6 +2437,7 @@ function lexiqueFiltrer(q) {
     s.style.display = visible ? '' : 'none';
   });
   if (pills) pills.style.display = q ? 'none' : '';
+  if (btn) btn.style.display = q ? 'block' : 'none';
   const nr = pg.querySelector('#lex-noresult');
   if (nr) nr.style.display = total === 0 ? 'block' : 'none';
 }
