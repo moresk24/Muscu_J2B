@@ -1205,11 +1205,15 @@ async function initLogin() {
 
     // Auto-connexion si identifiants sauvegardés
     const saved = getSavedLogin();
+    const classes = d.classes||[];
     if (saved) {
       loading(false);
-      await autoConnect(saved, d.classes||[]);
+      const connected = await autoConnect(saved, classes);
+      if (!connected) await prefillForm(getPrefill(), classes);
       return;
     }
+    // Pas de login complet → pré-remplir classe et nom si connu
+    await prefillForm(getPrefill(), classes);
   } catch(e) { toast('Erreur de connexion au serveur','error'); }
   loading(false);
 }
@@ -1223,14 +1227,14 @@ function getSavedLogin() {
 
 async function autoConnect(saved, classes) {
   // Vérifier que la classe existe toujours
-  if (!classes.includes(saved.classe)) return;
+  if (!classes.includes(saved.classe)) return false;
   loading(true);
   try {
     const d = await api({action:'loadEleve', classe:saved.classe, nom:saved.nom, prenom:saved.prenom});
     if (d.error || d.mdp !== saved.mdp) {
       localStorage.removeItem('muscu_login');
       loading(false);
-      return;
+      return false;
     }
     // Connecter directement
     state.classe              = saved.classe;
@@ -1266,7 +1270,48 @@ async function autoConnect(saved, classes) {
     $('screen-app').classList.add('active');
     startSessionCheck();
     showPageAfterLogin();
+    return true;
   } catch(e) { console.error(e); }
+  loading(false);
+  return false;
+}
+
+function getPrefill() {
+  try { return JSON.parse(localStorage.getItem('muscu_prefill')); } catch(e) { return null; }
+}
+
+async function prefillForm(data, classes) {
+  if (!data || !classes.includes(data.classe)) return;
+  $('sel-classe').value = data.classe;
+  loading(true);
+  try {
+    const d = await api({action:'getEleves', classe:data.classe});
+    const selE = $('sel-eleve');
+    selE.innerHTML = '<option value="">— Choisir —</option>';
+    selE.disabled = false;
+    (d.eleves||[]).forEach(e => {
+      const o = document.createElement('option');
+      o.value = JSON.stringify(e);
+      o.textContent = e.nom + ' ' + e.prenom;
+      selE.appendChild(o);
+    });
+    for (const opt of selE.options) {
+      if (!opt.value) continue;
+      const e = JSON.parse(opt.value);
+      if (e.nom === data.nom && e.prenom === data.prenom) {
+        selE.value = opt.value;
+        $('zone-mdp').style.display = 'block';
+        $('inp-mdp').value = '';
+        $('err-mdp').style.display = 'none';
+        $('mdp-label').textContent = 'Mon mot de passe';
+        $('mdp-rules').style.display = 'none';
+        $('zone-mdp2').style.display = 'none';
+        $('btn-login').disabled = false;
+        setTimeout(() => $('inp-mdp').focus(), 100);
+        break;
+      }
+    }
+  } catch(e) {}
   loading(false);
 }
 
@@ -1376,6 +1421,7 @@ $('btn-login').addEventListener('click', async () => {
 
     // Sauvegarder identifiants en localStorage
     localStorage.setItem('muscu_login', JSON.stringify({classe:cls, nom:eInfo.nom, prenom:eInfo.prenom, mdp}));
+    localStorage.setItem('muscu_prefill', JSON.stringify({classe:cls, nom:eInfo.nom, prenom:eInfo.prenom}));
 
     // Afficher app
     $('tb-prenom').textContent = eInfo.prenom;
