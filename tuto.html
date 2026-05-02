@@ -20,6 +20,18 @@
       --green:  #2ecc71;
       --blue:   #3d8bff;
     }
+    [data-theme="light"] {
+      --bg:     #f2f2f7;
+      --s1:     #ffffff;
+      --s2:     #e8e8f0;
+      --border: #ccccde;
+      --text:   #1a1a2e;
+      --muted:  #7070a0;
+      --accent: #e8581a;
+      --accent2:#f0963a;
+      --green:  #1fa055;
+      --blue:   #2570e8;
+    }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -528,5 +540,11 @@
   </div>
 
 </div>
+<script>
+  (function() {
+    const t = localStorage.getItem('muscu_theme') || 'dark';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
 </body>
 </html>

@@ -689,7 +689,7 @@ function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   const isLight = theme === 'light';
   const icon = isLight ? '☀️' : '🌙';
-  const label = isLight ? 'Thème clair' : 'Thème sombre';
+  const label = isLight ? 'Passer au thème sombre' : 'Passer au thème clair';
   const i = document.getElementById('hmenu-theme-icon');
   const lb = document.getElementById('hmenu-theme-label');
   const l = document.getElementById('btn-theme-login');
