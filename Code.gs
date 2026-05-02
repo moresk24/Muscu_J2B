@@ -79,7 +79,7 @@ function doPost(e) {
 // ── Liste des classes (= noms des onglets, sauf Config) ─────
 function handleGetClasses() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const classes = ss.getSheets().map(s => s.getName()).filter(n => n !== "Config");
+  const classes = ss.getSheets().map(s => s.getName()).filter(n => n !== "Config" && !n.endsWith("_Historique"));
   return { success: true, classes };
 }
 
