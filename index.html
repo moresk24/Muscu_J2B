@@ -683,7 +683,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 </div>
 
 <!-- Loading overlay -->
-<div class="overlay hidden" id="loading"><div class="spinner"></div></div>
+<div class="overlay hidden" id="loading" style="flex-direction:column;gap:1rem">
+  <div class="spinner"></div>
+  <div id="loading-msg" style="color:#fff;font-size:.88rem;text-align:center;line-height:1.5;display:none"></div>
+</div>
 
 <!-- Badge zoom overlay -->
 <div class="overlay hidden" id="badge-zoom" onclick="closeBadgeZoom()" style="flex-direction:column;gap:1rem;cursor:pointer">
@@ -1176,7 +1179,12 @@ function toast(msg, type='ok') {
   setTimeout(()=>t.classList.add('show'),10);
   toastTimer = setTimeout(()=>t.classList.remove('show'), type==='warn' ? 8000 : 3000);
 }
-function loading(show) { $('loading').classList.toggle('hidden',!show); }
+function loading(show, msg) {
+  $('loading').classList.toggle('hidden', !show);
+  const m = $('loading-msg');
+  if (msg) { m.innerHTML = msg; m.style.display = 'block'; }
+  else { m.style.display = 'none'; m.innerHTML = ''; }
+}
 
 async function api(params) {
   const url = WEBAPP + '?' + new URLSearchParams(params);
@@ -2137,6 +2145,7 @@ async function saveBadge() {
   state.badgeCourant = badge;
   state.badgeCourantNbAteliers = nbAteliers;
 
+  loading(true, 'Patientez pendant l\'enregistrement<br>de votre séance');
   try {
     await apiPost({
       action: 'saveBadge',
@@ -2150,6 +2159,7 @@ async function saveBadge() {
       comptOr: state.comptOr
     });
   } catch(e) { console.error('saveBadge error', e); }
+  loading(false);
 
   state.bilanSeance = {
     ateliers:    state.ateliersSeanceEnCours.slice(),
