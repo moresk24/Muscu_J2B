@@ -1589,10 +1589,13 @@ function buildMaxiCalc() {
       if (secuItems) pedagHtml += `<div class="atelier-bloc-title">🛡️ Règles de sécurité</div>${secuItems}`;
     }
 
+    const maxiActuel = state.maxis[a.nom];
+    const maxiDisplay = maxiActuel ? formatMaxiDisplay(a, maxiActuel) : null;
+
     pg.innerHTML = `
       <div class="calc-header">
-        <button class="calc-back-btn" id="calc-back">← Retour</button>
         <div class="calc-atelier-title">${a.icon} ${a.nom}</div>
+        ${maxiDisplay ? `<div style="font-size:.95rem;color:var(--accent);font-weight:700;margin-top:.25rem">Maxi actuel : ${maxiDisplay}</div>` : ''}
       </div>
       ${type === 'standard' ? `<div class="calc-mode-tabs">
         <button class="calc-mode-tab ${_calcMode===1?'active':''}" id="tab-calc">Calculer mon maxi</button>
@@ -1606,7 +1609,6 @@ function buildMaxiCalc() {
   }
 
   function attachListeners() {
-    $('calc-back').addEventListener('click', () => showPage('maxis'));
     if ($('tab-calc'))   $('tab-calc').addEventListener('click',   () => { _calcMode = 1; render(); });
     if ($('tab-direct')) $('tab-direct').addEventListener('click', () => { _calcMode = 2; render(); });
 
@@ -2641,9 +2643,13 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
 function decideSuggestion(serie, projet, historique) {
   const {ressenti, charge, reps, intensite} = serie;
   const ints = projet.intensites;
-  const idxCurrent = ints.indexOf(intensite);
+  let idxCurrent = ints.indexOf(intensite);
+  if (idxCurrent === -1) idxCurrent = ints.reduce((best, val, idx) =>
+    Math.abs(val - intensite) < Math.abs(ints[best] - intensite) ? idx : best, 0);
   const atMaxIntensite = idxCurrent >= ints.length - 1;
   const atMinIntensite = idxCurrent <= 0;
+  const atMaxReps = reps >= projet.repsMax;
+  const atMinReps = reps <= projet.repsMin;
 
   if (ressenti === 'TD') {
     return {type: 'td-parfait', params: {charge, reps, intensite}};
@@ -2651,6 +2657,8 @@ function decideSuggestion(serie, projet, historique) {
 
   if (ressenti === 'E') {
     if (atMinIntensite) {
+      // Cas 2 : plancher absolu atteint → maxi surévalué, recalcul obligatoire
+      if (atMinReps) return {type: 'e-plafond-bas', params: {charge, reps, intensite}};
       const newReps = Math.max(projet.repsMin, Math.ceil(reps * 0.85));
       return {type: 'e-min-intensite', params: {newReps, charge, intensite}};
     }
@@ -2660,13 +2668,18 @@ function decideSuggestion(serie, projet, historique) {
   // F ou D — F isolé après S1 → avertissement doux
   const avertissementDoux = ressenti === 'F' && historique.length > 1;
 
+  // Cas 1 : plafond absolu atteint → maxi sous-évalué
+  if (atMaxIntensite && atMaxReps) {
+    if (ressenti === 'F') return {type: 'fd-plafond-f', params: {charge, reps, intensite}};
+    return {type: 'fd-plafond-d', params: {charge, reps, intensite}};
+  }
+
   if (atMaxIntensite) {
     const mult = ressenti === 'F' ? 1.30 : 1.15;
     const newReps = Math.min(Math.ceil(reps * mult), projet.repsMax);
     return {type: 'fd-max-intensite', params: {newReps, charge, intensite}, avertissementDoux};
   }
 
-  const atMaxReps = reps >= projet.repsMax;
   if (atMaxReps) {
     const newIdx = ressenti === 'F'
       ? Math.min(idxCurrent + 2, ints.length - 1)
@@ -2764,16 +2777,48 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
         </div>`;
       break;
 
-    case 'e-choix':
+    case 'e-choix': {
+      const repsDejaMin = currentReps <= p.repsMin;
       sugBox.innerHTML = `
         <div class="suggestion-title">⚠️ Série ${nextSerie + 1} — Diminuer l'effort</div>
         <div class="suggestion-text">Comment souhaitez-vous ajuster ?</div>
         <div class="suggestion-actions" style="margin-top:.6rem">
           <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↓ La charge</button>
-          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↓ Les reps</button>
+          ${repsDejaMin ? '' : `<button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↓ Les reps</button>`}
         </div>
         <div style="margin-top:.4rem">
           <button class="btn btn-outline" style="width:100%" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.reps})">= Ne rien changer</button>
+        </div>`;
+      break;
+    }
+
+    case 'fd-plafond-f':
+      sugBox.innerHTML = `
+        <div class="suggestion-title" style="color:var(--red)">🚨 Maxi à recalculer</div>
+        <div class="suggestion-text">Vous êtes au maximum de votre projet en charge <strong>et</strong> en répétitions, et cela vous semble facile.<br>Votre maxi est sous-évalué — vous devez le recalculer avant de continuer.</div>
+        <div class="suggestion-actions">
+          <button class="btn" style="background:var(--red)" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="resetEtRecalculerMaxi('${nomAtelier}')">📏 Recalculer mon maxi</button>
+        </div>`;
+      break;
+
+    case 'fd-plafond-d':
+      sugBox.innerHTML = `
+        <div class="suggestion-title" style="color:var(--yellow)">⚠️ Plafond du projet atteint</div>
+        <div class="suggestion-text">Vous êtes au maximum de ce que permet votre projet en charge et en répétitions.<br>Votre maxi est sans doute sous-évalué — pensez à faire une nouvelle recherche de maxi pour cet atelier.<br><br>
+          Série conseillée : <strong>${params.reps} reps <span style="color:var(--blue)">×</span> ${params.charge} ${unite}</strong>
+        </div>
+        <div class="suggestion-actions">
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.reps})">✓ Reconduire la série</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="resetEtRecalculerMaxi('${nomAtelier}')">📏 Recalculer mon maxi</button>
+        </div>`;
+      break;
+
+    case 'e-plafond-bas':
+      sugBox.innerHTML = `
+        <div class="suggestion-title" style="color:var(--red)">🚨 Maxi à recalculer</div>
+        <div class="suggestion-text">Vous êtes au minimum de votre projet en charge <strong>et</strong> en répétitions, et cela vous semble épuisant.<br>Votre maxi est surévalué — vous devez le recalculer avant de continuer.</div>
+        <div class="suggestion-actions">
+          <button class="btn" style="background:var(--red)" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="resetEtRecalculerMaxi('${nomAtelier}')">📏 Recalculer mon maxi</button>
         </div>`;
       break;
 
@@ -2823,7 +2868,9 @@ function appliquerChoixCharge(nomAtelier, key, unite, ressenti, currentCharge, c
   const p = PROJETS[state.projet];
   const ints = p.intensites;
   const intensiteRef = currentIntensite || state.intensite;
-  const idxCurrent = ints.indexOf(intensiteRef);
+  let idxCurrent = ints.indexOf(intensiteRef);
+  if (idxCurrent === -1) idxCurrent = ints.reduce((best, val, idx) =>
+    Math.abs(val - intensiteRef) < Math.abs(ints[best] - intensiteRef) ? idx : best, 0);
   const maxi = parseFloat(state.maxis[nomAtelier]) || 0;
 
   let newIdx;
@@ -2855,6 +2902,12 @@ function allerAuxMaxis(nomAtelier) {
   } else {
     showPage('maxis');
   }
+}
+
+function resetEtRecalculerMaxi(nomAtelier) {
+  delete state.serieLocale[nomAtelier];
+  saveSerieLocale();
+  allerAuxMaxis(nomAtelier);
 }
 
 async function accepterNiveauSup(nomAtelier) {

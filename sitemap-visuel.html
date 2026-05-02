@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plan de l'application — Muscu à J2B</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #0a0a0f;
+    --card:    #13131f;
+    --border:  #2a2a40;
+    --accent:  #ff6b2b;
+    --accent2: #ffb347;
+    --green:   #2ecc71;
+    --blue:    #3498db;
+    --purple:  #9b59b6;
+    --text:    #f0f0f8;
+    --muted:   #8888aa;
+  }
+
+  /* ── THÈME CLAIR (impression) ── */
+  body.light {
+    --bg:     #ffffff;
+    --card:   #f7f7fb;
+    --border: #dcdce8;
+    --text:   #111118;
+    --muted:  #666680;
+  }
+  body.light .sections-wrap {
+    background: #f0f0f8;
+    border-color: #dcdce8;
+  }
+  body.light h1 {
+    -webkit-text-fill-color: unset;
+    color: var(--accent);
+    background: none;
+  }
+
+  @media print {
+    body {
+      --bg:     #ffffff;
+      --card:   #f7f7fb;
+      --border: #dcdce8;
+      --text:   #111118;
+      --muted:  #666680;
+    }
+    .sections-wrap { background: #f0f0f8 !important; border-color: #dcdce8 !important; }
+    h1 { -webkit-text-fill-color: unset !important; color: var(--accent) !important; background: none !important; }
+    .toggle-btn { display: none !important; }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 3rem;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: .08em;
+    text-align: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: .3rem;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: .9rem;
+    margin-bottom: 2.5rem;
+  }
+
+  /* ── LAYOUT ── */
+  .map {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ── BOÎTES ── */
+  .box {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem 1.4rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .box .icon { font-size: 1.8rem; display: block; margin-bottom: .3rem; }
+  .box .label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: .06em;
+    line-height: 1.1;
+  }
+  .box .desc {
+    font-size: .78rem;
+    color: var(--muted);
+    margin-top: .3rem;
+    line-height: 1.4;
+  }
+
+  /* Couleurs par section */
+  .box.login   { border-color: var(--accent); width: 200px; }
+  .box.dispensed { border-color: #555; opacity: .7; width: 180px; }
+  .box.maxis-c { border-color: var(--accent); }
+  .box.projet-c { border-color: var(--blue); }
+  .box.seance-c { border-color: var(--green); }
+  .box.badge-c { border-color: var(--purple); }
+  .box.sub     { border-style: dashed; width: 160px; }
+  .box.sub.maxis-c   { border-color: var(--accent); }
+  .box.sub.projet-c  { border-color: var(--blue); }
+  .box.sub.seance-c  { border-color: var(--green); }
+
+  /* ── FLÈCHES ── */
+  .arrow-down {
+    width: 2px;
+    height: 28px;
+    background: var(--border);
+    margin: 0 auto;
+    position: relative;
+  }
+  .arrow-down::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid var(--border);
+  }
+
+  .arrow-down.accent  { background: var(--accent); }
+  .arrow-down.accent::after  { border-top-color: var(--accent); }
+
+  /* ── LIGNE DE CONNEXION → DISPENSE ── */
+  .fork-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    gap: 0;
+    margin: 0;
+  }
+
+  .fork-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .fork-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+  }
+
+  .fork-branch {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .horiz-line {
+    height: 2px;
+    background: var(--border);
+    align-self: flex-start;
+    margin-top: 62px; /* aligne avec le milieu de la boîte */
+  }
+
+  /* ── GRILLE DES 4 SECTIONS ── */
+  .sections-wrap {
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.5rem 1rem 1.5rem;
+    width: 100%;
+    max-width: 860px;
+  }
+
+  .sections-title {
+    text-align: center;
+    font-size: .75rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+    font-weight: 600;
+  }
+
+  .sections-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .section-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .section-main {
+    width: 100%;
+  }
+
+  .arrow-down-sm {
+    width: 2px;
+    height: 20px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .arrow-down-sm::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+  }
+  .arrow-down-sm.maxis-c  { background: var(--accent); }
+  .arrow-down-sm.maxis-c::after  { border-top: 7px solid var(--accent); }
+  .arrow-down-sm.projet-c { background: var(--blue); }
+  .arrow-down-sm.projet-c::after { border-top: 7px solid var(--blue); }
+  .arrow-down-sm.seance-c { background: var(--green); }
+  .arrow-down-sm.seance-c::after { border-top: 7px solid var(--green); }
+
+  .section-sub {
+    width: 100%;
+  }
+
+  .lock-badge {
+    font-size: .65rem;
+    background: rgba(255,107,43,.15);
+    border: 1px solid rgba(255,107,43,.3);
+    color: var(--accent2);
+    border-radius: 20px;
+    padding: .15rem .5rem;
+    margin-top: .4rem;
+    display: inline-block;
+  }
+
+  /* ── LÉGENDE ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem 1.5rem;
+    justify-content: center;
+    margin-top: 2rem;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+  .legend-item { display: flex; align-items: center; gap: .4rem; }
+  .legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .sections-grid { grid-template-columns: repeat(2, 1fr); }
+    .fork-side { display: none; }
+  }
+
+  /* ── FORK CONNEXION ── */
+  .fork-container {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .fork-hbar {
+    position: absolute;
+    top: 0;
+    left: 25%;
+    right: 25%;
+    height: 2px;
+    background: var(--border);
+  }
+  .fork-branch-left,
+  .fork-branch-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 48%;
+  }
+  .fork-vbar {
+    width: 2px;
+    height: 24px;
+    background: var(--border);
+  }
+  .fork-vbar.accent { background: var(--accent); }
+  .fork-label {
+    font-size: .72rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: .3rem;
+    white-space: nowrap;
+  }
+  .fork-label.accent-label { color: var(--accent); }
+
+  /* ── BOUTON TOGGLE ── */
+  .toggle-btn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: .5rem .9rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem;
+    cursor: pointer;
+    z-index: 100;
+    transition: background .2s, color .2s;
+  }
+  .toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .sections-grid { grid-template-columns: repeat(2, 1fr); }
+    .fork-side { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<button class="toggle-btn" onclick="document.body.classList.toggle('light');this.textContent=document.body.classList.contains('light')?'🌙 Thème sombre':'🖨️ Aperçu impression'">🖨️ Aperçu impression</button>
+
+<div class="map">
+
+  <h1>Plan de l'application</h1>
+  <p class="subtitle">Muscu à J2B — Comment naviguer dans l'appli ?</p>
+
+  <!-- CONNEXION -->
+  <div class="box login">
+    <span class="icon">🔐</span>
+    <div class="label">Connexion</div>
+    <div class="desc">Classe · Prénom · Mot de passe</div>
+  </div>
+
+  <!-- FORK : deux chemins -->
+  <div class="fork-container">
+    <!-- Barre horizontale -->
+    <div class="fork-hbar"></div>
+    <!-- Branche gauche : dispensé -->
+    <div class="fork-branch-left">
+      <div class="fork-vbar"></div>
+      <div class="fork-label">si dispensé·e</div>
+      <div class="box dispensed">
+        <span class="icon">🩹</span>
+        <div class="label">Dispensé·e</div>
+        <div class="desc">Message d'information</div>
+      </div>
+    </div>
+    <!-- Branche droite : app -->
+    <div class="fork-branch-right">
+      <div class="fork-vbar accent"></div>
+      <div class="fork-label accent-label">connexion réussie</div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div class="sections-wrap">
+    <div class="sections-title">Application principale — après connexion réussie</div>
+    <div class="sections-grid">
+
+      <!-- MAXIS -->
+      <div class="section-col">
+        <div class="box maxis-c section-main">
+          <span class="icon">💪</span>
+          <div class="label">Maxis</div>
+          <div class="desc">Mes 16 ateliers<br>et mes charges max</div>
+        </div>
+        <div class="arrow-down-sm maxis-c"></div>
+        <div class="box sub maxis-c section-sub">
+          <span class="icon">📊</span>
+          <div class="label">Calculer<br>mon maxi</div>
+          <div class="desc">Formule · Saisie directe</div>
+        </div>
+      </div>
+
+      <!-- PROJETS -->
+      <div class="section-col">
+        <div class="box projet-c section-main">
+          <span class="icon">🎯</span>
+          <div class="label">Les Projets</div>
+          <div class="desc">Choisir mon objectif perso</div>
+          <span class="lock-badge">🔒 maxis requis</span>
+        </div>
+        <div class="arrow-down-sm projet-c"></div>
+        <div class="box sub projet-c section-sub">
+          <span class="icon">📋</span>
+          <div class="label">Détail<br>du projet</div>
+          <div class="desc">Description · Gains</div>
+        </div>
+      </div>
+
+      <!-- SÉANCES -->
+      <div class="section-col">
+        <div class="box seance-c section-main">
+          <span class="icon">🏋️</span>
+          <div class="label">Séances</div>
+          <div class="desc">Déroulement de la séance en cours</div>
+          <span class="lock-badge">🔒 maxis requis</span>
+        </div>
+        <div class="arrow-down-sm seance-c"></div>
+        <div class="box sub seance-c section-sub">
+          <span class="icon">🏃</span>
+          <div class="label">Détail<br>atelier</div>
+          <div class="desc">Charge · Reps · Ressenti</div>
+        </div>
+        <div class="arrow-down-sm seance-c"></div>
+        <div class="box sub seance-c section-sub">
+          <span class="icon">🏆</span>
+          <div class="label">Bilan &amp;<br>Badge</div>
+          <div class="desc">Résultats · Badge obtenu</div>
+        </div>
+      </div>
+
+      <!-- BADGES -->
+      <div class="section-col">
+        <div class="box badge-c section-main">
+          <span class="icon">🏅</span>
+          <div class="label">Mes Badges</div>
+          <div class="desc">Historique de toutes mes séances</div>
+          <span class="lock-badge">🔒 maxis requis</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LÉGENDE -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Maxis</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Les Projets</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Séances</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Mes Badges</div>
+    <div class="legend-item" style="color:var(--accent2)">🔒 = débloqué une fois tous les maxis renseignés</div>
+  </div>
+
+</div>
+</body>
+</html>
