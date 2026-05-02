@@ -1388,12 +1388,16 @@ $('btn-login').addEventListener('click', async () => {
 //  NAVIGATION
 // ═══════════════════════════════════════════════════
 const PAGES = ['maxis','maxi-calc','projet','projet-detail','fiche','seance','atelier-detail','bilan-badge','mes-badges','lexique','anatomie'];
+let _previousPage = 'seance';
+let _currentPage  = 'seance';
 function showPage(name) {
   // Rediriger fiche vers projet-detail si un projet est sélectionné
   if (name === 'fiche' && state.projet) {
     currentProjetDetail = state.projet;
     name = 'projet-detail';
   }
+  _previousPage = _currentPage;
+  _currentPage  = name;
   PAGES.forEach(p => {
     $('page-'+p).style.display = p===name ? 'block' : 'none';
   });
@@ -2295,7 +2299,7 @@ function buildLexique() {
   pg.innerHTML = `
     <div style="padding:1rem">
       <div class="ressource-header">
-        <button class="ressource-back" onclick="history.back()">←</button>
+        <button class="ressource-back" onclick="showPage(_previousPage)">←</button>
         <div class="ressource-title">📖 Lexique</div>
       </div>
       <input class="lexique-search" id="lex-search" type="text" placeholder="🔍  Rechercher un terme…" oninput="lexiqueFiltrer(this.value)">
@@ -2398,7 +2402,7 @@ function buildAnatomie() {
   pg.innerHTML = `
     <div style="padding:1rem">
       <div class="ressource-header">
-        <button class="ressource-back" onclick="history.back()">←</button>
+        <button class="ressource-back" onclick="showPage(_previousPage)">←</button>
         <div class="ressource-title">🦴 Anatomie</div>
       </div>
       <div class="ressource-intro">
