@@ -3482,7 +3482,7 @@ function buildAtelierDetail() {
 
   pg.innerHTML = `
     <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;margin-bottom:.2rem;text-align:center">${a.icon} ${a.nom}</div>
-    <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem">
+    <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem;justify-content:center">
       ${a.muscles.split(' · ').map(m=>`<span style="display:inline-block;background:rgba(255,107,43,.12);border:1px solid rgba(255,107,43,.3);color:var(--accent2);font-size:.72rem;font-weight:600;border-radius:20px;padding:.15rem .6rem">${m}</span>`).join('')}
     </div>
 
