@@ -1163,7 +1163,7 @@ const $ = id => document.getElementById(id);
 let toastTimer;
 function toast(msg, type='ok') {
   const t = $('toast');
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.className = 'toast' + (type==='error'?' error':type==='warn'?' warn':'');
   clearTimeout(toastTimer);
   setTimeout(()=>t.classList.add('show'),10);
