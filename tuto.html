@@ -308,6 +308,24 @@
     </ol>
   </div>
 
+  <!-- ══ MENU HAMBURGER ══ -->
+  <div class="section">
+    <div class="section-header">
+      <span>☰</span> Le menu de l'application
+    </div>
+    <div class="card">
+      <div class="card-title">☰ Menu (en haut à droite)</div>
+      <p>En appuyant sur l'icône <strong>☰</strong> en haut à droite de l'écran, un menu s'affiche avec les options suivantes :</p>
+      <ol class="steps" style="margin-top:.6rem">
+        <li><div class="num">🌙</div><div class="content"><strong>Thème sombre / clair</strong> — Basculez l'affichage entre le fond sombre et le fond clair selon votre préférence. Ce choix est mémorisé d'une session à l'autre.</div></li>
+        <li><div class="num">📖</div><div class="content"><strong>Lexique</strong> — Consultez le vocabulaire de la musculation organisé par thème (anatomie, physiologie, entraînement…), avec une barre de recherche.</div></li>
+        <li><div class="num">🦴</div><div class="content"><strong>Anatomie</strong> — Accédez au schéma musculaire et aux fiches descriptives de chaque groupe musculaire sollicité dans les ateliers.</div></li>
+        <li><div class="num">❓</div><div class="content"><strong>Guide d'utilisation</strong> — Ce document.</div></li>
+        <li><div class="num">↩</div><div class="content"><strong>Se déconnecter</strong> — Termine la session et revient à l'écran de connexion.</div></li>
+      </ol>
+    </div>
+  </div>
+
   <!-- ══ ÉTAPE 1 : Connexion ══ -->
   <div class="section">
     <div class="section-header">
@@ -343,6 +361,7 @@
     <div class="card">
       <div class="card-title">⚡ Calculer mon maxi (méthode recommandée)</div>
       <p>Utilisez les <strong>roulettes</strong> pour indiquer le poids que vous avez soulevé et le nombre de répétitions réalisées. L'application calcule votre 1RM théorique grâce à la formule de Brzycki. Appuyez ensuite sur <strong>Valider ce maxi</strong>.</p>
+      <p style="margin-top:.4rem">Si vous aviez déjà renseigné un maxi pour cet atelier, il est rappelé en haut de la page sous le nom de l'atelier : <em>Maxi actuel : XX kg</em>.</p>
       <p style="margin-top:.4rem">Les <strong>consignes d'exécution</strong> et les <strong>règles de sécurité</strong> de l'atelier sont affichées sous la formule pour vous guider pendant la recherche de maxi.</p>
     </div>
     <div class="card">
@@ -491,7 +510,17 @@
     </div>
 
     <div class="alert">
-      <strong>⚠️ Maxi incorrect ?</strong> Si l'application détecte que votre maxi est trop faible (2 fois Facile d'affilée) ou trop élevé (2 fois Échec d'affilée), elle vous redirige automatiquement pour le recalculer. Cet atelier sera indiqué dans le bilan de fin de séance.
+      <strong>⚠️ Recalcul de maxi obligatoire</strong> — L'application peut vous rediriger automatiquement vers la page de calcul du maxi dans trois situations :
+      <ul style="margin:.5rem 0 .2rem 1rem;font-size:.85rem">
+        <li><strong>2 fois Facile d'affilée</strong> — votre maxi est probablement sous-évalué.</li>
+        <li><strong>2 fois Échec d'affilée</strong> — votre maxi est probablement surévalué.</li>
+        <li><strong>Plafond absolu atteint avec ressenti F</strong> — vous êtes à la charge maximale ET aux répétitions maximales de votre projet, et vous trouvez ça facile : votre maxi est clairement sous-évalué.</li>
+        <li><strong>Plancher absolu atteint avec ressenti E</strong> — vous êtes à la charge minimale ET aux répétitions minimales de votre projet, et vous êtes en échec : votre maxi est clairement surévalué.</li>
+      </ul>
+      Dans ces cas, le chronomètre de récupération ne s'affiche pas. L'ancien maxi reste visible sur la page de calcul pour vous servir de référence. Cet atelier sera signalé dans le bilan de fin de séance.
+    </div>
+    <div class="alert yellow">
+      <strong>⚠️ Avertissement plafond</strong> — Si vous atteignez la charge maximale ET les répétitions maximales de votre projet avec un ressenti <strong>D</strong> (difficile), l'application vous avertit que votre maxi est peut-être sous-évalué, mais vous repropose la même série pour continuer.
     </div>
   </div>
 
