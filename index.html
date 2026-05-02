@@ -2240,20 +2240,18 @@ function buildBilanBadge() {
 
   pg.innerHTML = `
     <div style="padding:1rem">
-      <button class="btn-sm" onclick="showPage('seance')" style="margin-bottom:1rem;background:none;border:none;color:var(--accent);font-size:.95rem;cursor:pointer;padding:0">← Retour aux Séances</button>
-
       <div style="text-align:center;margin:1.5rem 0 1rem">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.06em;color:var(--accent)">Bravo ! Séance validée !</div>
       </div>
 
-      <div style="text-align:center;padding:1rem 0 .5rem">
-        <img src="${badgeImgBig(badge)}" alt="${badge}" width="200" height="200" style="width:200px;height:200px;object-fit:contain">
-      </div>
-
-      <div style="text-align:center;margin-bottom:1.5rem;line-height:1.7">
+      <div style="text-align:center;margin-bottom:1rem;line-height:1.7">
         <div style="color:var(--muted);font-size:.9rem">Séance du ${today}</div>
         <div style="font-size:1rem">${state.badgeCourantNbAteliers} atelier${state.badgeCourantNbAteliers > 1 ? 's' : ''} validé${state.badgeCourantNbAteliers > 1 ? 's' : ''} ✓</div>
-        <div style="font-size:1rem;font-weight:600">Dernier badge obtenu : <span style="color:var(--accent)">${badge}</span></div>
+        <div style="font-size:1rem;font-weight:600">Badge obtenu : <span style="color:var(--accent)">${badge}</span></div>
+      </div>
+
+      <div style="text-align:center;padding:.5rem 0 1rem">
+        <img src="${badgeImgBig(badge)}" alt="${badge}" width="200" height="200" style="width:200px;height:200px;object-fit:contain">
       </div>
 
       ${(()=>{
@@ -2344,7 +2342,6 @@ function buildBilanBadge() {
         </div>`;
       })()}
 
-      <button class="btn" style="width:100%;margin-top:.5rem" onclick="showPage('seance')">← Retour aux Séances</button>
     </div>`;
 }
 
