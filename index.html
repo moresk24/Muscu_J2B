@@ -33,6 +33,23 @@
   --haut:     #3d8bff;
   --bas:      #ff6b2b;
 }
+[data-theme="light"] {
+  --bg:       #f2f2f7;
+  --s1:       #ffffff;
+  --s2:       #e8e8f0;
+  --s3:       #dcdce8;
+  --border:   #ccccde;
+  --accent:   #e8581a;
+  --accent2:  #f0963a;
+  --blue:     #2570e8;
+  --green:    #1fa055;
+  --red:      #cc3328;
+  --yellow:   #c07a00;
+  --text:     #1a1a2e;
+  --muted:    #7070a0;
+  --haut:     #2570e8;
+  --bas:      #e8581a;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px}
@@ -527,8 +544,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       </div>
       <button class="btn" id="btn-login" disabled>Entrer</button>
     </div>
-    <div style="text-align:center;margin-top:1.25rem">
+    <div style="text-align:center;margin-top:1.25rem;display:flex;justify-content:center;align-items:center;gap:1.2rem">
       <a href="tuto.html" target="_blank" style="font-size:.82rem;color:var(--muted);text-decoration:none">📖 Comment utiliser l'application ?</a>
+      <button id="btn-theme-login" onclick="toggleTheme()" style="border:none;background:none;cursor:pointer;font-size:1.2rem;line-height:1;padding:0" title="Changer le thème">🌙</button>
     </div>
   </div>
 </div>
@@ -543,6 +561,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     <div class="topbar-info">
       <span id="tb-prenom" style="text-transform:uppercase">—</span><span id="tb-projet-header"></span><span style="color:var(--blue)"> — </span><span id="tb-seance" style="color:var(--accent)">—</span> <span id="tb-lock" style="display:none;color:var(--muted);font-size:.9rem" title="Mode consultation">🔒</span>
     </div>
+    <button id="btn-theme-topbar" onclick="toggleTheme()" title="Changer le thème" style="border:none;background:none;padding:.3rem .4rem;cursor:pointer;font-size:1.1rem;line-height:1">🌙</button>
     <button class="btn-sm" id="btn-logout" title="Se déconnecter" style="border:none;background:none;padding:.3rem .4rem;cursor:pointer;display:flex;align-items:center">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -624,6 +643,27 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════
+//  THÈME CLAIR / SOMBRE
+// ═══════════════════════════════════════════════════
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  const icon = theme === 'light' ? '☀️' : '🌙';
+  const t = document.getElementById('btn-theme-topbar');
+  const l = document.getElementById('btn-theme-login');
+  if (t) t.textContent = icon;
+  if (l) l.textContent = icon;
+}
+function toggleTheme() {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  localStorage.setItem('muscu_theme', next);
+  applyTheme(next);
+}
+(function() {
+  const saved = localStorage.getItem('muscu_theme') || 'dark';
+  applyTheme(saved);
+})();
+
 // ═══════════════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════════════
@@ -1747,7 +1787,6 @@ function buildProjetDetail() {
     : '';
 
   pg.innerHTML = `
-    <button onclick="showPage('projet')" style="background:none;border:none;color:var(--accent);font-size:.95rem;cursor:pointer;padding:0;margin-bottom:1rem">← Retour aux projets</button>
     ${pageTitle}
     ${chooseBtn ? `<div style="margin-bottom:.75rem">${chooseBtn}</div>` : ''}
     <div class="projet-fiche">
@@ -2162,9 +2201,6 @@ function buildMesBadges() {
           </div>
           ${b.compt === 0 ? `<div style="font-weight:600;margin-bottom:.1rem;color:var(--muted)">${b.nom}</div><div style="color:var(--muted);font-size:.85rem">0 obtenu</div>` : ''}
         </div>`).join('')}
-        ${total > 0 ? `
-        <div style="margin-top:1rem;text-align:center;color:var(--muted);font-size:.9rem">${total} badge${total>1?'s':''} gagné${total>1?'s':''}
-        </div>` : ''}
       </div>
     </div>`;
 }
@@ -2622,8 +2658,9 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   }
 
   // 5. Suggestion série suivante + timer récupération
-  showSuggestion(nomAtelier, key, unite, ressenti, serieIndex + 1, charge, reps, serieIntensite || state.intensite);
-  startRecupTimer(key);
+  const suggType = showSuggestion(nomAtelier, key, unite, ressenti, serieIndex + 1, charge, reps, serieIntensite || state.intensite);
+  const pasDeTimer = suggType === 'fd-plafond-f' || suggType === 'e-plafond-bas';
+  if (!pasDeTimer) startRecupTimer(key);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2861,6 +2898,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
   if (avertissementDoux) {
     sugBox.innerHTML = `<div style="font-size:.75rem;color:var(--yellow);margin-bottom:.5rem">⚠️ Votre maxi semble peut-être sous-évalué</div>` + sugBox.innerHTML;
   }
+  return type;
 }
 
 function appliquerChoixCharge(nomAtelier, key, unite, ressenti, currentCharge, currentReps, currentIntensite) {
