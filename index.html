@@ -2714,7 +2714,7 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
       }
     }
   } else {
-    startRecupTimer(key);
+    startRecupTimer(key, nomAtelier);
   }
 }
 
@@ -2830,17 +2830,23 @@ async function validateAtelier(nomAtelier) {
 
 let _recupTimerInterval = null;
 
-function getRecupSeconds() {
+function getRecupSeconds(nomAtelier) {
+  const type = getAtelierType(nomAtelier||'');
+  if (type === 'lombaires') return 60;
+  if (type === 'gainage') {
+    const niveau = parseInt(state.maxis[nomAtelier]||1);
+    return (niveau === 2 || niveau === 4) ? 120 : 60;
+  }
   const map = {"1":180,"2":90,"3A":45,"3B":60};
   return map[state.projet] || 60;
 }
 
-function startRecupTimer(key) {
+function startRecupTimer(key, nomAtelier) {
   stopRecupTimer(key);
   const el = document.getElementById('rt-'+key);
   const count = document.getElementById('rt-count-'+key);
   if (!el || !count) return;
-  let secs = getRecupSeconds();
+  let secs = getRecupSeconds(nomAtelier);
   function fmt(s) { return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60; }
   count.textContent = fmt(secs);
   count.style.color = '';
@@ -2986,7 +2992,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   // 5. Suggestion série suivante + timer récupération
   const suggType = showSuggestion(nomAtelier, key, unite, ressenti, serieIndex + 1, charge, reps, serieIntensite || state.intensite);
   const pasDeTimer = suggType === 'fd-plafond-f' || suggType === 'e-plafond-bas';
-  if (!pasDeTimer) startRecupTimer(key);
+  if (!pasDeTimer) startRecupTimer(key, nomAtelier);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
