@@ -59,7 +59,8 @@ function doGet(e) {
     if (action === "saveProjet")     return jsonResponse(handleSaveProjet(p));
     if (action === "incrementSerie")  return jsonResponse(handleIncrementSerie(p));
     if (action === "validateAtelier") return jsonResponse(handleValidateAtelier(p));
-    if (action === "saveBadge")       return jsonResponse(handleSaveBadge(p));
+    if (action === "saveBadge")        return jsonResponse(handleSaveBadge(p));
+    if (action === "saveHistorique")   return jsonResponse(handleSaveHistorique(p));
     return jsonResponse({ error: "Action inconnue : " + action });
   } catch(err) {
     return jsonResponse({ error: err.toString() });
@@ -341,6 +342,29 @@ function handleSaveBadge(p) {
     comptArgent:  parseInt(p.comptArgent) || 0,
     comptOr:      parseInt(p.comptOr)     || 0
   };
+}
+
+// ── Enregistrer la séance dans l'onglet Historique ──────────
+function handleSaveHistorique(p) {
+  const sheetName = p.classe + '_Historique';
+  const sheet = getSheet(sheetName);
+  if (!sheet) return { error: 'Onglet introuvable : ' + sheetName };
+
+  const data = sheet.getDataRange().getValues();
+  let rowIndex = -1;
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === p.nom && data[i][1] === p.prenom) {
+      rowIndex = i;
+      break;
+    }
+  }
+  if (rowIndex === -1) return { error: 'Élève introuvable dans l\'historique : ' + p.nom + ' ' + p.prenom };
+
+  const seance = parseInt(p.seance) || 1;
+  const col = 3 + seance - 1; // S1 = col index 3, S2 = 4, etc.
+  sheet.getRange(rowIndex + 1, col + 1).setValue(p.data);
+
+  return { success: true };
 }
 
 function updateLastCo(sheet, rowIndex) {

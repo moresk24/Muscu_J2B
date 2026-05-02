@@ -2147,19 +2147,34 @@ async function saveBadge() {
   state.badgeCourant = badge;
   state.badgeCourantNbAteliers = nbAteliers;
 
+  // Construire le JSON historique avant de vider serieLocale
+  const histDetail = state.ateliersSeanceEnCours.map(n => {
+    const local = state.serieLocale[n] || [];
+    const isSpecial = local.length && local[0] && local[0].special;
+    if (isSpecial) return { nom: n, special: true, series: local.map(s => ({resultat: s.resultat})) };
+    return { nom: n, series: local.slice(0,4).map(s => ({charge: s.charge, reps: s.reps, ressenti: s.ressenti})) };
+  });
+  const histJson = JSON.stringify({
+    date: new Date().toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'}),
+    seance: state.sessionNumber,
+    badge,
+    ateliers: nbAteliers,
+    detail: histDetail
+  });
+
   loading(true, 'Patientez pendant l\'enregistrement<br>de votre séance');
   try {
-    await apiPost({
-      action: 'saveBadge',
-      classe: state.classe,
-      nom: state.nom,
-      prenom: state.prenom,
-      badge,
-      comptCarton: state.comptCarton,
-      comptBronze: state.comptBronze,
-      comptArgent: state.comptArgent,
-      comptOr: state.comptOr
-    });
+    const reqs = [
+      apiPost({ action:'saveBadge', classe:state.classe, nom:state.nom, prenom:state.prenom,
+                badge, comptCarton:state.comptCarton, comptBronze:state.comptBronze,
+                comptArgent:state.comptArgent, comptOr:state.comptOr })
+    ];
+    const seanceHist = state.sessionNumber > 0 ? state.sessionNumber : (state.isAdmin ? 1 : 0);
+    if (seanceHist > 0) {
+      reqs.push(apiPost({ action:'saveHistorique', classe:state.classe, nom:state.nom,
+                          prenom:state.prenom, seance:seanceHist, data:histJson }));
+    }
+    await Promise.all(reqs);
   } catch(e) { console.error('saveBadge error', e); }
   loading(false);
 
