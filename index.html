@@ -2560,7 +2560,6 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
     if (state.suggestionEnAttente) delete state.suggestionEnAttente[nomAtelier];
     if (state.suggestionEnCours) state.suggestionEnCours[nomAtelier] = false;
     if (sgEl && a) sgEl.innerHTML = buildSeriesHTML(a, 0, []);
-    clearMaxiForAtelier(nomAtelier);
 
     const sugBox = document.getElementById('sug-' + key);
     if (sugBox) {
