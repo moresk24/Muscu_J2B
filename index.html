@@ -2820,7 +2820,7 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
     // Paramètres suggérés stockés ou défaut
     const suggested = state.suggestionEnAttente && state.suggestionEnAttente[a.nom];
     const enAttente = (state.suggestionEnCours && state.suggestionEnCours[a.nom])
-                   || (!state.guidage && s === 0 && !suggested);
+                   || (!state.guidage && !suggested);
     const serieCharge = suggested ? suggested.charge : (charge ? charge : 0);
     const serieReps   = suggested ? suggested.reps   : reps;
     const serieInt    = suggested ? suggested.intensite : intensite;
@@ -3703,65 +3703,64 @@ function buildAtelierDetail() {
     if (bravo) bravo.classList.add('visible');
   }
 
-  if (type === 'standard' && localSeries.length === 0) {
-    if (state.guidage) {
-      // Mode guidé : pré-remplir S1 depuis l'historique (meilleur D, ou TD le plus bas)
-      const raw = state.historiqueAteliers[nom];
-      if (raw && !Array.isArray(raw) && raw.series &&
-          (!raw.projet || raw.projet === state.projet) &&
-          (raw.seance !== state.sessionNumber || state.sessionNumber === 0)) {
-        const dSeries  = raw.series.filter(s => s.c && !s.special && s.s === 'D');
-        const tdSeries = raw.series.filter(s => s.c && !s.special && s.s === 'TD');
-        let bestSerie = null;
-        if (dSeries.length > 0) {
-          bestSerie = dSeries.reduce((best, s) => s.c > best.c ? s : best);
-        } else if (tdSeries.length > 0) {
-          bestSerie = tdSeries.reduce((best, s) => s.c < best.c ? s : best);
-        }
-        if (bestSerie && maxi > 0) {
-          const histIntensite = Math.round(bestSerie.c / maxi * 100);
-          applySuggestion(nom, histIntensite, bestSerie.c, bestSerie.r);
-        }
+  // Mode guidé : pré-remplir S1 depuis l'historique (meilleur D, ou TD le plus bas)
+  if (type === 'standard' && localSeries.length === 0 && state.guidage) {
+    const raw = state.historiqueAteliers[nom];
+    if (raw && !Array.isArray(raw) && raw.series &&
+        (!raw.projet || raw.projet === state.projet) &&
+        (raw.seance !== state.sessionNumber || state.sessionNumber === 0)) {
+      const dSeries  = raw.series.filter(s => s.c && !s.special && s.s === 'D');
+      const tdSeries = raw.series.filter(s => s.c && !s.special && s.s === 'TD');
+      let bestSerie = null;
+      if (dSeries.length > 0)       bestSerie = dSeries.reduce((best, s) => s.c > best.c ? s : best);
+      else if (tdSeries.length > 0) bestSerie = tdSeries.reduce((best, s) => s.c < best.c ? s : best);
+      if (bestSerie && maxi > 0) {
+        const histIntensite = Math.round(bestSerie.c / maxi * 100);
+        applySuggestion(nom, histIntensite, bestSerie.c, bestSerie.r);
       }
-    } else {
-      // Mode autonome : ouvrir les roulettes S1 immédiatement, sans proposition
-      const sugBox = document.getElementById('sug-' + key);
-      if (sugBox) {
-        const p = PROJETS[state.projet];
-        const startCharge = maxi ? Math.round(maxi * p.intensites[0] / 100 * 2) / 2 : 0;
-        const startReps   = p.repsMin;
-        const startInt    = p.intensites[0];
-        drumState[key] = { reps: startReps, charge: startCharge };
-        savedSuggestions[key] = '';
-        const chargeVals = genChargeValues(maxi, state.projet);
-        const repsVals = [];
-        for (let i = p.repsMin; i <= p.repsMax; i++) repsVals.push(i);
-        const chargeLabelFn = maxi > 0
-          ? v => `${v} <span style="font-size:.62rem;color:var(--muted)">(${Math.round(v/maxi*100)}%)</span>`
-          : null;
-        sugBox.innerHTML = `
-          <div class="suggestion-title">Série 1 — à toi de choisir</div>
-          <div class="drum-picker-wrap">
-            <div class="drum-picker-col">
-              <div class="field-label" style="margin-bottom:.3rem">Reps</div>
-              <div class="drum-picker" id="drum-reps-${key}">
-                <div class="drum-highlight"></div><div class="drum-track"></div>
-              </div>
-            </div>
-            <div class="drum-picker-col">
-              <div class="field-label" style="margin-bottom:.3rem">Charge (${a.unite})</div>
-              <div class="drum-picker" id="drum-charge-${key}">
-                <div class="drum-highlight"></div><div class="drum-track"></div>
-              </div>
+    }
+  }
+
+  // Mode autonome : ouvrir les roulettes pour la série suivante (au retour sur la page ou à l'arrivée)
+  if (!state.guidage && type === 'standard' && localSeries.length < 4) {
+    const sugBox = document.getElementById('sug-' + key);
+    if (sugBox && !sugBox.classList.contains('visible')) {
+      const p = PROJETS[state.projet];
+      const prev = localSeries.length > 0 ? localSeries[localSeries.length - 1] : null;
+      const startCharge = prev ? prev.charge : (maxi ? Math.round(maxi * p.intensites[0] / 100 * 2) / 2 : 0);
+      const startReps   = prev ? prev.reps   : p.repsMin;
+      const startInt    = prev ? (prev.intensite || p.intensites[0]) : p.intensites[0];
+      const nextSerie   = localSeries.length + 1;
+      drumState[key] = { reps: startReps, charge: startCharge };
+      savedSuggestions[key] = '';
+      const chargeVals = genChargeValues(maxi, state.projet);
+      const repsVals = [];
+      for (let i = p.repsMin; i <= p.repsMax; i++) repsVals.push(i);
+      const chargeLabelFn = maxi > 0
+        ? v => `${v} <span style="font-size:.62rem;color:var(--muted)">(${Math.round(v/maxi*100)}%)</span>`
+        : null;
+      sugBox.innerHTML = `
+        <div class="suggestion-title">Série ${nextSerie} — à toi de choisir</div>
+        <div class="drum-picker-wrap">
+          <div class="drum-picker-col">
+            <div class="field-label" style="margin-bottom:.3rem">Reps</div>
+            <div class="drum-picker" id="drum-reps-${key}">
+              <div class="drum-highlight"></div><div class="drum-track"></div>
             </div>
           </div>
-          <div class="suggestion-actions">
-            <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="validerModification('${nom}','${key}','${a.unite}',${startInt})">✓ Valider</button>
-          </div>`;
-        sugBox.classList.add('visible');
-        initDrumPicker('drum-reps-'   + key, repsVals,   startReps,   v => drumState[key].reps   = v);
-        initDrumPicker('drum-charge-' + key, chargeVals, startCharge, v => drumState[key].charge = v, chargeLabelFn);
-      }
+          <div class="drum-picker-col">
+            <div class="field-label" style="margin-bottom:.3rem">Charge (${a.unite})</div>
+            <div class="drum-picker" id="drum-charge-${key}">
+              <div class="drum-highlight"></div><div class="drum-track"></div>
+            </div>
+          </div>
+        </div>
+        <div class="suggestion-actions">
+          <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="validerModification('${nom}','${key}','${a.unite}',${startInt})">✓ Valider</button>
+        </div>`;
+      sugBox.classList.add('visible');
+      initDrumPicker('drum-reps-'   + key, repsVals,   startReps,   v => drumState[key].reps   = v);
+      initDrumPicker('drum-charge-' + key, chargeVals, startCharge, v => drumState[key].charge = v, chargeLabelFn);
     }
   }
 }
