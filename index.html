@@ -3642,9 +3642,9 @@ function buildAtelierDetail() {
     <div class="atelier-bloc-title">${state.historiqueAteliers[nom] && !Array.isArray(state.historiqueAteliers[nom]) && (state.historiqueAteliers[nom].seance !== state.sessionNumber || state.sessionNumber === 0) ? '🏋️ Aujourd\'hui :' : '🏋️ Vos séries à cet atelier'}</div>
     <div class="recup-timer" id="rt-${key}">
       <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.3rem">⏱ Récupération</div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+      <div style="display:flex;align-items:center;justify-content:center;gap:.5rem">
+        <button class="btn" style="width:auto;padding:.4rem .8rem;font-size:.78rem;background:var(--blue)" onclick="stopRecupTimer('${key}')">Passer →</button>
         <div class="recup-timer-count" id="rt-count-${key}">—</div>
-        <button class="btn" style="padding:.3rem 1.5rem;font-size:.78rem;background:var(--blue)" onclick="stopRecupTimer('${key}')">Passer →</button>
       </div>
     </div>
     <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
