@@ -490,7 +490,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 }
 .recup-timer{display:none;background:var(--s1);border:1px solid rgba(61,139,255,.35);border-radius:12px;padding:.75rem 1rem;margin:.4rem 0;text-align:center}
 .recup-timer.active{display:block}
-.recup-timer-count{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:.05em;color:var(--blue);line-height:1.1}
+.recup-timer-count{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.05em;color:var(--blue);line-height:1;
+  width:80px;height:80px;border-radius:50%;border:3px solid var(--blue);
+  display:flex;align-items:center;justify-content:center;margin:0 auto}
 .seance-atelier-card{
   background:var(--s1);border:1px solid var(--border);border-radius:14px;
   margin-bottom:.6rem;display:flex;align-items:center;gap:.75rem;
@@ -3640,9 +3642,9 @@ function buildAtelierDetail() {
     <div class="atelier-bloc-title">${state.historiqueAteliers[nom] && !Array.isArray(state.historiqueAteliers[nom]) && (state.historiqueAteliers[nom].seance !== state.sessionNumber || state.sessionNumber === 0) ? '🏋️ Aujourd\'hui :' : '🏋️ Vos séries à cet atelier'}</div>
     <div class="recup-timer" id="rt-${key}">
       <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.3rem">⏱ Récupération</div>
-      <div style="display:flex;align-items:center;gap:.75rem">
-        <div class="recup-timer-count" id="rt-count-${key}" style="flex:1;text-align:center">—</div>
-        <button class="btn" style="flex:1;padding:.3rem .9rem;font-size:.78rem;background:var(--blue)" onclick="stopRecupTimer('${key}')">Passer →</button>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+        <div class="recup-timer-count" id="rt-count-${key}">—</div>
+        <button class="btn" style="padding:.3rem 1.5rem;font-size:.78rem;background:var(--blue)" onclick="stopRecupTimer('${key}')">Passer →</button>
       </div>
     </div>
     <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
