@@ -3643,8 +3643,8 @@ function buildAtelierDetail() {
     <div class="recup-timer" id="rt-${key}">
       <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.3rem">⏱ Récupération</div>
       <div style="display:flex;align-items:center;justify-content:center;gap:.5rem">
-        <button class="btn" style="width:auto;padding:.4rem .8rem;font-size:.78rem;background:var(--blue)" onclick="stopRecupTimer('${key}')">Passer →</button>
         <div class="recup-timer-count" id="rt-count-${key}">—</div>
+        <button class="btn" style="width:auto;padding:.4rem .8rem;font-size:.78rem;background:var(--blue)" onclick="stopRecupTimer('${key}')">Passer →</button>
       </div>
     </div>
     <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
