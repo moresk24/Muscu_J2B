@@ -385,26 +385,26 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .drum-picker-wrap{display:flex;gap:1rem;margin:.5rem 0}
 .drum-picker-col{flex:1;text-align:center}
 .drum-picker{
-  position:relative;height:200px;overflow:hidden;
+  position:relative;height:160px;overflow:hidden;
   cursor:ns-resize;touch-action:none;
   border-radius:8px;
 }
 .drum-picker::before,.drum-picker::after{
-  content:'';position:absolute;left:0;right:0;height:80px;z-index:2;pointer-events:none;
+  content:'';position:absolute;left:0;right:0;height:64px;z-index:2;pointer-events:none;
 }
 .drum-picker::before{top:0;background:linear-gradient(to bottom,rgba(22,22,31,.95),transparent)}
 .drum-picker::after{bottom:0;background:linear-gradient(to top,rgba(22,22,31,.95),transparent)}
 .drum-highlight{
-  position:absolute;top:80px;left:8px;right:8px;height:40px;
+  position:absolute;top:64px;left:8px;right:8px;height:32px;
   border-top:1px solid var(--accent);border-bottom:1px solid var(--accent);
   border-radius:4px;pointer-events:none;z-index:1;
 }
 .drum-track{position:absolute;left:0;right:0;top:0;user-select:none}
 .drum-item{
-  height:40px;display:flex;align-items:center;justify-content:center;
-  font-size:1.15rem;color:var(--muted);transition:color .1s,font-size .1s;
+  height:32px;display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;color:var(--muted);transition:color .1s,font-size .1s;
 }
-.drum-item.selected{color:var(--text);font-weight:700;font-size:1.35rem}
+.drum-item.selected{color:var(--text);font-weight:700;font-size:1.25rem}
 
 /* Bravo */
 .bravo-box{
@@ -3442,7 +3442,7 @@ function genChargeValues(maxi, projet) {
 }
 
 function initDrumPicker(containerId, values, initialValue, onChange, labelFn) {
-  const ITEM_H = 40, PAD = 2;
+  const ITEM_H = 32, PAD = 2;
   const container = document.getElementById(containerId);
   if (!container) return;
   const track = container.querySelector('.drum-track');
