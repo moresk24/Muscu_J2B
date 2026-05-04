@@ -1371,7 +1371,7 @@ function buildGraphiqueProgression(moyennes) {
   }
 
   const W = 300, H = 130;
-  const padL = 30, padR = 12, padT = 18, padB = 24;
+  const padL = 42, padR = 12, padT = 18, padB = 24;
   const chartW = W - padL - padR;
   const chartH = H - padT - padB;
 
@@ -1389,21 +1389,43 @@ function buildGraphiqueProgression(moyennes) {
             <text x="${padL-4}" y="${(parseFloat(y)+3.5).toFixed(1)}" text-anchor="end" font-size="9" fill="${color}" font-family="DM Sans,sans-serif">${label}</text>`;
   }).join('');
 
-  let pathD = '', prev = null;
+  // Construire les segments de ligne : plein entre points consécutifs, pointillé à travers une absence
+  let solidPath = '', dashedPath = '';
+  let lastValidX = null, lastValidY = null, lastValidIdx = null;
+  let currentSolid = '';
+
   moyennes.forEach((m, i) => {
-    if (m === null) { prev = null; return; }
+    if (typeof m !== 'number') {
+      // Absence (A/D) ou null : ferme le segment solide en cours
+      if (currentSolid) { solidPath += currentSolid; currentSolid = ''; }
+      return;
+    }
     const x = xPos(i).toFixed(1), y = yPos(m).toFixed(1);
-    pathD += prev === null ? `M${x},${y}` : `L${x},${y}`;
-    prev = m;
+    if (lastValidIdx === null) {
+      currentSolid = `M${x},${y}`;
+    } else if (i === lastValidIdx + 1) {
+      currentSolid += `L${x},${y}`;
+    } else {
+      // Points non consécutifs : ligne pointillée puis nouveau segment solide
+      if (currentSolid) { solidPath += currentSolid; }
+      dashedPath += `M${lastValidX},${lastValidY}L${x},${y}`;
+      currentSolid = `M${x},${y}`;
+    }
+    lastValidIdx = i; lastValidX = x; lastValidY = y;
   });
+  if (currentSolid) solidPath += currentSolid;
 
   const elements = moyennes.map((m, i) => {
     const x = xPos(i).toFixed(1);
-    const xLbl = `<text x="${x}" y="${H-4}" text-anchor="middle" font-size="8" fill="var(--muted)" font-family="DM Sans,sans-serif">S${i+1}</text>`;
-    if (m === null) return xLbl;
+    // Label X : S1, S2... + marqueur absence en dessous si A ou D
+    const sLabel = `<text x="${x}" y="${H-13}" text-anchor="middle" font-size="8" fill="var(--muted)" font-family="DM Sans,sans-serif">S${i+1}</text>`;
+    const absLabel = (m === 'A' || m === 'D')
+      ? `<text x="${x}" y="${H-3}" text-anchor="middle" font-size="8" fill="#e67e22" font-family="DM Sans,sans-serif" font-style="italic">${m === 'A' ? 'Abs' : 'Disp'}</text>`
+      : `<text x="${x}" y="${H-3}" text-anchor="middle" font-size="8" fill="transparent" font-family="DM Sans,sans-serif">·</text>`;
+    if (typeof m !== 'number') return sLabel + absLabel;
     const y = yPos(m).toFixed(1);
     const color = dotColor(m);
-    return xLbl
+    return sLabel + absLabel
       + `<circle cx="${x}" cy="${y}" r="4" fill="${color}" stroke="var(--bg)" stroke-width="1.5"/>`
       + `<text x="${x}" y="${(parseFloat(y)-8).toFixed(1)}" text-anchor="middle" font-size="8" fill="${color}" font-family="DM Sans,sans-serif" font-weight="600">${m.toFixed(1)}</text>`;
   }).join('');
@@ -1414,7 +1436,8 @@ function buildGraphiqueProgression(moyennes) {
 
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
     ${refs}
-    ${pathD ? `<path d="${pathD}" fill="none" stroke="var(--border)" stroke-width="1.5" stroke-linejoin="round"/>` : ''}
+    ${solidPath  ? `<path d="${solidPath}"  fill="none" stroke="var(--border)" stroke-width="1.5" stroke-linejoin="round"/>` : ''}
+    ${dashedPath ? `<path d="${dashedPath}" fill="none" stroke="var(--muted)"  stroke-width="1.5" stroke-dasharray="4,3" stroke-linejoin="round"/>` : ''}
     ${elements}
   </svg>${note}`;
 }

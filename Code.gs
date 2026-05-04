@@ -410,9 +410,15 @@ function handleGetProgression(p) {
   const row = data[rowIndex];
   const moyennes = [];
   for (let s = 1; s <= 12; s++) {
-    const colMoy = 3 + (s - 1) * 2 + 1;
-    const val = row[colMoy];
-    moyennes.push((val !== '' && val !== undefined && val !== null) ? Math.round(parseFloat(val) * 100) / 100 : null);
+    const colJson = 3 + (s - 1) * 2;
+    const colMoy  = colJson + 1;
+    const marker  = (row[colJson] || '').toString().trim().toUpperCase();
+    if (marker === 'A' || marker === 'D') {
+      moyennes.push(marker);
+    } else {
+      const val = row[colMoy];
+      moyennes.push((val !== '' && val !== undefined && val !== null) ? Math.round(parseFloat(val) * 100) / 100 : null);
+    }
   }
   while (moyennes.length > 0 && moyennes[moyennes.length - 1] === null) moyennes.pop();
 
