@@ -345,6 +345,7 @@ function handleSaveBadge(p) {
 }
 
 // ── Enregistrer la séance dans l'onglet Historique ──────────
+// Structure colonnes : col 3 = S1 JSON, col 4 = S1 moy, col 5 = S2 JSON, col 6 = S2 moy, ...
 function handleSaveHistorique(p) {
   const sheetName = p.classe + '_Historique';
   const sheet = getSheet(sheetName);
@@ -361,10 +362,32 @@ function handleSaveHistorique(p) {
   if (rowIndex === -1) return { error: 'Élève introuvable dans l\'historique : ' + p.nom + ' ' + p.prenom };
 
   const seance = parseInt(p.seance) || 1;
-  const col = 3 + seance - 1; // S1 = col index 3, S2 = 4, etc.
-  sheet.getRange(rowIndex + 1, col + 1).setValue(p.data);
+  const colJson = 3 + (seance - 1) * 2;
+  const colMoy  = colJson + 1;
+
+  sheet.getRange(rowIndex + 1, colJson + 1).setValue(p.data);
+  sheet.getRange(rowIndex + 1, colMoy  + 1).setValue(calculerMoyenneRessentis(p.data));
 
   return { success: true };
+}
+
+// Calcule la moyenne des ressentis F/D/TD (E ignorés, ateliers spéciaux ignorés)
+// Retourne un nombre arrondi à 2 décimales, ou "" si aucune série valide
+function calculerMoyenneRessentis(jsonStr) {
+  const SCORES = { F: 1, D: 2, TD: 3 };
+  let sum = 0, count = 0;
+  try {
+    const hist = JSON.parse(jsonStr);
+    (hist.detail || []).forEach(function(atelier) {
+      if (atelier.special) return;
+      (atelier.series || []).forEach(function(s) {
+        const score = SCORES[s.ressenti];
+        if (score !== undefined) { sum += score; count++; }
+      });
+    });
+  } catch(e) {}
+  if (count === 0) return "";
+  return Math.round(sum / count * 100) / 100;
 }
 
 function updateLastCo(sheet, rowIndex) {
