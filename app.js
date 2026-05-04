@@ -1434,12 +1434,12 @@ function buildGraphiqueProgression(moyennes) {
     ? `<div style="color:var(--muted);font-size:.78rem;text-align:center;margin-top:.3rem">Revenez après la prochaine séance pour voir votre courbe !</div>`
     : '';
 
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-height:180px;height:auto;display:block">
+  return `<div style="width:100%;max-width:480px"><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
     ${refs}
     ${solidPath  ? `<path d="${solidPath}"  fill="none" stroke="var(--border)" stroke-width="1.5" stroke-linejoin="round"/>` : ''}
     ${dashedPath ? `<path d="${dashedPath}" fill="none" stroke="var(--muted)"  stroke-width="1.5" stroke-dasharray="4,3" stroke-linejoin="round"/>` : ''}
     ${elements}
-  </svg>${note}`;
+  </svg></div>${note}`;
 }
 
 // ═══════════════════════════════════════════════════
