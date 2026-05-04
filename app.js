@@ -1385,7 +1385,7 @@ function buildGraphiqueProgression(moyennes) {
     {v:1, label:'F',  color:'#2980b9'}
   ].map(({v, label, color}) => {
     const y = yPos(v).toFixed(1);
-    return `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="${color}" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
+    return `<line x1="${padL}" y1="${y}" x2="${W}" y2="${y}" stroke="${color}" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
             <text x="${padL-4}" y="${(parseFloat(y)+3.5).toFixed(1)}" text-anchor="end" font-size="9" fill="${color}" font-family="DM Sans,sans-serif">${label}</text>`;
   }).join('');
 
