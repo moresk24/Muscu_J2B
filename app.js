@@ -1437,7 +1437,7 @@ function buildGraphiqueProgression(moyennes) {
     ? `<div style="color:var(--muted);font-size:.78rem;text-align:center;margin-top:.3rem">Revenez après la prochaine séance pour voir votre courbe !</div>`
     : '';
 
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block">
     ${refs}
     ${solidPath  ? `<path d="${solidPath}"  fill="none" stroke="var(--border)" stroke-width="1.5" stroke-linejoin="round"/>` : ''}
     ${dashedPath ? `<path d="${dashedPath}" fill="none" stroke="var(--muted)"  stroke-width="1.5" stroke-dasharray="4,3" stroke-linejoin="round"/>` : ''}
