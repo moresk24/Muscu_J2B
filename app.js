@@ -1371,7 +1371,7 @@ function buildGraphiqueProgression(moyennes) {
   }
 
   const W = 300, H = 130;
-  const padL = 42, padR = 12, padT = 18, padB = 24;
+  const padL = 54, padR = 12, padT = 18, padB = 24;
   const chartW = W - padL - padR;
   const chartH = H - padT - padB;
 
