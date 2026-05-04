@@ -104,3 +104,13 @@ To deploy backend changes (`Code.gs`):
 ## PWA / Service Worker
 
 `sw.js` caches static assets for offline use. Cache key is `muscu-j2b-v1` — bump this string when assets change to force cache invalidation.
+
+## Fin de session — mise à jour mémoire
+
+À chaque fois que la conversation ralentit ou que l'utilisateur signale la fin de la session, mettre à jour automatiquement le fichier mémoire `project_etat_fonctionnalites.md` avec :
+- Les fonctionnalités implémentées durant la session
+- Les bugs corrigés
+- Les points techniques importants découverts
+- La roadmap mise à jour
+
+Ne pas attendre que l'utilisateur le demande explicitement.
