@@ -1374,7 +1374,7 @@ function buildGraphiqueProgression(moyennes) {
   }
 
   const W = 300, H = 130;
-  const padL = 54, padR = 18, padT = 18, padB = 24;
+  const padL = 6, padR = 16, padT = 18, padB = 24;
   const chartW = W - padL - padR;
   const chartH = H - padT - padB;
 
@@ -1388,8 +1388,8 @@ function buildGraphiqueProgression(moyennes) {
     {v:1, label:'F',  color:'#2980b9'}
   ].map(({v, label, color}) => {
     const y = yPos(v).toFixed(1);
-    return `<line x1="${padL}" y1="${y}" x2="${W}" y2="${y}" stroke="${color}" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
-            <text x="${padL-4}" y="${(parseFloat(y)+3.5).toFixed(1)}" text-anchor="end" font-size="9" fill="${color}" font-family="DM Sans,sans-serif">${label}</text>`;
+    return `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="${color}" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
+            <text x="3" y="${(parseFloat(y)-3).toFixed(1)}" text-anchor="start" font-size="8" fill="${color}" font-family="DM Sans,sans-serif" font-weight="700">${label}</text>`;
   }).join('');
 
   // Construire les segments de ligne : plein entre points consécutifs, pointillé à travers une absence
