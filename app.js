@@ -1165,12 +1165,12 @@ function closeBadgeZoom() {
 }
 
 function badgeImgBig(badge) {
-  const map = {Carton:'badge-carton-big.png', Bronze:'badge-bronze-big.png', Argent:'badge-argent-big.png', Or:'badge-or-big.png'};
+  const map = {Carton:'images/badge-carton-big.png', Bronze:'images/badge-bronze-big.png', Argent:'images/badge-argent-big.png', Or:'images/badge-or-big.png'};
   return map[badge] || '';
 }
 
 function badgeImgSmall(badge) {
-  const map = {Carton:'badge-carton-small.png', Bronze:'badge-bronze-small.png', Argent:'badge-argent-small.png', Or:'badge-or-small.png'};
+  const map = {Carton:'images/badge-carton-small.png', Bronze:'images/badge-bronze-small.png', Argent:'images/badge-argent-small.png', Or:'images/badge-or-small.png'};
   return map[badge] || '';
 }
 
@@ -1502,7 +1502,7 @@ function buildAnatomie() {
       <div class="ressource-intro">
         <strong>Les muscles moteurs du corps</strong> sont responsables de tous vos mouvements. Comprendre où ils se situent et leur fonction vous aide à mieux ressentir votre travail et à progresser plus efficacement.
       </div>
-      <img src="anatomie-muscles.png" alt="Anatomie musculaire" class="ressource-img">
+      <img src="images/anatomie-muscles.png" alt="Anatomie musculaire" class="ressource-img">
 
       <div class="ressource-section">
         <div class="ressource-section-title">🔴 Haut du corps</div>
@@ -1714,10 +1714,10 @@ function buildTuto() {
         </div>
         <div class="card">
           <div class="tuto-card-title">Les badges</div>
-          <div class="tuto-color-item" style="margin-top:.4rem"><img src="badge-carton-small.png" style="width:32px;height:32px;object-fit:contain"><strong style="color:#e74c3c">Carton Rouge</strong> — Moins de 4 ateliers</div>
-          <div class="tuto-color-item"><img src="badge-bronze-small.png" style="width:32px;height:32px;object-fit:contain"><strong>Bronze</strong> — 4 ateliers validés</div>
-          <div class="tuto-color-item"><img src="badge-argent-small.png" style="width:32px;height:32px;object-fit:contain"><strong>Argent</strong> — 5 ateliers validés</div>
-          <div class="tuto-color-item"><img src="badge-or-small.png"    style="width:32px;height:32px;object-fit:contain"><strong>Or</strong> — 6 ateliers ou plus</div>
+          <div class="tuto-color-item" style="margin-top:.4rem"><img src="images/badge-carton-small.png" style="width:32px;height:32px;object-fit:contain"><strong style="color:#e74c3c">Carton Rouge</strong> — Moins de 4 ateliers</div>
+          <div class="tuto-color-item"><img src="images/badge-bronze-small.png" style="width:32px;height:32px;object-fit:contain"><strong>Bronze</strong> — 4 ateliers validés</div>
+          <div class="tuto-color-item"><img src="images/badge-argent-small.png" style="width:32px;height:32px;object-fit:contain"><strong>Argent</strong> — 5 ateliers validés</div>
+          <div class="tuto-color-item"><img src="images/badge-or-small.png"    style="width:32px;height:32px;object-fit:contain"><strong>Or</strong> — 6 ateliers ou plus</div>
         </div>
         <div class="tuto-alert"><strong>⚠️ Important :</strong> Utilisez toujours "Enregistrer ma séance" avant de vous déconnecter, sinon votre badge ne sera pas enregistré.</div>
         <div class="card">
