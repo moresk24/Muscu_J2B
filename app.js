@@ -1301,7 +1301,7 @@ function buildBilanBadge() {
     </div>`;
 }
 
-function buildMesBadges() {
+async function buildMesBadges() {
   const pg = $('page-mes-badges');
   const badge = state.dernierBadge;
   const total = state.comptCarton + state.comptBronze + state.comptArgent + state.comptOr;
@@ -1330,6 +1330,11 @@ function buildMesBadges() {
         </div>
       </div>
 
+      <div id="section-progression" style="border-top:1px solid var(--border);padding-top:1rem;margin-bottom:1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.75rem">Ma progression</div>
+        <div style="color:var(--muted);font-size:.85rem;text-align:center;padding:.75rem 0">Chargement…</div>
+      </div>
+
       <div style="border-top:1px solid var(--border);padding-top:1rem">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:1rem">Badges obtenus</div>
         ${[{nom:'Carton',compt:state.comptCarton},{nom:'Bronze',compt:state.comptBronze},{nom:'Argent',compt:state.comptArgent},{nom:'Or',compt:state.comptOr}].map((b,idx,arr) => `
@@ -1344,6 +1349,74 @@ function buildMesBadges() {
         </div>`).join('')}
       </div>
     </div>`;
+
+  try {
+    const d = await api({action:'getProgression', classe:state.classe, nom:state.nom, prenom:state.prenom});
+    const el = $('section-progression');
+    if (el) {
+      el.innerHTML = `
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.05em;margin-bottom:.75rem">Ma progression</div>
+        ${buildGraphiqueProgression(d.success ? (d.moyennes || []) : [])}`;
+    }
+  } catch(e) {
+    const el = $('section-progression');
+    if (el) el.innerHTML = '';
+  }
+}
+
+function buildGraphiqueProgression(moyennes) {
+  const N = moyennes.length;
+  if (N === 0) {
+    return `<div style="color:var(--muted);font-size:.85rem;text-align:center;padding:.75rem 0;line-height:1.6">Votre progression apparaîtra<br>après votre première séance.</div>`;
+  }
+
+  const W = 300, H = 130;
+  const padL = 30, padR = 12, padT = 18, padB = 24;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+
+  const yPos = v => padT + (3.0 - v) / 2.0 * chartH;
+  const xPos = i => N === 1 ? padL + chartW / 2 : padL + i * chartW / (N - 1);
+  const dotColor = v => v < 1.67 ? '#2980b9' : v < 2.33 ? '#f39c12' : '#27ae60';
+
+  const refs = [
+    {v:3, label:'TD', color:'#27ae60'},
+    {v:2, label:'D',  color:'#f39c12'},
+    {v:1, label:'F',  color:'#2980b9'}
+  ].map(({v, label, color}) => {
+    const y = yPos(v).toFixed(1);
+    return `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="${color}" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
+            <text x="${padL-4}" y="${(parseFloat(y)+3.5).toFixed(1)}" text-anchor="end" font-size="9" fill="${color}" font-family="DM Sans,sans-serif">${label}</text>`;
+  }).join('');
+
+  let pathD = '', prev = null;
+  moyennes.forEach((m, i) => {
+    if (m === null) { prev = null; return; }
+    const x = xPos(i).toFixed(1), y = yPos(m).toFixed(1);
+    pathD += prev === null ? `M${x},${y}` : `L${x},${y}`;
+    prev = m;
+  });
+
+  const elements = moyennes.map((m, i) => {
+    const x = xPos(i).toFixed(1);
+    const xLbl = `<text x="${x}" y="${H-4}" text-anchor="middle" font-size="8" fill="var(--muted)" font-family="DM Sans,sans-serif">S${i+1}</text>`;
+    if (m === null) return xLbl;
+    const y = yPos(m).toFixed(1);
+    const color = dotColor(m);
+    return xLbl
+      + `<circle cx="${x}" cy="${y}" r="4" fill="${color}" stroke="var(--bg)" stroke-width="1.5"/>`
+      + `<text x="${x}" y="${(parseFloat(y)-8).toFixed(1)}" text-anchor="middle" font-size="8" fill="${color}" font-family="DM Sans,sans-serif" font-weight="600">${m.toFixed(1)}</text>`;
+  }).join('');
+
+  const note = N === 1
+    ? `<div style="color:var(--muted);font-size:.78rem;text-align:center;margin-top:.3rem">Revenez après la prochaine séance pour voir votre courbe !</div>`
+    : '';
+
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+    ${refs}
+    ${pathD ? `<path d="${pathD}" fill="none" stroke="var(--border)" stroke-width="1.5" stroke-linejoin="round"/>` : ''}
+    ${elements}
+  </svg>${note}`;
 }
 
 // ═══════════════════════════════════════════════════

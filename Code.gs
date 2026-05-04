@@ -61,6 +61,7 @@ function doGet(e) {
     if (action === "validateAtelier") return jsonResponse(handleValidateAtelier(p));
     if (action === "saveBadge")        return jsonResponse(handleSaveBadge(p));
     if (action === "saveHistorique")   return jsonResponse(handleSaveHistorique(p));
+    if (action === "getProgression")   return jsonResponse(handleGetProgression(p));
     return jsonResponse({ error: "Action inconnue : " + action });
   } catch(err) {
     return jsonResponse({ error: err.toString() });
@@ -388,6 +389,34 @@ function calculerMoyenneRessentis(jsonStr) {
   } catch(e) {}
   if (count === 0) return "";
   return Math.round(sum / count * 100) / 100;
+}
+
+// ── Lire les moyennes de progression d'un élève ─────────────
+function handleGetProgression(p) {
+  const sheetName = p.classe + '_Historique';
+  const sheet = getSheet(sheetName);
+  if (!sheet) return { error: 'Onglet introuvable : ' + sheetName };
+
+  const data = sheet.getDataRange().getValues();
+  let rowIndex = -1;
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === p.nom && data[i][1] === p.prenom) {
+      rowIndex = i;
+      break;
+    }
+  }
+  if (rowIndex === -1) return { error: 'Élève introuvable' };
+
+  const row = data[rowIndex];
+  const moyennes = [];
+  for (let s = 1; s <= 12; s++) {
+    const colMoy = 3 + (s - 1) * 2 + 1;
+    const val = row[colMoy];
+    moyennes.push((val !== '' && val !== undefined && val !== null) ? Math.round(parseFloat(val) * 100) / 100 : null);
+  }
+  while (moyennes.length > 0 && moyennes[moyennes.length - 1] === null) moyennes.pop();
+
+  return { success: true, moyennes };
 }
 
 function updateLastCo(sheet, rowIndex) {
