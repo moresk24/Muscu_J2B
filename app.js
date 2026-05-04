@@ -1365,9 +1365,12 @@ async function buildMesBadges() {
 }
 
 function buildGraphiqueProgression(moyennes) {
+  // S1 et S2 = recherche du maxi, pas de ressenti → on part de S3 (index 2)
+  const DEBUT = 2;
+  moyennes = moyennes.slice(DEBUT);
   const N = moyennes.length;
   if (N === 0) {
-    return `<div style="color:var(--muted);font-size:.85rem;text-align:center;padding:.75rem 0;line-height:1.6">Votre progression apparaîtra<br>après votre première séance.</div>`;
+    return `<div style="color:var(--muted);font-size:.85rem;text-align:center;padding:.75rem 0;line-height:1.6">Votre progression apparaîtra<br>à partir de la séance 3.</div>`;
   }
 
   const W = 300, H = 130;
@@ -1418,7 +1421,7 @@ function buildGraphiqueProgression(moyennes) {
   const elements = moyennes.map((m, i) => {
     const x = xPos(i).toFixed(1);
     // Label X : S1, S2... + marqueur absence en dessous si A ou D
-    const sLabel = `<text x="${x}" y="${H-13}" text-anchor="middle" font-size="8" fill="var(--muted)" font-family="DM Sans,sans-serif">S${i+1}</text>`;
+    const sLabel = `<text x="${x}" y="${H-13}" text-anchor="middle" font-size="8" fill="var(--muted)" font-family="DM Sans,sans-serif">S${i+1+DEBUT}</text>`;
     const absLabel = (m === 'A' || m === 'D')
       ? `<text x="${x}" y="${H-3}" text-anchor="middle" font-size="8" fill="#e67e22" font-family="DM Sans,sans-serif" font-style="italic">${m === 'A' ? 'Abs' : 'Disp'}</text>`
       : `<text x="${x}" y="${H-3}" text-anchor="middle" font-size="8" fill="transparent" font-family="DM Sans,sans-serif">·</text>`;
