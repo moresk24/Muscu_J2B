@@ -1308,7 +1308,7 @@ async function buildMesBadges() {
   const totalSeances = total;
 
   pg.innerHTML = `
-    <div style="padding:1rem">
+    <div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;margin-bottom:1.2rem">🏅 Mes Badges</div>
 
       ${badge ? `
