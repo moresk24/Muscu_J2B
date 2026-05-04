@@ -1382,6 +1382,7 @@ function buildGraphiqueProgression(moyennes) {
   const xPos = i => N === 1 ? padL + chartW / 2 : padL + i * chartW / (N - 1);
   const dotColor = v => v < 1.67 ? '#2980b9' : v < 2.33 ? '#f39c12' : '#27ae60';
 
+  const x0 = xPos(0).toFixed(1); // position colonne S2 (vide)
   const refs = [
     {v:3, label:'TD', color:'#27ae60'},
     {v:2, label:'D',  color:'#f39c12'},
@@ -1389,7 +1390,7 @@ function buildGraphiqueProgression(moyennes) {
   ].map(({v, label, color}) => {
     const y = yPos(v).toFixed(1);
     return `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="${color}" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>
-            <text x="3" y="${(parseFloat(y)-3).toFixed(1)}" text-anchor="start" font-size="8" fill="${color}" font-family="DM Sans,sans-serif" font-weight="700">${label}</text>`;
+            <text x="${x0}" y="${(parseFloat(y)-3).toFixed(1)}" text-anchor="middle" font-size="8" fill="${color}" font-family="DM Sans,sans-serif" font-weight="700">${label}</text>`;
   }).join('');
 
   // Construire les segments de ligne : plein entre points consécutifs, pointillé à travers une absence
@@ -1421,7 +1422,7 @@ function buildGraphiqueProgression(moyennes) {
   const elements = moyennes.map((m, i) => {
     const x = xPos(i).toFixed(1);
     // Label X : S1, S2... + marqueur absence en dessous si A ou D
-    const sLabel = `<text x="${x}" y="${H-13}" text-anchor="middle" font-size="8" fill="var(--muted)" font-family="DM Sans,sans-serif">S${i+2}</text>`;
+    const sLabel = i === 0 ? '' : `<text x="${x}" y="${H-13}" text-anchor="middle" font-size="8" fill="var(--muted)" font-family="DM Sans,sans-serif">S${i+2}</text>`;
     const absLabel = (m === 'A' || m === 'D')
       ? `<text x="${x}" y="${H-3}" text-anchor="middle" font-size="8" fill="#e67e22" font-family="DM Sans,sans-serif" font-style="italic">${m === 'A' ? 'Abs' : 'Disp'}</text>`
       : `<text x="${x}" y="${H-3}" text-anchor="middle" font-size="8" fill="transparent" font-family="DM Sans,sans-serif">·</text>`;
