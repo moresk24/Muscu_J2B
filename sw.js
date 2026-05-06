@@ -1,4 +1,4 @@
-const CACHE = 'muscu-j2b-v9';
+const CACHE = 'muscu-j2b-v10';
 const ASSETS = ['./', './index.html', './styles.css', './data.js', './app.js', './manifest.json',
   './tuto.html', './lexique.html', './anatomie.html',
   './images/anatomie-muscles.png',
@@ -12,5 +12,8 @@ const ASSETS = ['./', './index.html', './styles.css', './data.js', './app.js', '
 self.addEventListener('install', e =>
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))));
 
-self.addEventListener('fetch', e =>
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
+self.addEventListener('fetch', e => {
+  // Ne pas intercepter les requêtes cross-origin (API Google Apps Script, etc.)
+  if (!e.request.url.startsWith(self.location.origin)) return;
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+});

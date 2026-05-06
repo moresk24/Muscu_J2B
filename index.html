@@ -140,8 +140,9 @@
 
 <!-- Loading overlay -->
 <div class="overlay hidden" id="loading" style="flex-direction:column;gap:1rem">
-  <div class="spinner"></div>
+  <div class="spinner" id="loading-spinner"></div>
   <div id="loading-msg" style="color:#fff;font-size:.88rem;text-align:center;line-height:1.5;display:none"></div>
+  <button id="loading-retry" onclick="initLogin()" style="display:none;margin-top:.5rem;padding:.6rem 1.4rem;border:none;border-radius:8px;background:#fff;color:#333;font-size:.95rem;font-weight:600;cursor:pointer">Réessayer</button>
 </div>
 
 <!-- Badge zoom overlay -->

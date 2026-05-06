@@ -124,9 +124,15 @@ function loading(show, msg) {
   else { m.style.display = 'none'; m.innerHTML = ''; }
 }
 
+function fetchWithTimeout(url, ms) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(timer));
+}
+
 async function api(params) {
   const url = WEBAPP + '?' + new URLSearchParams(params);
-  const r = await fetch(url);
+  const r = await fetchWithTimeout(url, 12000);
   return r.json();
 }
 async function apiPost(body) {
@@ -136,7 +142,7 @@ async function apiPost(body) {
     params[k] = (typeof v === 'object' && v !== null) ? JSON.stringify(v) : v;
   }
   const url = WEBAPP + '?' + new URLSearchParams(params);
-  const r = await fetch(url);
+  const r = await fetchWithTimeout(url, 12000);
   return r.json();
 }
 
@@ -146,10 +152,13 @@ function validateMdp(v) { return /^[a-z]{6,10}$/.test(v); }
 //  INIT CONNEXION
 // ═══════════════════════════════════════════════════
 async function initLogin() {
+  $('loading-retry').style.display = 'none';
+  $('loading-spinner').style.display = '';
   loading(true);
   try {
     const d = await api({action:'getClasses'});
     const sel = $('sel-classe');
+    sel.innerHTML = '<option value="">-- Choisir --</option>';
     (d.classes||[]).forEach(c => {
       const o = document.createElement('option');
       o.value = o.textContent = c;
@@ -167,7 +176,12 @@ async function initLogin() {
     }
     // Pas de login complet → pré-remplir classe et nom si connu
     await prefillForm(getPrefill(), classes);
-  } catch(e) { toast('Erreur de connexion au serveur','error'); }
+  } catch(e) {
+    loading(true, 'Impossible de joindre le serveur.<br>Vérifiez votre connexion.');
+    $('loading-spinner').style.display = 'none';
+    $('loading-retry').style.display = '';
+    return;
+  }
   loading(false);
 }
 
