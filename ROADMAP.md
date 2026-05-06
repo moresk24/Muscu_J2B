@@ -315,3 +315,49 @@ const ATELIERS = [
 Commencer par **Phase 1** pour améliorer l'UX, puis ajouter le contenu pédagogique progressivement.
 
 ---
+
+## 🔜 Évolution — Multi-profs (même établissement)
+
+### Vision
+Permettre à des collègues EPS du même lycée d'utiliser l'app avec leurs propres élèves, chacun ayant son propre Google Sheet / Apps Script backend.
+
+### Flux UX
+1. Écran de sélection du professeur (avant le login)
+2. L'élève choisit son prof → l'app pointe vers le bon backend (`WEBAPP` dynamique)
+3. Login classique ensuite (classe, nom, prénom, mdp)
+4. Le choix du prof est sauvegardé en `localStorage` pour ne pas le ressaisir à chaque fois
+
+### Architecture retenue
+- Un objet `PROFS` hardcodé dans `app.js` : `{ "Cuvelier": "https://...", "Dupont": "https://..." }`
+- Chaque collègue a son propre GSheet (copie du template) + son propre Apps Script déployé
+- Un seul frontend hébergé sur GitHub Pages (commun à tous)
+- Ajouter un prof = 1 ligne dans `PROFS` + commit
+
+### À faire côté Code.gs
+- Exclure les onglets `_Appel` de `getClasses` (ajouter `!n.endsWith('_Appel')` dans le filter)
+
+### Décision
+À implémenter quand un collègue est prêt à tester. Commencer par créer un GSheet "template" propre.
+
+---
+
+## 🔜 Migration — Compte Google EPS du lycée
+
+### Contexte
+Le GSheet et l'Apps Script sont actuellement sur le compte Google perso de Stève. L'objectif est de migrer sur le compte Google EPS du lycée (compte normal, sans restrictions) pour que les collègues y aient accès sans partage manuel.
+
+### Étapes
+1. Copier le GSheet sur le Drive du compte EPS (Fichier → Faire une copie)
+2. Ouvrir l'Apps Script depuis ce nouveau fichier (Extensions → Apps Script)
+3. Remplacer le code par `Code.gs` actuel
+4. Déployer en Web App (accès : "Tout le monde") depuis le compte EPS — accepter les permissions
+5. Copier la nouvelle URL → remplacer `WEBAPP` dans `app.js`
+6. Tester en navigation privée
+
+### Note
+Ne pas transférer la propriété du fichier original — faire une copie propre sur le compte EPS.
+
+### Décision
+À faire avant d'impliquer des collègues. Prérequis à la fonctionnalité multi-profs.
+
+---
