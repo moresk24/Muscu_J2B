@@ -3011,6 +3011,18 @@ function buildAtelierDetail() {
 // ═══════════════════════════════════════════════════
 initLogin();
 
+// BFCache : page restaurée depuis le cache (fermeture/réouverture PWA)
+// → relancer initLogin si l'écran de login est actif
+window.addEventListener('pageshow', e => {
+  if (e.persisted) {
+    const loginActive = $('screen-login').classList.contains('active');
+    const appActive   = $('screen-app').classList.contains('active');
+    if (loginActive || (!loginActive && !appActive)) {
+      initLogin();
+    }
+  }
+});
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js');
 }
