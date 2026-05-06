@@ -2230,8 +2230,9 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   if (sgEl && a) sgEl.innerHTML = buildSeriesHTML(a, maxi, localSeries);
 
   // 3. Règle 1 — Interruption immédiate (priorité absolue)
+  // En mode autonome : 2F consécutifs ne forcent pas la redirection (l'élève choisit librement)
   const interruption = detectInterruption(localSeries);
-  if (interruption.interrompu) {
+  if (interruption.interrompu && !(interruption.raison === 'sous-evalue' && !state.guidage)) {
     delete state.serieLocale[nomAtelier];
     saveSerieLocale();
     if (!state.maxisForces.includes(nomAtelier)) state.maxisForces.push(nomAtelier);
