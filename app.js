@@ -151,7 +151,10 @@ function validateMdp(v) { return /^[a-z]{6,10}$/.test(v); }
 // ═══════════════════════════════════════════════════
 //  INIT CONNEXION
 // ═══════════════════════════════════════════════════
+let _initLoginRunning = false;
 async function initLogin() {
+  if (_initLoginRunning) return;
+  _initLoginRunning = true;
   $('loading-retry').style.display = 'none';
   $('loading-spinner').style.display = '';
   loading(true);
@@ -172,6 +175,7 @@ async function initLogin() {
       loading(false);
       const connected = await autoConnect(saved, classes);
       if (!connected) await prefillForm(getPrefill(), classes);
+      _initLoginRunning = false;
       return;
     }
     // Pas de login complet → pré-remplir classe et nom si connu
@@ -180,8 +184,10 @@ async function initLogin() {
     loading(true, 'Impossible de joindre le serveur.<br>Vérifiez votre connexion.');
     $('loading-spinner').style.display = 'none';
     $('loading-retry').style.display = '';
+    _initLoginRunning = false;
     return;
   }
+  _initLoginRunning = false;
   loading(false);
 }
 
@@ -3011,15 +3017,12 @@ function buildAtelierDetail() {
 // ═══════════════════════════════════════════════════
 initLogin();
 
-// BFCache : page restaurée depuis le cache (fermeture/réouverture PWA)
-// → relancer initLogin si l'écran de login est actif
-window.addEventListener('pageshow', e => {
-  if (e.persisted) {
-    const loginActive = $('screen-login').classList.contains('active');
-    const appActive   = $('screen-app').classList.contains('active');
-    if (loginActive || (!loginActive && !appActive)) {
-      initLogin();
-    }
+// Reprise d'app (swipe recents Samsung, backgrounding, BFCache)
+// → si le spinner est visible quand l'app revient au premier plan, relancer initLogin
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && !$('loading').classList.contains('hidden')) {
+    _initLoginRunning = false;
+    initLogin();
   }
 });
 
