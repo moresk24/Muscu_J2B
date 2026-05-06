@@ -361,3 +361,25 @@ Ne pas transférer la propriété du fichier original — faire une copie propre
 À faire avant d'impliquer des collègues. Prérequis à la fonctionnalité multi-profs.
 
 ---
+
+## ✅ Session du 06/05/2026 — Robustesse PWA + alertes mode autonome
+
+### Robustesse réseau / PWA
+
+- `fetchWithTimeout(url, 12000)` : timeout 12s via `AbortController` sur tous les appels `api()` et `apiPost()`
+- Bouton "Réessayer" dans l'overlay de chargement (spinner masqué, message affiché en cas d'erreur réseau)
+- SW : ne plus intercepter les requêtes cross-origin (Google Apps Script) → elles vont directement au réseau
+- SW : `skipWaiting()` + `clients.claim()` → mise à jour immédiate sans fermer/rouvrir l'app
+- SW : `activate` nettoie les anciens caches (v1 à v9) → cache bumped `v9` → `v10`
+- `visibilitychange` listener : si le spinner est visible quand l'app revient au premier plan → relance `initLogin()` (corrige le spinner figé Samsung)
+- `_initLoginRunning` flag : empêche deux appels simultanés à `initLogin()`
+- **Comportement connu** : fermeture brutale de la PWA sur Samsung peut encore bloquer → les élèves doivent utiliser la Déconnexion ☰. Si bloqué : vider le cache Chrome.
+
+### Alertes mode autonome (`state.guidage = false`)
+
+- **2 F consécutifs** : ne forcent plus la redirection vers le maxi (fix `detectInterruption`) — l'élève reste libre
+- **2 F cumulés (mid-atelier)** : warning jaune au-dessus des roulettes "Attention, choisissez mieux vos couples Charge/Reps pour atteindre TD"
+- **Charge max + reps max + F (mid-atelier)** : warning bleu "Votre maxi semble sous-évalué, pensez à faire une nouvelle recherche de maxi" — prioritaire sur le warning 2F
+- **Fin atelier sans TD** : warning jaune sous la bravo-box
+- **Fin atelier 4 F** : warning rouge sous la bravo-box (message plus fort)
+- Les alertes utilisent `innerHTML` → balises `<strong>`, `<br>` acceptées dans les messages
