@@ -2293,6 +2293,24 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
         if (bravoText) bravoText.textContent = '👍 Bien joué !';
         if (bravoSub)  bravoSub.textContent  = 'Cherchez le TD dès la S3 la prochaine fois pour progresser.';
       }
+
+      // Mode autonome — alertes effort insuffisant (ajoutées sous le message bravo)
+      if (!state.guidage && state.projet && bravoSub) {
+        const nbF  = localSeries.filter(s => s && s.ressenti === 'F').length;
+        const nbTD = localSeries.filter(s => s && s.ressenti === 'TD').length;
+        let alertMsg = '';
+        let alertColor = 'var(--yellow)';
+        if (nbF >= 4) {
+          alertMsg = 'Toutes vos séries étaient <strong>Facile</strong>. Augmentez significativement la charge ou les répétitions à la prochaine séance pour progresser.';
+          alertColor = 'var(--red)';
+        } else if (nbTD === 0) {
+          alertMsg = 'Vous n\'avez pas atteint le <strong>Très Difficile</strong> sur cet atelier. Choisissez mieux vos couples Charge/Reps pour atteindre l\'effort maximum (TD).';
+        }
+        if (alertMsg) {
+          bravoSub.innerHTML = bravoSub.textContent +
+            `<div style="margin-top:.6rem;padding:.5rem .7rem;background:rgba(243,156,18,.1);border-left:3px solid ${alertColor};border-radius:4px;font-size:.82rem;color:var(--text);text-align:left">⚠️ ${alertMsg}</div>`;
+        }
+      }
     }
 
     validateAtelier(nomAtelier);
@@ -2303,6 +2321,25 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   const suggType = showSuggestion(nomAtelier, key, unite, ressenti, serieIndex + 1, charge, reps, serieIntensite || state.intensite);
   const pasDeTimer = suggType === 'fd-plafond-f' || suggType === 'e-plafond-bas';
   if (!pasDeTimer) startRecupTimer(key, nomAtelier);
+
+  // Mode autonome — alertes mid-atelier (ajoutées au-dessus des roulettes)
+  if (!state.guidage && state.projet) {
+    const nbF  = localSeries.filter(s => s && s.ressenti === 'F').length;
+    const p    = PROJETS[state.projet];
+    const maxi = parseFloat(state.maxis[nomAtelier]) || 0;
+    const sugBox = document.getElementById('sug-' + key);
+    if (sugBox) {
+      let warnHtml = '';
+      // Alert charge max + reps max + F → maxi sous-évalué (prioritaire)
+      if (ressenti === 'F' && maxi > 0 && reps >= p.repsMax && charge >= maxi) {
+        warnHtml = `<div style="margin-bottom:.6rem;padding:.5rem .7rem;background:rgba(52,152,219,.1);border-left:3px solid var(--blue);border-radius:4px;font-size:.82rem;color:var(--text)">💡 Votre maxi semble sous-évalué, pensez à faire une nouvelle recherche de maxi.</div>`;
+      // Alert 2 F cumulés
+      } else if (nbF >= 2) {
+        warnHtml = `<div style="margin-bottom:.6rem;padding:.5rem .7rem;background:rgba(243,156,18,.1);border-left:3px solid var(--yellow);border-radius:4px;font-size:.82rem;color:var(--text)">⚠️ Attention, vous devez mieux choisir vos couples Charge/Reps pour atteindre l'effort maximum (TD).</div>`;
+      }
+      if (warnHtml) sugBox.insertAdjacentHTML('afterbegin', warnHtml);
+    }
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
