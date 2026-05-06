@@ -2305,7 +2305,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
           alertMsg = 'Toutes vos séries étaient <strong>Facile</strong>. Augmentez significativement la charge ou les répétitions à la prochaine séance pour progresser.';
           alertColor = 'var(--red)';
         } else if (nbTD === 0) {
-          alertMsg = 'Vous n\'avez pas atteint le <strong>Très Difficile</strong> sur cet atelier. Choisissez mieux vos couples Charge/Reps pour atteindre l\'effort maximum (TD).';
+          alertMsg = 'Vous n\'avez pas atteint le <strong>Très Difficile</strong> sur cet atelier.<br>Choisissez mieux vos couples Charge/Reps pour atteindre l\'effort maximum -> TD.';
         }
         if (alertMsg) {
           bravoSub.innerHTML = bravoSub.textContent +
