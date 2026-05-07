@@ -3064,10 +3064,18 @@ function buildAtelierDetail() {
 // ═══════════════════════════════════════════════════
 initLogin();
 
-// Reprise d'app (swipe recents Samsung, backgrounding, BFCache)
+// Reprise d'app (swipe recents Samsung, backgrounding)
 // → si le spinner est visible quand l'app revient au premier plan, relancer initLogin
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && !$('loading').classList.contains('hidden')) {
+    _initLoginRunning = false;
+    initLogin();
+  }
+});
+
+// Restauration BFCache Safari (refresh ou navigation arrière)
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) {
     _initLoginRunning = false;
     initLogin();
   }
