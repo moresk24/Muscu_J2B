@@ -531,6 +531,7 @@ function buildMaxis() {
   const nbDispo = ATELIERS.filter(a => state.maxis[a.nom] !== 'B').length;
   const maxisFilled = ATELIERS.filter(a => isMaxiValid(a, state.maxis[a.nom]) && state.maxis[a.nom] !== 'B').length;
   const allFilled = maxisAllFilled();
+  const maxisReallyFilled = ATELIERS.every(a => isMaxiValid(a, state.maxis[a.nom]));
 
   let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;margin-bottom:.5rem">💪 Mes Maxis <span style="color:var(--accent)">(1RM)</span></div>
   <div style="font-size:.78rem;color:var(--muted);line-height:1.55;margin-bottom:.9rem"><strong style="color:var(--text)">MAXI :</strong> c'est le poids maximum que vous pouvez soulever <strong style="color:var(--text)">une seule fois</strong> (1RM) sur un atelier, dans une exécution correcte.<br>C'est votre référence personnelle pour calculer ensuite vos charges de travail en fonction de votre projet.</div>
@@ -541,7 +542,7 @@ function buildMaxis() {
     <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${nbDispo > 0 ? (maxisFilled/nbDispo*100).toFixed(0) : 0}%"></div></div>
   </div>`;
 
-  if (allFilled && !state.projet) {
+  if (maxisReallyFilled && !state.projet) {
     html += `<div class="congrats-banner">
       <div class="congrats-banner-emoji">🎉</div>
       <div class="congrats-banner-title">Bravo ! Tous vos maxis sont renseignés !</div>
