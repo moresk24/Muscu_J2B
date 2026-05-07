@@ -34,6 +34,7 @@
   --muted:    #7070a0;
   --haut:     #2570e8;
   --bas:      #e8581a;
+  --drum-fade: #ffffff;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
@@ -377,8 +378,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .drum-picker::before,.drum-picker::after{
   content:'';position:absolute;left:0;right:0;height:64px;z-index:2;pointer-events:none;
 }
-.drum-picker::before{top:0;background:linear-gradient(to bottom,rgba(22,22,31,.95),transparent)}
-.drum-picker::after{bottom:0;background:linear-gradient(to top,rgba(22,22,31,.95),transparent)}
+.drum-picker::before{top:0;background:linear-gradient(to bottom,var(--drum-fade,rgba(22,22,31,.95)),transparent)}
+.drum-picker::after{bottom:0;background:linear-gradient(to top,var(--drum-fade,rgba(22,22,31,.95)),transparent)}
 .drum-highlight{
   position:absolute;top:64px;left:8px;right:8px;height:32px;
   border-top:1px solid var(--accent);border-bottom:1px solid var(--accent);
