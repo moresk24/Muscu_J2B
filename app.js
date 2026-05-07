@@ -1899,7 +1899,7 @@ function buildSeance() {
 
   // Ateliers — cartes simples cliquables (détail sur page dédiée)
   let lastGroupe = null;
-  ATELIERS.filter(a => state.maxis[a.nom] !== 'B').forEach(a => {
+  ATELIERS.filter(a => state.maxis[a.nom] !== 'B' && isMaxiValid(a, state.maxis[a.nom])).forEach(a => {
     if (a.groupe !== lastGroupe) {
       lastGroupe = a.groupe;
       html += `<div class="section-title">${a.groupe==='haut'?'🏋️ Haut du corps':'🦵 Bas du corps'}</div>`;
