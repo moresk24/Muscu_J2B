@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide Enseignant — Muscu J2B</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; background: #f5f5f7; color: #1a1a2e; line-height: 1.7; }
+  h1 { font-size: 2rem; color: #e8581a; border-bottom: 3px solid #e8581a; padding-bottom: .5rem; margin-bottom: 1.5rem; }
+  h2 { font-size: 1.4rem; color: #fff; background: #1a1a2e; padding: .6rem 1rem; border-radius: 8px; margin-top: 2.5rem; }
+  h3 { font-size: 1.1rem; color: #e8581a; margin-top: 1.5rem; border-left: 4px solid #e8581a; padding-left: .75rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  th { background: #1a1a2e; color: #fff; padding: .6rem .9rem; text-align: left; font-size: .85rem; }
+  td { padding: .55rem .9rem; border-bottom: 1px solid #eee; font-size: .9rem; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #f9f9fb; }
+  code { background: #eee; padding: .15rem .4rem; border-radius: 4px; font-family: monospace; font-size: .88rem; color: #c0392b; }
+  pre { background: #1a1a2e; color: #f0f0f0; padding: 1rem 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .88rem; line-height: 1.6; margin: 1rem 0; }
+  .checklist { background: #fff; border-radius: 8px; padding: 1rem 1.2rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin: 1rem 0; }
+  .checklist li { margin: .4rem 0; }
+  .tag { display: inline-block; padding: .15rem .5rem; border-radius: 4px; font-size: .78rem; font-weight: 700; margin-right: .3rem; }
+  .tag-ok { background: #d4f5e2; color: #1a7a40; }
+  .tag-warn { background: #fff3cd; color: #856404; }
+  .tag-info { background: #cce5ff; color: #004085; }
+  .note { background: #fff8e1; border-left: 4px solid #f39c12; padding: .7rem 1rem; border-radius: 0 8px 8px 0; margin: 1rem 0; font-size: .9rem; }
+  ul, ol { padding-left: 1.5rem; margin: .5rem 0; }
+  li { margin: .3rem 0; }
+  p { margin: .7rem 0; }
+  hr { border: none; border-top: 2px solid #e0e0e8; margin: 2rem 0; }
+</style>
+</head>
+<body>
+
+<h1>📋 Guide Enseignant — Muscu J2B</h1>
+<p>Ce document décrit la structure du Google Sheet et les conventions à respecter pour que l'application fonctionne correctement.</p>
+
+<hr>
+
+<h2>⚙️ Onglet <code>Config</code></h2>
+<p>C'est l'onglet de configuration globale. Il contient les paramètres de l'admin et le planning de chaque classe.</p>
+
+<h3>Ligne 1 — Mot de passe admin</h3>
+<table>
+  <tr><th>Col A</th><th>Col B</th></tr>
+  <tr><td>ADMIN</td><td>mot_de_passe_admin</td></tr>
+</table>
+<p>Le mot de passe admin permet de se connecter depuis n'importe quel compte élève. Il donne accès à toutes les pages sans restriction et bypass le verrou des maxis.</p>
+
+<h3>Lignes suivantes — Une classe = deux lignes</h3>
+<p><strong>Ligne 1 (paramètres de la classe) :</strong></p>
+<table>
+  <tr><th>Col A</th><th>Col B</th><th>Col C</th><th>Col D</th><th>Col E</th><th>Col F…</th></tr>
+  <tr><td>Nom de la classe</td><td>Accès Appli ✓/☐</td><td>Horaire début</td><td>Horaire fin</td><td>Date séance 1</td><td>Date séance 2…</td></tr>
+</table>
+<p><strong>Ligne 2 (statut des séances) :</strong></p>
+<table>
+  <tr><th>Col A</th><th>Col B</th><th>Col C</th><th>Col D</th><th>Col E</th><th>Col F…</th></tr>
+  <tr><td>Label libre (ex: ton nom)</td><td><em>vide</em></td><td><em>vide</em></td><td><em>vide</em></td><td>ok / vide</td><td>ok / vide…</td></tr>
+</table>
+
+<h3>Règles importantes</h3>
+<ul>
+  <li><strong>Accès Appli</strong> : case à cocher. ✓ (TRUE) = accès autorisé. ☐ (FALSE) = app bloquée pour les élèves. L'admin garde toujours l'accès.</li>
+  <li><strong>Horaires</strong> : format <code>10h05</code> ou <code>10:05</code>. Définissent la plage horaire pendant laquelle une séance est active.</li>
+  <li><strong>Dates</strong> : format <code>jj/mm/aa</code>.</li>
+  <li><strong>Statut "ok"</strong> : écrire exactement <code>ok</code> (minuscules) sous une date pour que l'app la reconnaisse comme une séance valide. <span class="tag tag-warn">⚠️ Sans "ok", même si la date et l'heure correspondent, la séance n'est pas active.</span></li>
+  <li><strong>Séance active</strong> = date du jour + statut "ok" + heure actuelle dans la plage horaire.</li>
+  <li><strong>Numéro de séance</strong> = nombre de dates avec statut "ok" passées ou en cours (S1, S2, S3…). S1 et S2 = recherche de maxi (non comptées dans le graphique de progression).</li>
+</ul>
+
+<h3>Exemple</h3>
+<pre>Ligne 1 :  ADMIN      |  1234
+
+Ligne 3 :  2BPRO  |  ✓  |  10h05  |  11h40  |  10/03/26  |  17/03/26  |  24/03/26  |  31/03/26
+Ligne 4 :  Cuvelier   |     |         |         |  ok        |  ok        |  ok        |  (vide)</pre>
+<p>→ 3 séances validées (S1, S2, S3). La séance S4 du 31/03/26 sera active uniquement si tu écris "ok" et que l'heure correspond.</p>
+
+<hr>
+
+<h2>🗂️ Onglets de classe (ex : <code>2BPRO</code>)</h2>
+<p>Un onglet par classe. Chaque ligne = un élève.</p>
+
+<h3>Structure des colonnes</h3>
+<table>
+  <tr><th>Index</th><th>Colonne</th><th>Contenu</th></tr>
+  <tr><td>0</td><td>A</td><td>Nom</td></tr>
+  <tr><td>1</td><td>B</td><td>Prénom</td></tr>
+  <tr><td>2</td><td>C</td><td>Classe</td></tr>
+  <tr><td>3</td><td>D</td><td>Mot de passe (hashé SHA-256)</td></tr>
+  <tr><td>4</td><td>E</td><td>Guidage ✓/☐ — ✓ = mode guidé (app propose), ☐ = mode autonome (élève choisit)</td></tr>
+  <tr><td>5</td><td>F</td><td>Statut : vide = normal · <code>D</code> = dispensé · <code>B</code> = blessé</td></tr>
+  <tr><td>6</td><td>G</td><td>Numéro de projet (1, 2, 3A, 3B)</td></tr>
+  <tr><td>7</td><td>H</td><td>Compteur global d'ateliers validés (cycle entier)</td></tr>
+  <tr><td>8</td><td>I</td><td>Date de dernière connexion</td></tr>
+  <tr><td>9</td><td>J</td><td>Dernier badge obtenu (<code>Bronze</code> / <code>Argent</code> / <code>Or</code>)</td></tr>
+  <tr><td>10</td><td>K</td><td>Nb badges Carton</td></tr>
+  <tr><td>11</td><td>L</td><td>Nb badges Bronze</td></tr>
+  <tr><td>12</td><td>M</td><td>Nb badges Argent</td></tr>
+  <tr><td>13</td><td>N</td><td>Nb badges Or</td></tr>
+  <tr><td>14–45</td><td>O–AS</td><td>Maxis et séries des 16 ateliers (paires : maxi + nb séries validées)</td></tr>
+  <tr><td>46</td><td>AT</td><td>JSON historique de la dernière séance validée</td></tr>
+</table>
+
+<h3>Les 16 ateliers (colonnes O–AS, paires maxi/séries)</h3>
+<table>
+  <tr><th>#</th><th>Atelier</th><th>Type</th></tr>
+  <tr><td>1</td><td>Développé Couché</td><td>Standard (kg)</td></tr>
+  <tr><td>2</td><td>Développé Incliné</td><td>Standard (kg)</td></tr>
+  <tr><td>3</td><td>Pull-Down Nuque</td><td>Standard (kg)</td></tr>
+  <tr><td>4</td><td>Pull-Down Poitrine</td><td>Standard (kg)</td></tr>
+  <tr><td>5</td><td>Butterfly</td><td>Standard (kg)</td></tr>
+  <tr><td>6</td><td>Banc Tirage Biceps</td><td>Standard (kg)</td></tr>
+  <tr><td>7</td><td>Machine Biceps</td><td>Standard (kg)</td></tr>
+  <tr><td>8</td><td>Deltoïdes (haltères)</td><td>Standard (kg)</td></tr>
+  <tr><td>9</td><td>Banc à Lombaires</td><td>Spécial — 30 rép. sur 1 min (kg additionnel)</td></tr>
+  <tr><td>10</td><td>Gainage sol</td><td>Spécial — niveaux 1 à 4</td></tr>
+  <tr><td>11</td><td>Abdo Sol</td><td>Spécial — 30 rép. sur 1 min (kg additionnel)</td></tr>
+  <tr><td>12</td><td>Banc Ischio Jambiers</td><td>Standard (kg)</td></tr>
+  <tr><td>13</td><td>Chaise à ADDucteurs</td><td>Standard (kg)</td></tr>
+  <tr><td>14</td><td>Chaise à ABDucteurs</td><td>Standard (kg)</td></tr>
+  <tr><td>15</td><td>Chaise à Quadriceps</td><td>Standard (kg)</td></tr>
+  <tr><td>16</td><td>Presse Inclinée</td><td>Standard (kg)</td></tr>
+</table>
+
+<h3>Valeurs spéciales dans la colonne maxi</h3>
+<ul>
+  <li><code>B</code> : atelier <strong>bloqué</strong> — n'apparaît pas dans Maxis ni en Séances (machine en panne, indisponible)</li>
+  <li><code>0</code> : valide uniquement pour Banc à Lombaires, Abdo Sol et Gainage sol</li>
+  <li><em>Vide</em> : maxi non renseigné → l'atelier n'apparaît pas en Séances</li>
+</ul>
+
+<hr>
+
+<h2>📊 Onglets <code>[Classe]_Historique</code></h2>
+<p>Un onglet par classe, créé manuellement. Stocke l'historique des séances pour le graphique de progression.</p>
+
+<h3>Structure</h3>
+<table>
+  <tr><th>Index</th><th>Contenu</th></tr>
+  <tr><td>0</td><td>Nom</td></tr>
+  <tr><td>1</td><td>Prénom</td></tr>
+  <tr><td>2</td><td>Réservé</td></tr>
+  <tr><td>3</td><td>S1 — JSON de séance</td></tr>
+  <tr><td>4</td><td>S1 — Moyenne ressentis</td></tr>
+  <tr><td>5</td><td>S2 — JSON de séance</td></tr>
+  <tr><td>6</td><td>S2 — Moyenne ressentis</td></tr>
+  <tr><td>…</td><td>S{n} JSON = index <code>3 + (n-1)×2</code>, moyenne = index suivant</td></tr>
+</table>
+
+<h3>Valeurs spéciales dans les colonnes JSON</h3>
+<ul>
+  <li><code>A</code> : élève <strong>absent</strong> — affiché comme absence dans le graphique</li>
+  <li><code>D</code> : élève <strong>dispensé</strong> — affiché comme dispense dans le graphique</li>
+  <li><em>Vide</em> : séance non effectuée</li>
+</ul>
+
+<div class="note">Le graphique de progression commence à S3 (S1 et S2 sont des séances de recherche de maxi). La moyenne exclut les ressentis E et les ateliers spéciaux.</div>
+
+<hr>
+
+<h2>🎯 Projets disponibles</h2>
+<table>
+  <tr><th>Numéro</th><th>Nom</th><th>Intensité</th><th>Objectif</th></tr>
+  <tr><td>1</td><td>SPORTIF</td><td>80–90 % du maxi</td><td>Force et puissance</td></tr>
+  <tr><td>2</td><td>ESTHÉTIQUE</td><td>65–80 % du maxi</td><td>Hypertrophie</td></tr>
+  <tr><td>3A</td><td>SANTÉ Endurance</td><td>40–50 % du maxi</td><td>Endurance musculaire</td></tr>
+  <tr><td>3B</td><td>SANTÉ Tonification</td><td>50–65 % du maxi</td><td>Tonification</td></tr>
+</table>
+
+<h2>🏅 Badges</h2>
+<table>
+  <tr><th>Badge</th><th>Condition</th></tr>
+  <tr><td>🥉 Bronze</td><td>Moins de 5 ateliers validés en une séance</td></tr>
+  <tr><td>🥈 Argent</td><td>Exactement 5 ateliers validés</td></tr>
+  <tr><td>🥇 Or</td><td>6 ateliers ou plus validés</td></tr>
+</table>
+<p>Un atelier est validé quand l'élève complète ses <strong>4 séries</strong>.</p>
+
+<hr>
+
+<h2>✅ Checklist — Ajouter une nouvelle classe</h2>
+<div class="checklist">
+  <ol>
+    <li>Créer un onglet dans le GSheet avec le nom exact de la classe (ex : <code>2BPRO</code>)</li>
+    <li>Ajouter la ligne d'en-tête des colonnes (voir structure ci-dessus)</li>
+    <li>Saisir les élèves (nom, prénom, classe) — le mot de passe sera défini à la première connexion</li>
+    <li>Créer l'onglet <code>2BPRO_Historique</code> avec la même liste d'élèves (colonnes A et B)</li>
+    <li>Dans l'onglet Config, ajouter les deux lignes de la classe (paramètres + statuts)</li>
+    <li>Cocher "Accès Appli" pour autoriser l'accès</li>
+    <li>Ajouter les dates des séances et écrire <code>ok</code> au fur et à mesure</li>
+  </ol>
+</div>
+
+<h2>✅ Checklist — Démarrer une séance</h2>
+<div class="checklist">
+  <ol>
+    <li>Dans l'onglet Config, écrire <code>ok</code> sous la date du jour dans la ligne de statut</li>
+    <li>Vérifier que les horaires correspondent bien au créneau</li>
+    <li>Vérifier que "Accès Appli" est coché</li>
+    <li>Les élèves peuvent se connecter — l'app passe en mode édition automatiquement</li>
+  </ol>
+</div>
+
+<h2>✅ Checklist — Période d'évaluation théorique</h2>
+<div class="checklist">
+  <ol>
+    <li>Dans l'onglet Config, <strong>décocher</strong> "Accès Appli" pour la classe concernée</li>
+    <li>Les élèves voient un écran "Application indisponible pendant la période d'évaluation théorique"</li>
+    <li>L'admin garde l'accès normalement</li>
+    <li>Recocher la case quand la période d'évaluation est terminée</li>
+  </ol>
+</div>
+
+</body>
+</html>

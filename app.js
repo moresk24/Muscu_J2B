@@ -436,7 +436,9 @@ function showPage(name) {
   _previousPage = _currentPage;
   _currentPage  = name;
   PAGES.forEach(p => {
-    $('page-'+p).style.display = p===name ? 'block' : 'none';
+    const el = $('page-'+p);
+    el.style.display = p===name ? 'block' : 'none';
+    if (p===name) el.scrollTop = 0;
   });
   document.querySelectorAll('.nav-btn').forEach(b => {
     b.classList.toggle('active',
