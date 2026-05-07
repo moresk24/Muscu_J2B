@@ -238,16 +238,20 @@ function handleGetConfig(classe) {
     return d1.getDate()===d2.getDate() && d1.getMonth()===d2.getMonth() && d1.getFullYear()===d2.getFullYear();
   }
 
-  const debutMin = parseMinutes(classRow[1]);
-  const finMin   = parseMinutes(classRow[2]);
+  // Col B (index 1) : Accès Appli (case à cocher)
+  const accesVal = classRow[1];
+  const acces = accesVal === false || accesVal === 'FALSE' || accesVal === 'false' ? false : true;
+
+  const debutMin = parseMinutes(classRow[2]);
+  const finMin   = parseMinutes(classRow[3]);
   const now      = new Date();
   const nowMin   = now.getHours() * 60 + now.getMinutes();
 
   let sessionNumber = 0;
   let isActive = false;
 
-  // Les dates commencent à la colonne D (index 3)
-  for (let col = 3; col < classRow.length; col++) {
+  // Les dates commencent à la colonne E (index 4)
+  for (let col = 4; col < classRow.length; col++) {
     const dateVal = classRow[col];
     if (!dateVal) continue;
     const date   = (dateVal instanceof Date) ? dateVal : new Date(dateVal);
@@ -265,7 +269,7 @@ function handleGetConfig(classe) {
     }
   }
 
-  return { adminMdp, isActive, sessionNumber };
+  return { adminMdp, isActive, sessionNumber, acces };
 }
 
 // ════════════════════════════════════════════════════════════

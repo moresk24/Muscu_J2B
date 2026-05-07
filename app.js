@@ -62,6 +62,7 @@ function startSessionCheck() {
     if (!state.classe || state.isAdmin) return;
     try {
       const d = await api({action:'getConfig', classe: state.classe});
+      if (d.acces === false) { showAccesBloque(); return; }
       const wasActive = state.isActive;
       state.isActive = d.isActive;
       if (wasActive && !state.isActive && state.compteurAteliersSeance > 0) {
@@ -85,6 +86,7 @@ async function loadConfig() {
     state.isActive    = d.isActive    || false;
     state.sessionNumber = d.sessionNumber || 0;
     state.isAdmin     = d.adminMdp && state.mdp === d.adminMdp.toString().trim();
+    if (d.acces === false && !state.isAdmin) { showAccesBloque(); return; }
   } catch(e) { console.error('Config error', e); }
   updateTopbarSeance();
 }
@@ -117,6 +119,12 @@ function toast(msg, type='ok') {
   setTimeout(()=>t.classList.add('show'),10);
   toastTimer = setTimeout(()=>t.classList.remove('show'), type==='warn' ? 8000 : 3000);
 }
+function showAccesBloque() {
+  stopSessionCheck();
+  loading(false);
+  $('acces-bloque').classList.remove('hidden');
+}
+
 function loading(show, msg) {
   $('loading').classList.toggle('hidden', !show);
   const m = $('loading-msg');
