@@ -780,7 +780,7 @@ function buildMaxiCalc() {
           const charge = _calcDrum.charge;
           const reps   = _calcDrum.reps;
           const rm = Math.ceil(charge / (1.0278 - 0.0278 * reps));
-          result.textContent = `${a.nom} : votre maxi théorique est ${rm} kg`;
+          result.innerHTML = `${a.nom} :<br><span class="calc-result-value">${rm} kg</span>`;
           result.classList.add('visible');
           btnValid.style.display = 'block';
           btnValid.dataset.value = rm;

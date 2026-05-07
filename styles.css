@@ -425,9 +425,13 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 }
 .calc-mode-tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
 .calc-result{
-  background:rgba(255,107,43,.08);border:1px solid rgba(255,107,43,.25);
-  border-radius:12px;padding:.9rem 1rem;margin:1rem 0;
-  font-size:1rem;font-weight:600;text-align:center;color:var(--text);display:none;
+  background:rgba(255,107,43,.15);border:2px solid rgba(255,107,43,.6);
+  border-radius:12px;padding:1.1rem 1rem;margin:1rem 0;
+  font-size:.95rem;font-weight:600;text-align:center;color:var(--text);display:none;
+}
+.calc-result-value{
+  display:block;font-size:2rem;font-weight:800;color:var(--accent);
+  font-family:'Bebas Neue',sans-serif;letter-spacing:.05em;margin-top:.3rem;
 }
 .calc-result.visible{display:block}
 /* Ateliers maxis — lecture seule + cliquable */
