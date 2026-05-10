@@ -648,7 +648,10 @@ function buildMaxiCalc() {
   const type = getAtelierType(a.nom);
   const pg = $('page-maxi-calc');
 
-  const chargeValsCalc = Array.from({length: 150}, (_, i) => i + 1);
+  const chargeValsCalc = [
+    ...Array.from({length: 28}, (_, i) => Math.round((0.5 + i * 0.5) * 10) / 10), // 0.5 → 14.5 par 0.5
+    ...Array.from({length: 136}, (_, i) => 15 + i)                                  // 15 → 150 par 1
+  ];
   const repsValsCalc   = Array.from({length: 12},  (_, i) => i + 4);
 
   function render() {
