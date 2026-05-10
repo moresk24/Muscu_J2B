@@ -632,10 +632,10 @@ function maxisAllFilled() {
 let _calcMode = 1;
 let _calcDrum = { charge: 40, reps: 10 };
 let _forcedRecalc = false;
-function goToMaxiCalc(idx) {
+function goToMaxiCalc(idx, forced = false) {
   state.currentCalcAtelier = idx;
   _calcMode = 1;
-  _forcedRecalc = false;
+  _forcedRecalc = forced;
   showPage('maxi-calc');
 }
 
@@ -2258,7 +2258,8 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
     if (!state.maxisForces.includes(nomAtelier)) state.maxisForces.push(nomAtelier);
     if (state.suggestionEnAttente) delete state.suggestionEnAttente[nomAtelier];
     if (state.suggestionEnCours) state.suggestionEnCours[nomAtelier] = false;
-    if (sgEl && a) sgEl.innerHTML = buildSeriesHTML(a, 0, []);
+    const seriesSec = document.getElementById('series-section-' + key);
+    if (seriesSec) seriesSec.style.display = 'none';
 
     const sugBox = document.getElementById('sug-' + key);
     if (sugBox) {
@@ -2672,7 +2673,7 @@ function appliquerChoixReps(nomAtelier, key, unite, ressenti, currentCharge, cur
 function allerAuxMaxis(nomAtelier) {
   const idx = ATELIERS.findIndex(a => a.nom === nomAtelier);
   if (idx !== -1) {
-    goToMaxiCalc(idx);
+    goToMaxiCalc(idx, true);
   } else {
     showPage('maxis');
   }
@@ -2681,7 +2682,6 @@ function allerAuxMaxis(nomAtelier) {
 function resetEtRecalculerMaxi(nomAtelier) {
   delete state.serieLocale[nomAtelier];
   saveSerieLocale();
-  _forcedRecalc = true;
   allerAuxMaxis(nomAtelier);
 }
 
@@ -2949,17 +2949,19 @@ function buildAtelierDetail() {
         ${rows}
       </div>`;
     })()}
-    <div class="atelier-bloc-title">${state.historiqueAteliers[nom] && !Array.isArray(state.historiqueAteliers[nom]) && (state.historiqueAteliers[nom].seance !== state.sessionNumber || state.sessionNumber === 0) ? '🏋️ Aujourd\'hui :' : '🏋️ Vos séries à cet atelier'}</div>
-    <div class="recup-timer" id="rt-${key}">
-      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.3rem">⏱ Récupération</div>
-      <div style="display:flex;justify-content:center">
-        <div style="display:flex;align-items:center;gap:.5rem">
-          <div class="recup-timer-count" id="rt-count-${key}">—</div>
-          <button class="btn" style="width:auto;padding:.4rem .8rem;font-size:.78rem;background:var(--blue)" onclick="stopRecupTimer('${key}')">Passer →</button>
+    <div id="series-section-${key}">
+      <div class="atelier-bloc-title">${state.historiqueAteliers[nom] && !Array.isArray(state.historiqueAteliers[nom]) && (state.historiqueAteliers[nom].seance !== state.sessionNumber || state.sessionNumber === 0) ? '🏋️ Aujourd\'hui :' : '🏋️ Vos séries à cet atelier'}</div>
+      <div class="recup-timer" id="rt-${key}">
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.3rem">⏱ Récupération</div>
+        <div style="display:flex;justify-content:center">
+          <div style="display:flex;align-items:center;gap:.5rem">
+            <div class="recup-timer-count" id="rt-count-${key}">—</div>
+            <button class="btn" style="width:auto;padding:.4rem .8rem;font-size:.78rem;background:var(--blue)" onclick="stopRecupTimer('${key}')">Passer →</button>
+          </div>
         </div>
       </div>
+      <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
     </div>
-    <div class="series-grid" id="sg-${key}">${buildSeriesHTML(a, maxi, localSeries)}</div>
     ${type==='standard'?`<div class="suggestion-box" id="sug-${key}"></div>`:''}
     <div class="bravo-box" id="bravo-${key}" onclick="showPage('seance')" style="cursor:pointer">
       <div class="bravo-emoji">🎉</div>
