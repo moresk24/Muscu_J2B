@@ -815,10 +815,14 @@ function buildMaxiCalc() {
 
       } else if (type === 'lombaires') {
         const sel = $('calc-poids-add');
+        const maxiActuelLomb = state.maxis[a.nom];
+        if (maxiActuelLomb !== undefined) sel.value = String(maxiActuelLomb);
         $('btn-valid-calc').addEventListener('click', () => saveSingleMaxi(a.nom, sel.value));
 
       } else {
         const sel = $('calc-niveau');
+        const maxiActuelGain = state.maxis[a.nom];
+        if (maxiActuelGain !== undefined) sel.value = String(maxiActuelGain);
         $('btn-valid-calc').addEventListener('click', () => saveSingleMaxi(a.nom, sel.value));
       }
 
