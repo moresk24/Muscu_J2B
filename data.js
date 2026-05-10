@@ -32,7 +32,7 @@ document.addEventListener('click', function(e) {
   }
 });
 (function() {
-  const saved = localStorage.getItem('muscu_theme') || 'dark';
+  const saved = localStorage.getItem('muscu_theme') || 'light';
   applyTheme(saved);
 })();
 
