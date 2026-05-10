@@ -130,6 +130,13 @@ function loading(show, msg) {
   const m = $('loading-msg');
   if (msg) { m.innerHTML = msg; m.style.display = 'block'; }
   else { m.style.display = 'none'; m.innerHTML = ''; }
+  if (!show) setProgress(0, 'Connexion en cours…');
+}
+function setProgress(pct, label) {
+  const bar = $('loading-bar');
+  const lbl = $('loading-step-label');
+  if (bar) bar.style.width = pct + '%';
+  if (lbl && label) lbl.textContent = label;
 }
 
 function fetchWithTimeout(url, ms) {
@@ -166,8 +173,10 @@ async function initLogin() {
   $('loading-retry').style.display = 'none';
   $('loading-spinner').style.display = '';
   loading(true);
+  setProgress(10, 'Chargement des classes…');
   try {
     const d = await api({action:'getClasses'});
+    setProgress(33, 'Classes chargées…');
     const sel = $('sel-classe');
     sel.innerHTML = '<option value="">-- Choisir --</option>';
     (d.classes||[]).forEach(c => {
@@ -210,8 +219,10 @@ async function autoConnect(saved, classes) {
   // Vérifier que la classe existe toujours
   if (!classes.includes(saved.classe)) return false;
   loading(true);
+  setProgress(40, 'Chargement de votre profil…');
   try {
     const d = await api({action:'loadEleve', classe:saved.classe, nom:saved.nom, prenom:saved.prenom});
+    setProgress(70, 'Profil chargé…');
     if (d.error || d.mdp !== saved.mdp) {
       localStorage.removeItem('muscu_login');
       loading(false);
@@ -248,7 +259,10 @@ async function autoConnect(saved, classes) {
     }
     $('tb-prenom').textContent = saved.prenom;
     updateHeaderProjet();
+    setProgress(85, 'Vérification de la séance…');
     await loadConfig();
+    setProgress(100, 'Prêt !');
+    await new Promise(r => setTimeout(r, 300));
     loading(false);
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
