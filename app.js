@@ -631,9 +631,11 @@ function maxisAllFilled() {
 // ── Navigation vers la page calcul maxi ────────────────────
 let _calcMode = 1;
 let _calcDrum = { charge: 40, reps: 10 };
+let _forcedRecalc = false;
 function goToMaxiCalc(idx) {
   state.currentCalcAtelier = idx;
   _calcMode = 1;
+  _forcedRecalc = false;
   showPage('maxi-calc');
 }
 
@@ -759,11 +761,18 @@ function buildMaxiCalc() {
     const maxiActuel = state.maxis[a.nom];
     const maxiDisplay = maxiActuel ? formatMaxiDisplay(a, maxiActuel) : null;
 
+    const forcedBanner = _forcedRecalc ? `
+      <div style="background:var(--red);color:#fff;border-radius:12px;padding:.85rem 1rem;margin-bottom:1rem;font-size:.88rem;line-height:1.5">
+        ⚠️ <strong>Votre maxi n'est pas adapté à votre niveau actuel.</strong><br>
+        Vous devez effectuer une nouvelle recherche pour cet atelier avant de reprendre la séance.
+      </div>` : '';
+
     pg.innerHTML = `
       <div class="calc-header">
         <div class="calc-atelier-title">${a.icon} ${a.nom}</div>
         ${maxiDisplay ? `<div style="font-size:.95rem;color:var(--accent);font-weight:700;margin-top:.25rem">Maxi actuel : ${maxiDisplay}</div>` : ''}
       </div>
+      ${forcedBanner}
       ${type === 'standard' ? `<div class="calc-mode-tabs">
         <button class="calc-mode-tab ${_calcMode===1?'active':''}" id="tab-calc">Calculer mon maxi</button>
         <button class="calc-mode-tab ${_calcMode===2?'active':''}" id="tab-direct">Saisie manuelle</button>
@@ -2672,6 +2681,7 @@ function allerAuxMaxis(nomAtelier) {
 function resetEtRecalculerMaxi(nomAtelier) {
   delete state.serieLocale[nomAtelier];
   saveSerieLocale();
+  _forcedRecalc = true;
   allerAuxMaxis(nomAtelier);
 }
 
