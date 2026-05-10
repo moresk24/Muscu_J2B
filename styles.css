@@ -191,6 +191,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
 .login-sub{font-size:.8rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-top:.25rem}
+#login-haltere-dark,#login-haltere-light{display:none}
+[data-theme="light"] #login-haltere-light{display:inline-block}
+[data-theme="dark"] #login-haltere-dark{display:inline-block}
 .login-card{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:1.5rem;width:100%;max-width:380px}
 .login-card h2{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.05em;margin-bottom:1.25rem;color:var(--text)}
 .mdp-rules{font-size:.72rem;color:var(--muted);margin-top:.35rem;line-height:1.5}
