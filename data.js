@@ -261,7 +261,7 @@ const ATELIERS_CONTENT = {
   },
   "Banc à Lombaires":{
     exec:["Allongé face vers le bas sur le banc, chevilles calées sous les appuis","Tenir l'épaule gauche avec la main droite et l'épaule droite avec la main gauche","Garder le dos rond durant toute l'exécution du geste","Descendre le buste vers le bas, remonter jusqu'à l'horizontale (30 répétitions en 1 minute), expirer à la remontée","Si l'exercice est trop facile : tenir un disque de 2, 5 ou 10 kg contre la poitrine"],
-    secu:["⚠️ Ne surtout pas cambrer à la remontée","Mouvement fluide, pas d'à-coups","⚠️ Déconseillé en cas de problème lombaire"],
+    secu:["⚠️ Ne surtout pas cambrer à la remontée","⚠️ Le haut du dos remonte à la même hauteur que les fesses (se faire aider par un partenaire)","Mouvement fluide, pas d'à-coups","⚠️ Déconseillé en cas de problème lombaire"],
     video:"https://www.youtube.com/watch?v=PLACEHOLDER"
   },
   "Gainage sol":{
@@ -282,7 +282,7 @@ const ATELIERS_CONTENT = {
   },
   "Abdo Sol":{
     exec:["Allongé sur le dos, genoux fléchis, pieds au sol","Mains croisées sur la poitrine ou derrière les tempes (pas derrière la nuque)","Monter les épaules vers les genoux, ne pas toucher le sol avec le haut du dos à la redescente","30 répétitions en 1 minute, expirer à la montée","Si l'exercice est trop facile : tenir un disque contre la poitrine"],
-    secu:["Ne pas tirer sur la nuque avec les mains","Le bas du dos reste en contact avec le sol","Ne pas bloquer la respiration"],
+    secu:["Ne pas tirer sur la nuque avec les mains","Ne pas bloquer la respiration"],
     videos:[
       {label:"Foot 2 foot crunch",url:"https://www.youtube.com/watch?v=8FSPprNrqx4"},
       {label:"Alternés",url:"https://www.youtube.com/watch?v=UuQNxjMPIfw"},
