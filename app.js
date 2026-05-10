@@ -660,7 +660,7 @@ function buildMaxiCalc() {
         formHtml = `
           <div class="drum-picker-wrap">
             <div class="drum-picker-col">
-              <div class="field-label" style="margin-bottom:.3rem">Charge soulevée (kg)</div>
+              <div class="field-label" style="margin-bottom:.3rem">Charge (kg)</div>
               <div class="drum-picker" id="drum-calc-charge">
                 <div class="drum-highlight"></div>
                 <div class="drum-track"></div>
