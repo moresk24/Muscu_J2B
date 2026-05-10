@@ -1020,7 +1020,16 @@ function selectProjetFromDetail(num) {
 $('modal-cancel').onclick = () => { $('modal-bg').classList.add('hidden'); pendingProjet=null; };
 $('modal-confirm').onclick = () => { $('modal-bg').classList.add('hidden'); if(pendingProjet) confirmProjet(pendingProjet); };
 
-function confirmerFinSeance() { $('modal-fin-seance-bg').classList.remove('hidden'); }
+function confirmerFinSeance() {
+  const nb = state.compteurAteliersSeance;
+  const msg = $('modal-fin-msg');
+  if (nb < 4) {
+    msg.innerHTML = `⚠️ <strong>Attention, vous avez fait seulement ${nb} atelier${nb > 1 ? 's' : ''}.</strong><br>Êtes-vous sûr(e) de vouloir enregistrer votre séance ?<br>Vous ne pourrez plus valider d'atelier à la suite de l'enregistrement.`;
+  } else {
+    msg.innerHTML = 'Êtes-vous sûr(e) ?<br>Vous ne pourrez plus valider d\'atelier pour cette séance.';
+  }
+  $('modal-fin-seance-bg').classList.remove('hidden');
+}
 $('modal-fin-cancel').onclick = () => { $('modal-fin-seance-bg').classList.add('hidden'); };
 $('modal-fin-confirm').onclick = () => { $('modal-fin-seance-bg').classList.add('hidden'); saveBadge(); };
 
