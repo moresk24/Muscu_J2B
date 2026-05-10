@@ -650,7 +650,8 @@ function buildMaxiCalc() {
 
   const chargeValsCalc = [
     ...Array.from({length: 28}, (_, i) => Math.round((0.5 + i * 0.5) * 10) / 10), // 0.5 → 14.5 par 0.5
-    ...Array.from({length: 136}, (_, i) => 15 + i)                                  // 15 → 150 par 1
+    ...Array.from({length: 86}, (_, i) => 15 + i),                                  // 15 → 100 par 1
+    ...Array.from({length: 20}, (_, i) => 102.5 + i * 2.5)                          // 102.5 → 150 par 2.5
   ];
   const repsValsCalc   = Array.from({length: 12},  (_, i) => i + 4);
 
