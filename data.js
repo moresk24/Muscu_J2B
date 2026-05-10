@@ -265,6 +265,12 @@ const ATELIERS_CONTENT = {
     video:"https://www.youtube.com/watch?v=PLACEHOLDER"
   },
   "Gainage sol":{
+    exec:[
+      "<strong>Niveau 1 — 1 mn d'effort</strong><br>Planche (15s) → Côté droit (15s) → Planche (15s) → Côté gauche (15s)",
+      "<strong>Niveau 2 — 2 mn d'effort</strong><br>Planche (30s) → Côté droit (30s) → Planche (30s) → Côté gauche (30s)",
+      "<strong>Niveau 3 — 1 mn + jambe levée</strong><br>Planche jambe gauche levée (15s) → Côté droit jambe gauche levée (15s) → Planche jambe droite levée (15s) → Côté gauche jambe droite levée (15s)",
+      "<strong>Niveau 4 — 2 mn + jambe levée</strong><br>Planche jambe gauche levée (30s) → Côté droit jambe gauche levée (30s) → Planche jambe droite levée (30s) → Côté gauche jambe droite levée (30s)"
+    ],
     levels:[
       {label:"Niveau 1 — 1 mn d'effort",steps:["Planche face au sol — appui sur les coudes et les orteils — tenir 15s","Côté droit — appui sur le coude droit et le bord du pied droit — tenir 15s","Planche face au sol — appui sur les coudes et les orteils — tenir 15s","Côté gauche — appui sur le coude gauche et le bord du pied gauche — tenir 15s"]},
       {label:"Niveau 2 — 2 mn d'effort",steps:["Planche face au sol — appui sur les coudes et les orteils — tenir 30s","Côté droit — appui sur le coude droit et le bord du pied droit — tenir 30s","Planche face au sol — appui sur les coudes et les orteils — tenir 30s","Côté gauche — appui sur le coude gauche et le bord du pied gauche — tenir 30s"]},
