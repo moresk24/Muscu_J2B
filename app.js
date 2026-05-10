@@ -249,6 +249,7 @@ async function autoConnect(saved, classes) {
     $('tb-prenom').textContent = saved.prenom;
     updateHeaderProjet();
     await loadConfig();
+    loading(false);
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
     startSessionCheck();
