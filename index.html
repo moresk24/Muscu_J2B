@@ -25,7 +25,7 @@
       <img src="images/haltere_dark2.png"  alt="Haltère" id="login-haltere-dark"   style="width:300px;margin-bottom:.75rem">
       <img src="images/haltere_orange.png" alt="Haltère" id="login-haltere-light" style="width:300px;margin-bottom:.75rem">
       <div class="login-logo">Muscu à J2B</div>
-      <div class="login-sub">2025 · 2026</div>
+      <div class="login-sub">Lycée Jay de Beaufort</div>
     </div>
     <div class="login-card">
       <h2>Connexion</h2>
@@ -51,6 +51,42 @@
         </div>
       </div>
       <button class="btn" id="btn-login" disabled>Entrer</button>
+      <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:1rem;line-height:1.5">
+        ⚠️ Cette application collecte des données personnelles dans le cadre d'un usage pédagogique.<br>
+        <button onclick="document.getElementById('rgpd-modal').style.display='flex'" style="background:none;border:none;color:var(--accent);font-size:.72rem;cursor:pointer;padding:0;text-decoration:underline">En savoir plus</button>
+      </p>
+    </div>
+
+    <!-- Modale RGPD -->
+    <div id="rgpd-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;padding:1rem">
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:1.5rem;max-width:420px;width:100%;max-height:80vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;color:var(--accent)">🔒 Données personnelles</div>
+          <button onclick="document.getElementById('rgpd-modal').style.display='none'" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted);line-height:1">✕</button>
+        </div>
+        <div style="font-size:.82rem;color:var(--text);line-height:1.7">
+          <p style="margin-bottom:.75rem">Cette application est utilisée dans le cadre de l'EPS au <strong>Lycée Jay de Beaufort</strong>, durant les cycles de Musculation. Elle est gérée par l'enseignant d'EPS responsable de la classe ou du groupe EPS.</p>
+
+          <div style="font-weight:700;color:var(--accent);margin-bottom:.25rem">Données collectées</div>
+          <p style="margin-bottom:.75rem">Nom, prénom, classe, mot de passe (chiffré), projet personnel, charges maximales par atelier et ressentis d'effort lors des séances.</p>
+
+          <div style="font-weight:700;color:var(--accent);margin-bottom:.25rem">Finalité</div>
+          <p style="margin-bottom:.75rem">Suivi pédagogique individuel dans le cadre des cours d'EPS. Les données ne sont utilisées à aucune autre fin.</p>
+
+          <div style="font-weight:700;color:var(--accent);margin-bottom:.25rem">Accès aux données</div>
+          <p style="margin-bottom:.75rem">Seul l'enseignant responsable a accès aux données, via un tableau Google Sheets sécurisé par mot de passe.</p>
+
+          <div style="font-weight:700;color:var(--accent);margin-bottom:.25rem">Hébergement</div>
+          <p style="margin-bottom:.75rem">Les données sont stockées sur Google Sheets (Google Workspace). Aucune donnée n'est transmise à des tiers.</p>
+
+          <div style="font-weight:700;color:var(--accent);margin-bottom:.25rem">Durée de conservation</div>
+          <p style="margin-bottom:.75rem">Les données sont conservées pour la durée de l'année scolaire, puis supprimées.</p>
+
+          <div style="font-weight:700;color:var(--accent);margin-bottom:.25rem">Vos droits</div>
+          <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour exercer ces droits, adressez-vous directement à votre enseignant d'EPS.</p>
+        </div>
+        <button onclick="document.getElementById('rgpd-modal').style.display='none'" class="btn" style="margin-top:1.25rem">Fermer</button>
+      </div>
     </div>
     <div style="text-align:center;margin-top:1.25rem;display:flex;justify-content:center;align-items:center;gap:1.2rem">
       <a href="tuto.html" target="_blank" style="font-size:.82rem;color:var(--muted);text-decoration:none">📖 Comment utiliser l'application ?</a>
