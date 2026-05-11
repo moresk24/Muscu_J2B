@@ -3047,6 +3047,14 @@ function buildAtelierDetail() {
     }
   }
 
+  // Mode guidé : restaurer la boîte de suggestion si l'élève a quitté la page avant d'avoir accepté la proposition
+  if (state.guidage && type === 'standard' && localSeries.length > 0 && localSeries.length < 4 &&
+      state.suggestionEnCours && state.suggestionEnCours[nom]) {
+    const lastSerie = localSeries[localSeries.length - 1];
+    showSuggestion(nom, key, a.unite, lastSerie.ressenti, localSeries.length + 1,
+      lastSerie.charge, lastSerie.reps, lastSerie.intensite || state.intensite);
+  }
+
   // Mode autonome : ouvrir les roulettes pour la série suivante (au retour sur la page ou à l'arrivée)
   if (!state.guidage && type === 'standard' && localSeries.length < 4) {
     const sugBox = document.getElementById('sug-' + key);
