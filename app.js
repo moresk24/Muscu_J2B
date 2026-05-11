@@ -2940,7 +2940,7 @@ function buildAtelierDetail() {
   pg.innerHTML = `
     <div style="text-align:center;margin-bottom:.6rem">
       <span style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em">${a.icon} ${a.nom}</span>
-      <span style="font-size:.85rem;color:var(--muted);margin-left:.5rem">(Maxi : <span style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--accent)">${formatMaxiSeance(a)}</span>)</span>
+      ${type === 'standard' ? `<span style="font-size:.85rem;color:var(--muted);margin-left:.5rem">— Maxi : <span style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--accent)">${formatMaxiSeance(a)}</span></span>` : ''}
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem;justify-content:center">
       ${a.muscles.split(' · ').map(m=>`<span style="display:inline-block;background:rgba(255,107,43,.12);border:1px solid rgba(255,107,43,.3);color:var(--accent2);font-size:.72rem;font-weight:600;border-radius:20px;padding:.15rem .6rem">${m}</span>`).join('')}
