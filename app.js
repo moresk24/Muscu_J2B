@@ -236,6 +236,7 @@ async function autoConnect(saved, classes) {
     state.comptArgent         = d.comptArgent  || 0;
     state.comptOr             = d.comptOr      || 0;
     const newSession = saved.classe + saved.nom + saved.prenom + new Date().toDateString();
+    state.seanceDejaEnregistree = localStorage.getItem('muscu_seance_enregistree') === newSession;
     if (localStorage.getItem('sessionId') !== newSession) {
       localStorage.setItem('sessionId', newSession);
       localStorage.setItem('compteurAteliersSeance', '0');
@@ -253,6 +254,7 @@ async function autoConnect(saved, classes) {
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
     startSessionCheck();
+    updateHmenuFinSeance();
     showPageAfterLogin();
     return true;
   } catch(e) { console.error(e); }
@@ -394,6 +396,7 @@ $('btn-login').addEventListener('click', async () => {
 
     // Nouvelle session → reset compteur local
     const newSession = cls + eInfo.nom + eInfo.prenom + new Date().toDateString();
+    state.seanceDejaEnregistree = localStorage.getItem('muscu_seance_enregistree') === newSession;
     if (localStorage.getItem('sessionId') !== newSession) {
       localStorage.setItem('sessionId', newSession);
       localStorage.setItem('compteurAteliersSeance', '0');
@@ -416,6 +419,7 @@ $('btn-login').addEventListener('click', async () => {
     $('screen-login').classList.remove('active');
     $('screen-app').classList.add('active');
     startSessionCheck();
+    updateHmenuFinSeance();
     showPageAfterLogin();
 
   } catch(e) { toast('Erreur réseau','error'); console.error(e); }
@@ -513,7 +517,7 @@ function doLogout() {
   $('screen-app').classList.remove('active');
   $('screen-dispensed').classList.remove('active');
   $('screen-login').classList.add('active');
-  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,statut:'',projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurAteliersSeance:0,sessionId:'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0,dernierBadge:'',comptCarton:0,comptBronze:0,comptArgent:0,comptOr:0,badgeCourant:'',badgeCourantNbAteliers:0,ateliersSeanceEnCours:[],currentAtelierDetail:''};
+  state = {classe:'',nom:'',prenom:'',mdp:'',isFirstLogin:false,statut:'',projet:'',maxis:{},series:{},intensite:null,serieLocale:{},compteurAteliersSeance:0,sessionId:'',isAdmin:false,isActive:false,sessionNumber:0,currentCalcAtelier:0,dernierBadge:'',comptCarton:0,comptBronze:0,comptArgent:0,comptOr:0,badgeCourant:'',badgeCourantNbAteliers:0,ateliersSeanceEnCours:[],currentAtelierDetail:'',seanceDejaEnregistree:false};
   localStorage.setItem('compteurAteliersSeance', '0');
   $('sel-classe').value=''; $('sel-eleve').innerHTML='<option>— Choisir ma classe d\'abord —</option>'; $('sel-eleve').disabled=true;
   $('zone-mdp').style.display='none'; $('btn-login').disabled=true;
@@ -1020,7 +1024,25 @@ function selectProjetFromDetail(num) {
 $('modal-cancel').onclick = () => { $('modal-bg').classList.add('hidden'); pendingProjet=null; };
 $('modal-confirm').onclick = () => { $('modal-bg').classList.add('hidden'); if(pendingProjet) confirmProjet(pendingProjet); };
 
+function updateHmenuFinSeance() {
+  const btn = $('hmenu-fin-seance');
+  if (!btn) return;
+  if (state.seanceDejaEnregistree) {
+    btn.textContent = '✅ Séance déjà enregistrée';
+    btn.disabled = true;
+    btn.style.opacity = '0.45';
+  } else {
+    btn.textContent = '✅ Enregistrer ma séance';
+    btn.disabled = false;
+    btn.style.opacity = '';
+  }
+}
+
 function confirmerFinSeance() {
+  if (state.seanceDejaEnregistree) {
+    toast('Votre séance a déjà été enregistrée pour cette séance.', 'warn');
+    return;
+  }
   const nb = state.compteurAteliersSeance;
   const msg = $('modal-fin-msg');
   if (nb < 4) {
@@ -1187,6 +1209,10 @@ async function saveBadge() {
   state.serieLocale = {};
   state.ateliersSeanceEnCours = [];
   localStorage.removeItem('muscu_serieLocale');
+
+  state.seanceDejaEnregistree = true;
+  localStorage.setItem('muscu_seance_enregistree', localStorage.getItem('sessionId') || '');
+  updateHmenuFinSeance();
 
   showPage('bilan-badge');
 }
@@ -2912,20 +2938,12 @@ function buildAtelierDetail() {
   const secuHtml = (c.secu||[]).map(s=>`<div class="atelier-detail-item${s.startsWith('⚠️')?' atelier-detail-warn':''}">${s}</div>`).join('');
 
   pg.innerHTML = `
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;margin-bottom:.2rem;text-align:center">${a.icon} ${a.nom}</div>
+    <div style="text-align:center;margin-bottom:.6rem">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em">${a.icon} ${a.nom}</span>
+      <span style="font-size:.85rem;color:var(--muted);margin-left:.5rem">(Maxi : <span style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--accent)">${formatMaxiSeance(a)}</span>)</span>
+    </div>
     <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem;justify-content:center">
       ${a.muscles.split(' · ').map(m=>`<span style="display:inline-block;background:rgba(255,107,43,.12);border:1px solid rgba(255,107,43,.3);color:var(--accent2);font-size:.72rem;font-weight:600;border-radius:20px;padding:.15rem .6rem">${m}</span>`).join('')}
-    </div>
-
-    <div class="atelier-detail-maxi">
-      <div>
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.2rem">Votre Maxi (1RM)</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent)">${formatMaxiSeance(a)}</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:.7rem;color:var(--muted);margin-bottom:.2rem">Validations</div>
-        <div style="font-size:1rem;font-weight:700;color:${validations>0?'var(--green)':'var(--muted)'}">${validations}</div>
-      </div>
     </div>
 
     ${(()=>{
