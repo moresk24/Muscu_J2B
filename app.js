@@ -1255,7 +1255,8 @@ function buildBilanBadge() {
   pg.innerHTML = `
     <div style="padding:1rem">
       <div style="text-align:center;margin:1.5rem 0 1rem">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.06em;color:var(--accent)">Bravo ! Séance validée !</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.06em;color:var(--accent)">${badge === 'Carton' ? 'Séance enregistrée.' : 'Bravo ! Séance validée !'}</div>
+        ${badge === 'Carton' ? `<div style="font-size:.95rem;color:var(--muted);margin-top:.3rem">Il faudra faire mieux à la prochaine séance !</div>` : ''}
       </div>
 
       <div style="text-align:center;margin-bottom:1rem;line-height:1.7">
