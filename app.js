@@ -490,7 +490,7 @@ function isMaxiValid(a, val) {
 
 function formatMaxiDisplay(a, val) {
   const type = getAtelierType(a.nom);
-  if (type === 'gainage') return `${val} <span class="maxi-unit">niv.</span>`;
+  if (type === 'gainage') return `<span class="maxi-unit">niv.</span> ${val}`;
   return `${val} <span class="maxi-unit">kg</span>`;
 }
 
