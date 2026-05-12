@@ -2965,16 +2965,17 @@ function buildAtelierDetail() {
       else if (_tdRef.length > 0) _ref = _tdRef.reduce((b,s) => s.c < b.c ? s : b);
       const refIdx = _ref ? series.indexOf(_ref) : -1;
       const rows = series.map((s,i)=>{
+        const border = i < series.length - 1 ? 'border-bottom:1px solid var(--border)' : '';
         if (s.special) {
           const ok = s.resultat === 'ok';
-          return `<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.2rem 0;border-bottom:1px solid var(--border)">
+          return `<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.2rem 0;${border}">
             <span style="color:var(--muted);min-width:1.5rem">S${i+1}</span>
             <span style="flex:1;font-weight:700;color:${ok?'var(--green)':'var(--red,#e74c3c)'}">${ok?'OK':'Échec'}</span>
           </div>`;
         }
         const chargeColor = i === refIdx ? 'var(--red,#e74c3c)' : 'var(--text)';
         const bg = colors[s.s] || '#444';
-        return `<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.2rem 0;border-bottom:1px solid var(--border)">
+        return `<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;padding:.2rem 0;${border}">
           <span style="color:var(--muted);min-width:1.5rem">S${i+1}</span>
           <span style="flex:1;color:${chargeColor};font-weight:${i===refIdx?'700':'400'}">${s.r} × ${s.c} kg</span>
           <span style="display:inline-flex;align-items:center;justify-content:center;min-width:1.6rem;height:1.4rem;border-radius:3px;background:${bg};color:#fff;font-size:.6rem;font-weight:700;padding:0 .2rem">${s.s||'—'}</span>
