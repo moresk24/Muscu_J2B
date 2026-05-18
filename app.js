@@ -256,6 +256,7 @@ async function autoConnect(saved, classes) {
     startSessionCheck();
     updateHmenuFinSeance();
     showPageAfterLogin();
+    showRappelFinSeance();
     return true;
   } catch(e) { console.error(e); }
   loading(false);
@@ -421,6 +422,7 @@ $('btn-login').addEventListener('click', async () => {
     startSessionCheck();
     updateHmenuFinSeance();
     showPageAfterLogin();
+    showRappelFinSeance();
 
   } catch(e) { toast('Erreur réseau','error'); console.error(e); }
   loading(false);
@@ -504,6 +506,20 @@ function showPageAfterLogin() {
   if (!maxisAllFilled()) showPage('maxis');
   else if (!state.projet)  showPage('projet');
   else                     showPage('seance');
+}
+
+function showRappelFinSeance() {
+  if (!state.isActive || state.isAdmin) return;
+  const key = 'muscu_rappel_' + (state.sessionId || 'session');
+  if (sessionStorage.getItem(key)) return;
+  sessionStorage.setItem(key, '1');
+  const el = $('rappel-fin-seance');
+  if (el) el.style.display = 'flex';
+}
+
+function dismissRappelFinSeance() {
+  const el = $('rappel-fin-seance');
+  if (el) el.style.display = 'none';
 }
 
 function doLogout() {
@@ -2022,16 +2038,28 @@ function buildSeriesSpecialHTML(a, localSeries) {
   if (doneSeries < 4) {
     const s = doneSeries;
     const disabled = !isEditable() ? 'disabled' : '';
-    html += `<div class="serie-row active-serie" id="sr-${key}-${s}">
-      <div class="serie-num">${s+1}</div>
-      <div class="serie-info"><div class="serie-charge">${maxiLabel}</div></div>
-      <div style="display:flex;gap:.5rem;flex-shrink:0">
-        <button style="background:rgba(46,204,113,.15);border:1px solid var(--green);border-radius:8px;color:var(--green);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
-          ${isEditable()?`onclick="onSerieSpeciale('${a.nom}',${s},'ok')"`:disabled}>✓ Ok</button>
-        <button style="background:rgba(231,76,60,.1);border:1px solid var(--red);border-radius:8px;color:var(--red);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
-          ${isEditable()?`onclick="onSerieSpeciale('${a.nom}',${s},'echec')"`:disabled}>✗ Échec</button>
-      </div>
-    </div>`;
+    const nomEsc = a.nom.replace(/'/g,"\\'");
+    if (getAtelierType(a.nom) === 'gainage') {
+      html += `<div class="serie-row active-serie" id="sr-${key}-${s}">
+        <div class="serie-num">${s+1}</div>
+        <div style="flex:1">
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem">${maxiLabel}</div>
+          <button style="background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:.85rem;padding:.45rem 1rem;cursor:pointer"
+            ${isEditable()?`onclick="startGainageTimer('${nomEsc}',${s})"`:disabled}>▶ Démarrer</button>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="serie-row active-serie" id="sr-${key}-${s}">
+        <div class="serie-num">${s+1}</div>
+        <div class="serie-info"><div class="serie-charge">${maxiLabel}</div></div>
+        <div style="display:flex;gap:.5rem;flex-shrink:0">
+          <button style="background:rgba(46,204,113,.15);border:1px solid var(--green);border-radius:8px;color:var(--green);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
+            ${isEditable()?`onclick="onSerieSpeciale('${nomEsc}',${s},'ok')"`:disabled}>✓ Ok</button>
+          <button style="background:rgba(231,76,60,.1);border:1px solid var(--red,#e74c3c);border-radius:8px;color:var(--red,#e74c3c);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
+            ${isEditable()?`onclick="onSerieSpeciale('${nomEsc}',${s},'echec')"`:disabled}>✗ Échec</button>
+        </div>
+      </div>`;
+    }
   }
 
   return html;
@@ -2204,6 +2232,135 @@ async function validateAtelier(nomAtelier) {
 }
 
 let _recupTimerInterval = null;
+let _gainageTimerInterval = null;
+let _gainageTimerState = null;
+
+function _gainageStepDuration(nomAtelier) {
+  const n = parseInt(state.maxis[nomAtelier]||1);
+  return (n === 2 || n === 4) ? 30 : 15;
+}
+
+function _gainageStepTexts(nomAtelier) {
+  const c = ATELIERS_CONTENT[nomAtelier];
+  if (!c || !c.levels) return [];
+  const n = parseInt(state.maxis[nomAtelier]||1);
+  const idx = Math.min(Math.max(n-1,0), c.levels.length-1);
+  return c.levels[idx].steps.map(s => s.replace(/\s*—\s*tenir\s*\d+\s*s$/,''));
+}
+
+function startGainageTimer(nomAtelier, serieIndex) {
+  if (!isEditable()) return;
+  if (_gainageTimerInterval) { clearInterval(_gainageTimerInterval); _gainageTimerInterval = null; }
+  const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
+  stopRecupTimer(key);
+  const steps = _gainageStepTexts(nomAtelier);
+  const dur = _gainageStepDuration(nomAtelier);
+  const total = dur * 4;
+  _gainageTimerState = {nomAtelier, serieIndex, key, phaseIndex:0, elapsed:0, total, dur, steps};
+  const row = document.getElementById('sr-'+key+'-'+serieIndex);
+  if (!row) return;
+  const nomEsc = nomAtelier.replace(/'/g,"\\'");
+  row.innerHTML = `
+    <div class="serie-num">${serieIndex+1}</div>
+    <div style="flex:1;min-width:0">
+      <div id="gt-step-${key}" style="font-size:.8rem;font-weight:600;margin-bottom:.35rem;color:var(--text)">${steps[0]}</div>
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
+        <div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+          <div id="gt-bar-${key}" style="height:100%;background:var(--accent);border-radius:4px;width:100%"></div>
+        </div>
+        <span id="gt-count-${key}" style="font-size:1rem;font-weight:700;min-width:2.5rem;text-align:right;color:var(--text)">${dur}s</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span id="gt-phase-${key}" style="font-size:.88rem;font-weight:700;color:var(--accent)">Phase 1 / 4</span>
+        <button onclick="stopGainageTimer('${nomEsc}',${serieIndex})" style="background:rgba(231,76,60,.1);border:1px solid var(--red,#e74c3c);border-radius:6px;color:var(--red,#e74c3c);font-size:.75rem;font-weight:600;padding:.25rem .6rem;cursor:pointer">Arrêter</button>
+      </div>
+    </div>`;
+  _gainageRunPhase();
+}
+
+function _gainageRunPhase() {
+  if (!_gainageTimerState) return;
+  const st = _gainageTimerState;
+  const {key, dur} = st;
+  let timeLeft = dur;
+  _gainageUpdateBar(key, timeLeft, dur);
+  if (_gainageTimerInterval) clearInterval(_gainageTimerInterval);
+  _gainageTimerInterval = setInterval(() => {
+    if (!_gainageTimerState) { clearInterval(_gainageTimerInterval); _gainageTimerInterval = null; return; }
+    timeLeft--;
+    st.elapsed++;
+    if (timeLeft >= 0) _gainageUpdateBar(key, timeLeft, dur);
+    if (timeLeft <= 0) {
+      clearInterval(_gainageTimerInterval);
+      _gainageTimerInterval = null;
+      st.phaseIndex++;
+      if (st.phaseIndex >= 4) {
+        _gainageTimerState = null;
+        showGainageRessentis(st.nomAtelier, st.serieIndex, null, st.total);
+      } else {
+        _gainagePause(st);
+      }
+    }
+  }, 1000);
+}
+
+function _gainageUpdateBar(key, timeLeft, dur) {
+  const bar = document.getElementById('gt-bar-'+key);
+  const cnt = document.getElementById('gt-count-'+key);
+  if (bar) bar.style.width = (timeLeft/dur*100)+'%';
+  if (cnt) cnt.textContent = timeLeft+'s';
+}
+
+function _gainagePause(st) {
+  const {key} = st;
+  const stepEl  = document.getElementById('gt-step-'+key);
+  const barEl   = document.getElementById('gt-bar-'+key);
+  const cntEl   = document.getElementById('gt-count-'+key);
+  const phaseEl = document.getElementById('gt-phase-'+key);
+  if (stepEl)  { stepEl.textContent = 'Changez !'; stepEl.style.color = 'var(--accent)'; stepEl.style.fontWeight = '700'; }
+  if (barEl)   { barEl.style.background = 'var(--border)'; barEl.style.width = '100%'; }
+  if (cntEl)   cntEl.textContent = '';
+  if (phaseEl) { phaseEl.textContent = 'Phase '+(st.phaseIndex+1)+' / 4'; phaseEl.style.color = 'var(--accent)'; }
+  setTimeout(() => {
+    if (!_gainageTimerState) return;
+    const step = st.steps[st.phaseIndex];
+    if (stepEl)  { stepEl.textContent = step; stepEl.style.color = 'var(--text)'; stepEl.style.fontWeight = '600'; }
+    if (barEl)   { barEl.style.background = 'var(--accent)'; barEl.style.width = '100%'; }
+    _gainageRunPhase();
+  }, 2000);
+}
+
+function stopGainageTimer(nomAtelier, serieIndex) {
+  if (_gainageTimerInterval) { clearInterval(_gainageTimerInterval); _gainageTimerInterval = null; }
+  const elapsed = _gainageTimerState ? _gainageTimerState.elapsed : 0;
+  const total   = _gainageTimerState ? _gainageTimerState.total   : 0;
+  _gainageTimerState = null;
+  showGainageRessentis(nomAtelier, serieIndex, elapsed, total);
+}
+
+function showGainageRessentis(nomAtelier, serieIndex, elapsed, total) {
+  const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
+  const row = document.getElementById('sr-'+key+'-'+serieIndex);
+  if (!row) return;
+  const nomEsc = nomAtelier.replace(/'/g,"\\'");
+  const fmt = s => s >= 60 ? Math.floor(s/60)+'m'+(s%60<10?'0':'')+s%60 : s+'s';
+  const stoppedMsg = (elapsed !== null && elapsed < total)
+    ? `<div style="font-size:.72rem;color:var(--muted);margin-bottom:.4rem">Arrêté à ${fmt(elapsed)} / ${fmt(total)}</div>`
+    : '';
+  const disabled = !isEditable() ? 'disabled' : '';
+  row.innerHTML = `
+    <div class="serie-num">${serieIndex+1}</div>
+    <div style="flex:1">
+      ${stoppedMsg}
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:.4rem">Résultat :</div>
+      <div style="display:flex;gap:.5rem">
+        <button style="background:rgba(46,204,113,.15);border:1px solid var(--green);border-radius:8px;color:var(--green);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
+          ${isEditable()?`onclick="onSerieSpeciale('${nomEsc}',${serieIndex},'ok')"`:disabled}>✓ Ok</button>
+        <button style="background:rgba(231,76,60,.1);border:1px solid var(--red,#e74c3c);border-radius:8px;color:var(--red,#e74c3c);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
+          ${isEditable()?`onclick="onSerieSpeciale('${nomEsc}',${serieIndex},'echec')"`:disabled}>✗ Échec</button>
+      </div>
+    </div>`;
+}
 
 function getRecupSeconds(nomAtelier) {
   const type = getAtelierType(nomAtelier||'');
@@ -2912,6 +3069,8 @@ function goToAtelierDetail(nom) {
 }
 
 function buildAtelierDetail() {
+  if (_gainageTimerInterval) { clearInterval(_gainageTimerInterval); _gainageTimerInterval = null; }
+  _gainageTimerState = null;
   const pg = $('page-atelier-detail');
   const nom = state.currentAtelierDetail;
   const a = ATELIERS.find(x => x.nom === nom);

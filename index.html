@@ -222,6 +222,28 @@
   </div>
 </div>
 
+<div id="rappel-fin-seance" style="display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center">
+  <div style="font-size:3rem;margin-bottom:1rem">⚠️</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.05em;color:var(--accent);margin-bottom:.5rem">Important !</div>
+  <div style="font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:1.5rem;line-height:1.5">N'oubliez pas d'enregistrer<br>votre séance à la fin du cours.</div>
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:2rem;text-align:left;width:100%;max-width:320px">
+    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.9rem">Marche à suivre</div>
+    <div style="display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.75rem">
+      <span style="background:var(--accent);color:#fff;border-radius:50%;width:1.4rem;height:1.4rem;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">1</span>
+      <span style="font-size:.85rem;color:var(--text)">Appuyez sur <strong>☰</strong> en haut à droite</span>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.75rem">
+      <span style="background:var(--accent);color:#fff;border-radius:50%;width:1.4rem;height:1.4rem;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">2</span>
+      <span style="font-size:.85rem;color:var(--text)">Appuyez sur <strong>✅ Enregistrer ma séance</strong></span>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:.75rem">
+      <span style="background:var(--accent);color:#fff;border-radius:50%;width:1.4rem;height:1.4rem;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">3</span>
+      <span style="font-size:.85rem;color:var(--text)">Confirmez en appuyant sur <strong>Oui, terminer</strong></span>
+    </div>
+  </div>
+  <button class="btn" onclick="dismissRappelFinSeance()" style="width:100%;max-width:320px;font-size:1rem;padding:.75rem">J'ai compris →</button>
+</div>
+
 <script src="data.js"></script>
 <script src="app.js"></script>
 </body>
