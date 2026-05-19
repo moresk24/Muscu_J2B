@@ -2767,7 +2767,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
       ? v => `${v} <span style="font-size:.62rem;color:var(--muted)">(${Math.round(v/maxi*100)}%)</span>`
       : null;
     sugBox.innerHTML = `
-      <div class="suggestion-title">Série ${nextSerie} — à toi de choisir</div>
+      <div class="suggestion-title">Série ${nextSerie} — à vous de choisir</div>
       <div class="drum-picker-wrap">
         <div class="drum-picker-col">
           <div class="field-label" style="margin-bottom:.3rem">Reps</div>
@@ -2794,7 +2794,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     case 'td-parfait':
       sugBox.innerHTML = `
         <div class="suggestion-title" style="color:var(--green)">🔥 Parfait !</div>
-        <div class="suggestion-text">C'est exactement l'objectif ! Continuez comme ça.<br>
+        <div class="suggestion-text">C'est exactement l'effort recherché. Reconduisez la même série.<br><br>
           Série conseillée : <strong>${params.reps} reps <span style="color:var(--blue)">×</span> ${params.charge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
@@ -2805,8 +2805,8 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
 
     case 'e-min-intensite':
       sugBox.innerHTML = `
-        <div class="suggestion-title">⚠️ Série ${nextSerie + 1}</div>
-        <div class="suggestion-text">Intensité déjà au minimum — réduisez les répétitions.<br>
+        <div class="suggestion-title">⬇️ On réduit les répétitions</div>
+        <div class="suggestion-text">La charge est déjà au minimum — on diminue les répétitions.<br><br>
           Série conseillée : <strong>${params.newReps} reps <span style="color:var(--blue)">×</span> ${params.charge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
@@ -2818,14 +2818,14 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     case 'e-choix': {
       const repsDejaMin = currentReps <= p.repsMin;
       sugBox.innerHTML = `
-        <div class="suggestion-title">⚠️ Série ${nextSerie + 1} — Diminuer l'effort</div>
-        <div class="suggestion-text">Comment souhaitez-vous ajuster ?</div>
+        <div class="suggestion-title">⬇️ Diminuer l'effort</div>
+        <div class="suggestion-text">Comment souhaitez-vous ajuster pour la prochaine série ?</div>
         <div class="suggestion-actions" style="margin-top:.6rem">
           <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↓ La charge</button>
           ${repsDejaMin ? '' : `<button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↓ Les reps</button>`}
         </div>
         <div style="margin-top:.4rem">
-          <button class="btn btn-outline" style="width:100%" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.reps})">= Ne rien changer</button>
+          <button class="btn btn-outline" style="width:100%" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.reps})">= Garder la même série</button>
         </div>`;
       break;
     }
@@ -2833,7 +2833,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     case 'fd-plafond-f':
       sugBox.innerHTML = `
         <div class="suggestion-title" style="color:var(--red)">🚨 Maxi à recalculer</div>
-        <div class="suggestion-text">Vous êtes au maximum de votre projet en charge <strong>et</strong> en répétitions, et cela vous semble facile.<br>Votre maxi est sous-évalué — vous devez le recalculer avant de continuer.</div>
+        <div class="suggestion-text">Vous êtes au maximum du projet en charge et en répétitions, et cela vous semble facile. Votre maxi est sous-évalué — recalculez-le avant de continuer.</div>
         <div class="suggestion-actions">
           <button class="btn" style="background:var(--red)" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="resetEtRecalculerMaxi('${nomAtelier}')">📏 Recalculer mon maxi</button>
         </div>`;
@@ -2841,8 +2841,8 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
 
     case 'fd-plafond-d':
       sugBox.innerHTML = `
-        <div class="suggestion-title" style="color:var(--yellow)">⚠️ Plafond du projet atteint</div>
-        <div class="suggestion-text">Vous êtes au maximum de ce que permet votre projet en charge et en répétitions.<br>Votre maxi est sans doute sous-évalué — pensez à faire une nouvelle recherche de maxi pour cet atelier.<br><br>
+        <div class="suggestion-title" style="color:var(--yellow)">⚠️ Plafond atteint</div>
+        <div class="suggestion-text">Vous êtes au maximum de ce que permet votre projet. Pensez à recalculer votre maxi prochainement.<br><br>
           Série conseillée : <strong>${params.reps} reps <span style="color:var(--blue)">×</span> ${params.charge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
@@ -2854,7 +2854,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     case 'e-plafond-bas':
       sugBox.innerHTML = `
         <div class="suggestion-title" style="color:var(--red)">🚨 Maxi à recalculer</div>
-        <div class="suggestion-text">Vous êtes au minimum de votre projet en charge <strong>et</strong> en répétitions, et cela vous semble épuisant.<br>Votre maxi est surévalué — vous devez le recalculer avant de continuer.</div>
+        <div class="suggestion-text">Vous êtes au minimum du projet en charge et en répétitions, et c'est un échec. Votre maxi est surévalué — recalculez-le avant de continuer.</div>
         <div class="suggestion-actions">
           <button class="btn" style="background:var(--red)" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="resetEtRecalculerMaxi('${nomAtelier}')">📏 Recalculer mon maxi</button>
         </div>`;
@@ -2862,8 +2862,8 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
 
     case 'fd-max-intensite':
       sugBox.innerHTML = `
-        <div class="suggestion-title">💡 Proposition pour Série ${nextSerie + 1}</div>
-        <div class="suggestion-text">Intensité au maximum — augmentez les répétitions.<br>
+        <div class="suggestion-title">⬆️ On monte les répétitions</div>
+        <div class="suggestion-text">La charge est déjà au maximum de votre projet — on augmente les répétitions.<br><br>
           Série conseillée : <strong>${params.newReps} reps <span style="color:var(--blue)">×</span> ${params.charge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
@@ -2875,8 +2875,8 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     case 'fd-force-charge': {
       const newCharge = maxi ? Math.round(maxi * params.newIntensite / 100 * 2) / 2 : currentCharge;
       sugBox.innerHTML = `
-        <div class="suggestion-title">💡 Charge modifiée</div>
-        <div class="suggestion-text">↑ Intensité : ${intensiteRef}% → ${params.newIntensite}%<br>
+        <div class="suggestion-title">⬆️ On monte la charge</div>
+        <div class="suggestion-text">Intensité : ${intensiteRef}% → ${params.newIntensite}%<br><br>
           Série conseillée : <strong>${params.reps} reps <span style="color:var(--blue)">×</span> ${newCharge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
@@ -2888,8 +2888,8 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
 
     case 'fd-choix':
       sugBox.innerHTML = `
-        <div class="suggestion-title">💡 Proposition pour Série ${nextSerie + 1} — Augmenter l'effort</div>
-        <div class="suggestion-text">Vous souhaitez augmenter l'effort en faisant varier :</div>
+        <div class="suggestion-title">⬆️ Augmenter l'effort</div>
+        <div class="suggestion-text">Comment souhaitez-vous progresser pour la prochaine série ?</div>
         <div class="suggestion-actions" style="margin-top:.6rem">
           <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↑ La charge</button>
           <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↑ Les reps</button>
@@ -2898,7 +2898,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
   }
 
   if (avertissementDoux) {
-    sugBox.innerHTML = `<div style="font-size:.75rem;color:var(--yellow);margin-bottom:.5rem">⚠️ Votre maxi semble peut-être sous-évalué</div>` + sugBox.innerHTML;
+    sugBox.innerHTML = `<div style="font-size:.75rem;color:var(--yellow);margin-bottom:.5rem">⚠️ Votre maxi semble sous-évalué sur cet atelier</div>` + sugBox.innerHTML;
   }
   return type;
 }
