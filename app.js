@@ -2500,8 +2500,6 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
   // En mode autonome : 2F consécutifs ne forcent pas la redirection (l'élève choisit librement)
   const interruption = detectInterruption(localSeries);
   if (interruption.interrompu && !(interruption.raison === 'sous-evalue' && !state.guidage)) {
-    delete state.serieLocale[nomAtelier];
-    saveSerieLocale();
     if (!state.maxisForces.includes(nomAtelier)) state.maxisForces.push(nomAtelier);
     if (state.suggestionEnAttente) delete state.suggestionEnAttente[nomAtelier];
     if (state.suggestionEnCours) state.suggestionEnCours[nomAtelier] = false;
@@ -2515,7 +2513,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
         sugBox.innerHTML = `
           <div class="suggestion-title" style="color:var(--yellow)">⬆️ 2 fois Facile d'affilée !</div>
           <div class="suggestion-text" style="margin-bottom:.6rem">
-            Votre maxi est probablement <strong>sous-évalué</strong>. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.<br><em>Vous allez être redirigé(e) automatiquement.</em>
+            Votre maxi est probablement <strong>sous-évalué</strong>. Recalculez-le — vos 2 séries sont conservées, vous reprendrez à la Série 3 avec le nouveau maxi.<br><em>Vous allez être redirigé(e) automatiquement.</em>
           </div>
           <div class="suggestion-actions">
             <button class="btn" style="background:linear-gradient(135deg,var(--yellow),#e67e22);color:#000"
@@ -2525,7 +2523,7 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
         sugBox.innerHTML = `
           <div class="suggestion-title" style="color:var(--red)">⬇️ 2 fois Échec d'affilée !</div>
           <div class="suggestion-text" style="margin-bottom:.6rem">
-            Votre maxi est probablement <strong>surévalué</strong>. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.<br><em>Vous allez être redirigé(e) automatiquement.</em>
+            Votre maxi est probablement <strong>surévalué</strong>. Recalculez-le — vos 2 séries sont conservées, vous reprendrez à la Série 3 avec le nouveau maxi.<br><em>Vous allez être redirigé(e) automatiquement.</em>
           </div>
           <div class="suggestion-actions">
             <button class="btn" style="background:linear-gradient(135deg,var(--red),#c0392b);color:#fff"
