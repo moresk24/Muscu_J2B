@@ -2021,24 +2021,47 @@ function formatMaxiSeance(a) {
 
 function buildSeriesSpecialHTML(a, localSeries) {
   const key = a.nom.replace(/[^a-zA-Z]/g,'_');
-  const doneSeries = localSeries.length;
+  const nomEsc = a.nom.replace(/'/g,"\\'");
   const maxiLabel = formatMaxiSeance(a);
+  const rColors = {F:'#2980b9',D:'#27ae60',TD:'#f39c12',E:'#c0392b'};
   let html = `<div style="font-size:.82rem;color:var(--text);margin-bottom:.75rem">Réalisez cette série 4 fois :</div>`;
 
-  for (let s = 0; s < doneSeries; s++) {
+  for (let s = 0; s < localSeries.length; s++) {
     const local = localSeries[s];
     const isOk = local.resultat === 'ok';
-    html += `<div class="serie-row done" id="sr-${key}-${s}">
-      <div class="serie-num">${s+1}</div>
-      <div class="serie-info"><div class="serie-charge">${maxiLabel}</div></div>
-      <div style="font-size:.85rem;font-weight:700;color:${isOk?'var(--green)':'var(--red)'}">${isOk?'✓ Ok':'✗ Échec'}</div>
-    </div>`;
+    const couleur = isOk ? 'var(--green)' : 'var(--red)';
+    const label = isOk ? '✓ Ok' : '✗ Échec';
+
+    if (local.resultat && !local.ressenti && isEditable()) {
+      html += `<div class="serie-row active-serie" id="sr-${key}-${s}">
+        <div class="serie-num">${s+1}</div>
+        <div class="serie-info">
+          <span style="font-size:.85rem;font-weight:700;color:${couleur}">${label}</span>
+        </div>
+        <div class="serie-ressenti" id="res-${key}-${s}" style="align-items:center">
+          <span style="font-size:.7rem;color:var(--muted);margin-right:.3rem;white-space:nowrap">Ressenti ?</span>
+          ${['F','D','TD','E'].map(r=>`<button class="ressenti-btn" onclick="onRessentiSpeciale('${nomEsc}',${s},'${r}')">${r}</button>`).join('')}
+        </div>
+      </div>`;
+    } else {
+      const ressentiSpan = local.ressenti
+        ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;background:${rColors[local.ressenti]||'#444'};color:#fff;font-size:.65rem;font-weight:700">${local.ressenti}</span>`
+        : '';
+      html += `<div class="serie-row done" id="sr-${key}-${s}">
+        <div class="serie-num">${s+1}</div>
+        <div class="serie-info"><div class="serie-charge">${maxiLabel}</div></div>
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <span style="font-size:.85rem;font-weight:700;color:${couleur}">${label}</span>
+          ${ressentiSpan}
+        </div>
+      </div>`;
+    }
   }
 
-  if (doneSeries < 4) {
-    const s = doneSeries;
+  const hasPending = localSeries.some(s => s && s.resultat && !s.ressenti);
+  if (!hasPending && localSeries.length < 4) {
+    const s = localSeries.length;
     const disabled = !isEditable() ? 'disabled' : '';
-    const nomEsc = a.nom.replace(/'/g,"\\'");
     if (getAtelierType(a.nom) === 'gainage') {
       html += `<div class="serie-row active-serie" id="sr-${key}-${s}">
         <div class="serie-num">${s+1}</div>
@@ -2073,14 +2096,16 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
 
   const a = ATELIERS.find(x => x.nom === nomAtelier);
   const sgEl = document.getElementById('sg-'+key);
-  if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, state.serieLocale[nomAtelier]);
 
-  // Interruption si 2 échecs cumulés (consécutifs ou non)
+  // Interruption si 2 échecs — pas besoin de demander le ressenti
   const nbEchecs = state.serieLocale[nomAtelier].filter(s => s && s.resultat === 'echec').length;
   if (nbEchecs >= 2) {
+    const estLombairesA0 = getAtelierType(nomAtelier) === 'lombaires' && parseFloat(state.maxis[nomAtelier]) === 0;
+    const estGainageNiv1 = getAtelierType(nomAtelier) === 'gainage' && parseInt(state.maxis[nomAtelier]) <= 1;
+    const estNiveauMinimal = estLombairesA0 || estGainageNiv1;
     delete state.serieLocale[nomAtelier];
     saveSerieLocale();
-    clearMaxiForAtelier(nomAtelier);
+    if (!estNiveauMinimal) clearMaxiForAtelier(nomAtelier);
     if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, []);
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) {
@@ -2089,27 +2114,44 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
       const bravoText  = bravo.querySelector('.bravo-text');
       const bravoSub   = bravo.querySelector('.bravo-sub');
       if (bravoEmoji) bravoEmoji.textContent = '⬇️';
-      if (bravoText)  { bravoText.textContent = '2 Échecs !'; bravoText.style.color = 'var(--red)'; }
-      if (bravoSub)   bravoSub.innerHTML = 'Votre maxi est probablement surévalué. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.<br><em>Vous allez être redirigé(e) automatiquement.</em>';
+      if (bravoText) { bravoText.textContent = '2 Échecs !'; bravoText.style.color = 'var(--red)'; }
+      if (estNiveauMinimal) {
+        if (bravoSub) bravoSub.innerHTML = 'Vous êtes déjà au niveau minimal. Parlez-en avec votre enseignant.';
+      } else {
+        if (bravoSub) bravoSub.innerHTML = 'Votre maxi est probablement surévalué. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.<br><em>Vous allez être redirigé(e) automatiquement.</em>';
+        setTimeout(() => allerAuxMaxis(nomAtelier), 10000);
+      }
     }
-    setTimeout(() => allerAuxMaxis(nomAtelier), 10000);
     return;
   }
 
-  if (state.serieLocale[nomAtelier].length >= 4) {
-    // Décider du niveau sup avant le fire & forget (besoin des données locales)
-    const localAvantFire = state.serieLocale[nomAtelier] || [];
-    const nbOkFire = localAvantFire.filter(s => s && s.resultat === 'ok').length;
+  // Afficher le sélecteur de ressenti
+  if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, state.serieLocale[nomAtelier]);
+}
+
+function onRessentiSpeciale(nomAtelier, serieIndex, ressenti) {
+  const key = nomAtelier.replace(/[^a-zA-Z]/g,'_');
+  const local = state.serieLocale[nomAtelier]?.[serieIndex];
+  if (!local) return;
+  local.ressenti = ressenti;
+  saveSerieLocale();
+
+  const a = ATELIERS.find(x => x.nom === nomAtelier);
+  const sgEl = document.getElementById('sg-'+key);
+  const localSeries = state.serieLocale[nomAtelier];
+
+  if (localSeries.length >= 4) {
+    if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, localSeries);
+    const nbOkFire = localSeries.filter(s => s && s.resultat === 'ok').length;
     const niveauActuelFire = parseInt(state.maxis[nomAtelier]) || 1;
     const niveauDecisionFire = decideNiveauSup(nomAtelier, nbOkFire, niveauActuelFire);
     if (niveauDecisionFire.proposer) {
       state.propositionNiveauSup = {atelier: nomAtelier, niveauActuel: niveauActuelFire, niveauSuivant: niveauDecisionFire.niveauSuivant};
     }
-
     const bravo = document.getElementById('bravo-'+key);
     if (bravo) bravo.classList.add('visible');
     stopRecupTimer(key);
-    validateAtelier(nomAtelier); // fire & forget
+    validateAtelier(nomAtelier);
     if (state.propositionNiveauSup && state.propositionNiveauSup.atelier === nomAtelier) {
       const prop = state.propositionNiveauSup;
       const bloc = document.getElementById('bravo-niveau-'+key);
@@ -2120,6 +2162,7 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
       }
     }
   } else {
+    if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, localSeries);
     startRecupTimer(key, nomAtelier);
   }
 }
@@ -2223,7 +2266,7 @@ async function validateAtelier(nomAtelier) {
 
   // Sauvegarder les 4 séries dans l'historique local
   const seriesDuJour = (state.serieLocale[nomAtelier] || []).slice(0,4).map(s =>
-    s.special ? {special:true, resultat:s.resultat} : {c:s.charge, r:s.reps, s:s.ressenti}
+    s.special ? {special:true, resultat:s.resultat, r:s.ressenti} : {c:s.charge, r:s.reps, s:s.ressenti}
   );
   const histEntry = {series:seriesDuJour, projet:state.projet, seance:state.sessionNumber};
   state.historiqueAteliers[nomAtelier] = histEntry;
@@ -2575,6 +2618,7 @@ function activerCorrectionRessenti(nomAtelier, key, serieIndex) {
   const resEl = document.getElementById('res-' + key + '-' + serieIndex);
   if (!resEl) return;
   const nomEsc = nomAtelier.replace(/'/g,"\\'");
+  resEl.style.alignItems = 'center';
   resEl.innerHTML = `<span style="font-size:.7rem;color:var(--muted);margin-right:.3rem;white-space:nowrap">Modifier ?</span>`
     + ['F','D','TD','E'].map(r => `
     <button class="ressenti-btn ${local.ressenti===r?'selected-'+r:''}"
