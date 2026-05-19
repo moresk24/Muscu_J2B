@@ -509,7 +509,7 @@ function showPageAfterLogin() {
 }
 
 function showRappelFinSeance() {
-  if (!state.isActive || state.isAdmin) return;
+  if (!state.isActive) return;
   const key = 'muscu_rappel_' + (state.sessionId || 'session');
   if (sessionStorage.getItem(key)) return;
   sessionStorage.setItem(key, '1');
