@@ -2806,7 +2806,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     case 'e-min-intensite':
       sugBox.innerHTML = `
         <div class="suggestion-title">⬇️ On réduit les répétitions</div>
-        <div class="suggestion-text">La charge est déjà au minimum — on diminue les répétitions.<br><br>
+        <div class="suggestion-text">La charge est déjà au minimum de votre projet.<br>Donc on diminue les répétitions.<br><br>
           Série conseillée : <strong>${params.newReps} reps <span style="color:var(--blue)">×</span> ${params.charge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
@@ -2863,7 +2863,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     case 'fd-max-intensite':
       sugBox.innerHTML = `
         <div class="suggestion-title">⬆️ On monte les répétitions</div>
-        <div class="suggestion-text">La charge est déjà au maximum de votre projet — on augmente les répétitions.<br><br>
+        <div class="suggestion-text">La charge est déjà au maximum de votre projet.<br>Donc on augmente les répétitions.<br><br>
           Série conseillée : <strong>${params.newReps} reps <span style="color:var(--blue)">×</span> ${params.charge} ${unite}</strong>
         </div>
         <div class="suggestion-actions">
