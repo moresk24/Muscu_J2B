@@ -354,6 +354,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .ressenti-btn[disabled]{opacity:.3;cursor:default}
 .ressenti-btn[disabled][class*="selected-"]{opacity:1;cursor:default}
 .serie-row.done{opacity:.7}
+.btn-corriger-ressenti{background:none;border:none;font-size:.85rem;cursor:pointer;opacity:.45;padding:.2rem .1rem;flex-shrink:0;transition:opacity .15s;line-height:1}
+.btn-corriger-ressenti:hover{opacity:1}
   .serie-row.active-serie{border-color:var(--accent);background:rgba(255,107,43,.05)}
 
 /* Suggestion */

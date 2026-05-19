@@ -2143,16 +2143,19 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
   for (let s = 0; s < doneSeries; s++) {
     const local = localSeries[s];
     const pctDone = showPct ? ` <span style="font-size:.65rem;color:var(--muted);font-weight:400">(${Math.round(local.charge / maxi * 100)}%)</span>` : '';
+    const isLastDone = (s === doneSeries - 1) && (doneSeries < 4) && isEditable();
+    const nomEsc = a.nom.replace(/'/g,"\\'");
     html += `<div class="serie-row done" id="sr-${key}-${s}">
       <div class="serie-num">${s+1}</div>
       <div class="serie-info">
         <div class="serie-charge">${local.reps} <span style="color:var(--blue);font-weight:400">×</span> ${local.charge} ${a.unite}${pctDone}</div>
       </div>
-      <div class="serie-ressenti">
+      <div class="serie-ressenti" id="res-${key}-${s}">
         ${['F','D','TD','E'].map(r=>`
           <button class="ressenti-btn ${local.ressenti===r?'selected-'+r:''}" disabled>${r}</button>
         `).join('')}
       </div>
+      ${isLastDone ? `<button class="btn-corriger-ressenti" onclick="activerCorrectionRessenti('${nomEsc}','${key}',${s})" title="Corriger le ressenti">✏️</button>` : ''}
     </div>`;
   }
 
@@ -2564,6 +2567,22 @@ async function onRessenti(nomAtelier, unite, serieIndex, ressenti, charge, reps,
       if (warnHtml) sugBox.insertAdjacentHTML('afterbegin', warnHtml);
     }
   }
+}
+
+function activerCorrectionRessenti(nomAtelier, key, serieIndex) {
+  const local = state.serieLocale[nomAtelier]?.[serieIndex];
+  if (!local) return;
+  const resEl = document.getElementById('res-' + key + '-' + serieIndex);
+  if (!resEl) return;
+  const nomEsc = nomAtelier.replace(/'/g,"\\'");
+  resEl.innerHTML = ['F','D','TD','E'].map(r => `
+    <button class="ressenti-btn ${local.ressenti===r?'selected-'+r:''}"
+      onclick="onRessenti('${nomEsc}','${local.unite}',${serieIndex},'${r}',${local.charge},${local.reps},${local.intensite})">
+      ${r}
+    </button>
+  `).join('');
+  const row = document.getElementById('sr-' + key + '-' + serieIndex);
+  if (row) { const btn = row.querySelector('.btn-corriger-ressenti'); if (btn) btn.style.display = 'none'; }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
