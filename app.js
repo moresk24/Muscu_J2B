@@ -2889,7 +2889,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     case 'fd-choix':
       sugBox.innerHTML = `
         <div class="suggestion-title">⬆️ Augmenter l'effort</div>
-        <div class="suggestion-text">Comment souhaitez-vous progresser ?</div>
+        <div class="suggestion-text">Que souhaitez-vous modifier ?</div>
         <div class="suggestion-actions" style="margin-top:.6rem">
           <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↑ La charge</button>
           <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↑ Les reps</button>
