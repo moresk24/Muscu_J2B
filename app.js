@@ -1751,10 +1751,10 @@ function buildTuto() {
           <p style="font-size:.87rem;color:var(--muted);line-height:1.5">L'application vous accompagne à chaque étape du cycle de musculation. Le déroulement est toujours le même :</p>
         </div>
         <ol class="tuto-steps">
-          <li><div class="tuto-num">1</div><div class="tuto-content"><strong>Connexion</strong> — Choisissez votre classe, votre nom et entrez votre mot de passe.</div></li>
+          <li><div class="tuto-num">1</div><div class="tuto-content"><strong>Connexion</strong> — Choisissez votre classe ou groupe, votre nom et entrez votre mot de passe.</div></li>
           <li><div class="tuto-num">2</div><div class="tuto-content"><strong>Maxis (1RM)</strong> — Renseignez votre charge maximale sur chaque atelier.</div></li>
           <li><div class="tuto-num">3</div><div class="tuto-content"><strong>Choix du projet</strong> — Choisissez votre objectif de travail pour le cycle.</div></li>
-          <li><div class="tuto-num">4</div><div class="tuto-content"><strong>Séances</strong> — L'application vous guide atelier par atelier pendant le cours.</div></li>
+          <li><div class="tuto-num">4</div><div class="tuto-content"><strong>Séances</strong> — L'application vous accompagne atelier par atelier pendant le cours.</div></li>
           <li><div class="tuto-num">5</div><div class="tuto-content"><strong>Badge</strong> — À chaque séance, obtenez un badge selon votre nombre d'ateliers validés.</div></li>
         </ol>
       </div>
@@ -1763,13 +1763,13 @@ function buildTuto() {
       <div class="ressource-section">
         <div class="ressource-section-title">☰ Le menu de l'application</div>
         <div class="card">
-          <div class="tuto-card-title">☰ Menu (en haut à droite)</div>
           <p style="font-size:.87rem;color:var(--muted);margin-bottom:.5rem">En appuyant sur <strong>☰</strong> en haut à droite, un menu s'affiche :</p>
           <ol class="tuto-steps">
             <li><div class="tuto-num">🌙</div><div class="tuto-content"><strong>Thème sombre / clair</strong> — Basculez l'affichage. Ce choix est mémorisé.</div></li>
             <li><div class="tuto-num">📖</div><div class="tuto-content"><strong>Lexique</strong> — Vocabulaire de la musculation avec barre de recherche.</div></li>
             <li><div class="tuto-num">🦴</div><div class="tuto-content"><strong>Anatomie</strong> — Schéma musculaire et fiches par groupe.</div></li>
             <li><div class="tuto-num">❓</div><div class="tuto-content"><strong>Guide d'utilisation</strong> — Ce document.</div></li>
+            <li><div class="tuto-num">✅</div><div class="tuto-content"><strong>Enregistrer ma séance</strong> — Apparaît dès 4 ateliers validés. À faire avant de partir !</div></li>
             <li><div class="tuto-num">↩</div><div class="tuto-content"><strong>Se déconnecter</strong> — Revient à l'écran de connexion.</div></li>
           </ol>
         </div>
@@ -1779,14 +1779,13 @@ function buildTuto() {
       <div class="ressource-section">
         <div class="ressource-section-title"><span style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-size:.8rem;font-weight:700;width:1.5rem;height:1.5rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">1</span> Connexion</div>
         <ol class="tuto-steps">
-          <li><div class="tuto-num">1</div><div class="tuto-content">Sélectionnez votre <strong>classe</strong> dans le menu déroulant.</div></li>
+          <li><div class="tuto-num">1</div><div class="tuto-content">Sélectionnez votre <strong>classe ou groupe</strong> dans le menu déroulant.</div></li>
           <li><div class="tuto-num">2</div><div class="tuto-content">Sélectionnez votre <strong>nom</strong> dans la liste.</div></li>
           <li><div class="tuto-num">3</div><div class="tuto-content">Saisissez votre <strong>mot de passe</strong> (6 à 10 lettres minuscules, sans accent). <em>Lors de votre première connexion, vous créez votre mot de passe — retenez-le.</em></div></li>
           <li><div class="tuto-num">4</div><div class="tuto-content">Appuyez sur <strong>Entrer</strong>.</div></li>
         </ol>
-        <div class="tuto-alert blue"><strong>ℹ️ En-tête :</strong> Une fois connecté(e), votre prénom apparaît en haut de l'écran avec le numéro de votre projet — ex. <strong>LÉA (2)</strong>.</div>
+        <div class="tuto-alert blue"><strong>ℹ️ Reconnexion automatique :</strong> Si vous avez déjà utilisé l'application sur cet appareil, votre nom est pré-rempli et seul le mot de passe vous est demandé.</div>
         <div class="tuto-alert yellow"><strong>⚠️ Mot de passe oublié ?</strong> Votre enseignant peut le réinitialiser.</div>
-        <div class="tuto-alert"><strong>⚠️ À retenir :</strong> Utilisez toujours le bouton "Enregistrer ma séance" avant de vous déconnecter. Sans cette étape, votre badge ne sera pas enregistré.</div>
       </div>
 
       <!-- Maxis -->
@@ -1794,27 +1793,27 @@ function buildTuto() {
         <div class="ressource-section-title"><span style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-size:.8rem;font-weight:700;width:1.5rem;height:1.5rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">2</span> 💪 Mes Maxis (1RM)</div>
         <div class="card">
           <div class="tuto-card-title">Qu'est-ce que le Maxi (1RM) ?</div>
-          <p style="font-size:.85rem;color:var(--muted);line-height:1.5">Le <strong>1RM</strong> est le poids maximum que vous pouvez soulever <strong>une seule fois</strong> correctement. C'est votre référence personnelle pour calculer les charges adaptées.</p>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.5">Le <strong>1RM</strong> est le poids maximum que vous pouvez soulever <strong>une seule fois</strong> correctement. C'est votre référence personnelle — toutes les charges proposées pendant la séance en sont calculées.</p>
         </div>
         <div class="card">
           <div class="tuto-card-title">⚡ Calculer mon maxi (recommandé)</div>
-          <p style="font-size:.85rem;color:var(--muted);line-height:1.5">Utilisez les <strong>roulettes</strong> pour indiquer le poids soulevé et le nombre de répétitions. L'application calcule votre 1RM via la formule de Brzycki. Si vous aviez déjà un maxi, il est rappelé sous le nom de l'atelier.</p>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.5">Utilisez les <strong>roulettes</strong> pour indiquer le poids soulevé et le nombre de répétitions réalisées. L'application calcule votre 1RM via la formule de Brzycki. Si vous aviez déjà un maxi enregistré, il est affiché sous le nom de l'atelier.</p>
         </div>
         <div class="card">
           <div class="tuto-card-title">✏️ Saisie directe</div>
-          <p style="font-size:.85rem;color:var(--muted)">Si vous connaissez déjà votre maxi, basculez sur l'onglet <strong>Saisie directe</strong>.</p>
+          <p style="font-size:.85rem;color:var(--muted)">Si vous connaissez déjà votre maxi exact, basculez sur l'onglet <strong>Saisie directe</strong>.</p>
         </div>
         <div class="card">
           <div class="tuto-card-title">🧍 Ateliers spéciaux</div>
-          <p style="font-size:.85rem;color:var(--muted);line-height:1.5"><strong>Banc à Lombaires / Abdo Sol</strong> — Poids additionnel (0, 2, 5 ou 10 kg) pour 30 reps en 1 minute.<br><strong>Gainage sol</strong> — Sélectionnez votre niveau de 1 à 4.</p>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.5"><strong>Banc à Lombaires / Abdo Sol</strong> — Choisissez le poids additionnel (0, 2, 5 ou 10 kg) que vous pouvez tenir pour 30 répétitions en 1 minute.<br><br><strong>Gainage sol</strong> — Sélectionnez votre niveau de 1 à 4.</p>
         </div>
-        <div class="tuto-alert green"><strong>✅ Tous les maxis renseignés ?</strong> Le reste de l'application se déverrouille.</div>
+        <div class="tuto-alert green"><strong>✅ Tous les maxis renseignés ?</strong> Les pages Projets, Mon projet et Séances se déverrouillent.</div>
       </div>
 
       <!-- Projets -->
       <div class="ressource-section">
         <div class="ressource-section-title"><span style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-size:.8rem;font-weight:700;width:1.5rem;height:1.5rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span> 🎯 Les Projets</div>
-        <p style="font-size:.87rem;color:var(--muted);margin-bottom:.6rem">Choisissez <strong>un seul projet</strong> pour tout le cycle. Il détermine l'intensité, les répétitions et la récupération proposées.</p>
+        <p style="font-size:.87rem;color:var(--muted);margin-bottom:.6rem">Choisissez <strong>un seul projet</strong> pour tout le cycle. Il détermine l'intensité, les répétitions et la durée de récupération proposées à chaque séance.</p>
         <div class="card"><div class="tuto-card-title">⚡ Projet 1 — SPORTIF</div><p style="font-size:.85rem;color:var(--muted)">Puissance et explosivité. Séries courtes (4–8 reps) à haute intensité (80–90%). Récupération : 3 à 6 min.</p></div>
         <div class="card"><div class="tuto-card-title">🏛️ Projet 2 — ESTHÉTIQUE</div><p style="font-size:.85rem;color:var(--muted)">Volume musculaire. Séries longues (10–20 reps) à intensité modérée (65–80%). Récupération : 1'30 à 2'30.</p></div>
         <div class="card"><div class="tuto-card-title">🫀 Projet 3A — SANTÉ Endurance</div><p style="font-size:.85rem;color:var(--muted)">Dépense d'énergie. Séries très longues (25–35 reps) à faible intensité (40–50%). Récupération : 30s à 1 min.</p></div>
@@ -1826,70 +1825,72 @@ function buildTuto() {
         <div class="ressource-section-title"><span style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-size:.8rem;font-weight:700;width:1.5rem;height:1.5rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">4</span> 🏋️ Ma Séance</div>
         <div class="card">
           <div class="tuto-card-title">Déroulement général</div>
-          <p style="font-size:.85rem;color:var(--muted);line-height:1.5">La page Séance liste tous les ateliers. Appuyez sur un atelier pour ouvrir sa page dédiée. Effectuez vos <strong>4 séries</strong> et indiquez votre ressenti après chacune. Validez au moins 5 ateliers pour obtenir un badge.</p>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.5">La page Séance liste tous les ateliers disponibles. Les ateliers en cours de séance ont un <strong style="color:var(--blue)">fond bleu</strong>, ceux déjà validés lors d'une séance précédente ont une <strong style="color:var(--green)">bordure verte</strong>. Appuyez sur un atelier pour l'ouvrir.</p>
         </div>
         <div class="card">
-          <div class="tuto-card-title">📄 Page détail d'un atelier</div>
+          <div class="tuto-card-title">📄 Page d'un atelier</div>
           <ol class="tuto-steps" style="margin-top:.4rem">
-            <li><div class="tuto-num">1</div><div class="tuto-content">Nom de l'atelier + muscles sollicités</div></li>
-            <li><div class="tuto-num">2</div><div class="tuto-content">Votre <strong>maxi (1RM)</strong> et nombre de validations</div></li>
-            <li><div class="tuto-num">3</div><div class="tuto-content"><strong>Dernière validation</strong> à cet atelier — vos 4 séries précédentes</div></li>
-            <li><div class="tuto-num">4</div><div class="tuto-content"><strong>Chronomètre de récupération</strong> + grille de vos séries du jour</div></li>
-            <li><div class="tuto-num">5</div><div class="tuto-content"><strong>Consignes d'exécution</strong> et <strong>règles de sécurité</strong></div></li>
-            <li><div class="tuto-num">6</div><div class="tuto-content">Lien vers la <strong>vidéo de démonstration</strong> (si disponible)</div></li>
+            <li><div class="tuto-num">1</div><div class="tuto-content">En-tête : <strong>nom de l'atelier</strong>, votre maxi et les muscles sollicités</div></li>
+            <li><div class="tuto-num">2</div><div class="tuto-content"><strong>Historique</strong> — vos 4 séries de la dernière validation (si même projet)</div></li>
+            <li><div class="tuto-num">3</div><div class="tuto-content"><strong>Chronomètre de récupération</strong> + grille de vos 4 séries du jour</div></li>
+            <li><div class="tuto-num">4</div><div class="tuto-content"><strong>Consignes d'exécution</strong> et <strong>règles de sécurité</strong></div></li>
           </ol>
         </div>
         <div class="card">
-          <div class="tuto-card-title">📋 Dernière validation à cet atelier</div>
-          <p style="font-size:.85rem;color:var(--muted);line-height:1.5;margin-bottom:.5rem">Si vous avez déjà travaillé cet atelier avec le <strong>même projet</strong>, vos 4 séries précédentes s'affichent :</p>
+          <div class="tuto-card-title">📋 Historique de l'atelier</div>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.5;margin-bottom:.5rem">Si vous avez déjà travaillé cet atelier avec le <strong>même projet</strong>, vos 4 séries précédentes s'affichent sous forme de petits carrés colorés :</p>
           <div class="tuto-color-item"><div class="tuto-color-dot" style="background:#2980b9"></div><strong>F</strong> — Facile</div>
           <div class="tuto-color-item"><div class="tuto-color-dot" style="background:#27ae60"></div><strong>D</strong> — Difficile</div>
           <div class="tuto-color-item"><div class="tuto-color-dot" style="background:#f39c12"></div><strong>TD</strong> — Très Difficile</div>
           <div class="tuto-color-item"><div class="tuto-color-dot" style="background:#c0392b"></div><strong>E</strong> — Échec</div>
-          <p style="font-size:.82rem;color:var(--muted);margin-top:.5rem;line-height:1.4">La série en <strong style="color:#c0392b">rouge</strong> sert de référence pour votre première série du jour.</p>
+          <p style="font-size:.82rem;color:var(--muted);margin-top:.5rem;line-height:1.4">La série encadrée en <strong style="color:#c0392b">rouge</strong> sert de référence pour votre première série du jour.</p>
         </div>
         <div class="card">
           <div class="tuto-card-title">⏱ Chronomètre de récupération</div>
-          <p style="font-size:.85rem;color:var(--muted);line-height:1.5;margin-bottom:.4rem">Se déclenche après S1, S2 et S3 selon votre projet :</p>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.5;margin-bottom:.4rem">Se déclenche après chaque série (S1, S2, S3) selon votre projet :</p>
           <p style="font-size:.84rem;line-height:1.6">Projet 1 : <strong>3 min</strong> · Projet 2 : <strong>1 min 30</strong> · Projet 3A : <strong>45 s</strong> · Projet 3B : <strong>1 min</strong></p>
-          <p style="font-size:.82rem;color:var(--muted);margin-top:.4rem;line-height:1.4">Passe au <strong style="color:var(--green)">vert</strong> dans les 5 dernières secondes, puis en <strong style="color:#e74c3c">rouge négatif</strong> si dépassé. Appuyez sur <strong>Passer →</strong> pour ignorer.</p>
+          <p style="font-size:.82rem;color:var(--muted);margin-top:.4rem;line-height:1.4">Passe au <strong style="color:var(--green)">vert</strong> dans les 5 dernières secondes, puis en <strong style="color:#e74c3c">rouge</strong> si dépassé. Appuyez sur <strong>Passer →</strong> pour ignorer.</p>
         </div>
         <div class="card">
-          <div class="tuto-card-title">Faire une série</div>
+          <div class="tuto-card-title">Faire une série — mode guidé</div>
           <ol class="tuto-steps" style="margin-top:.4rem">
-            <li><div class="tuto-num">1</div><div class="tuto-content">L'application affiche une <strong>💡 Proposition</strong> : charge et répétitions calculées selon votre projet et votre maxi.</div></li>
-            <li><div class="tuto-num">2</div><div class="tuto-content">Si besoin, modifiez via <strong>✏️ Modifier</strong>. La roulette affiche le <strong>% du maxi</strong> pour chaque charge.</div></li>
-            <li><div class="tuto-num">3</div><div class="tuto-content">Réalisez la série, puis indiquez votre <strong>ressenti</strong>.</div></li>
-            <li><div class="tuto-num">4</div><div class="tuto-content">La suggestion pour la série suivante apparaît. Les boutons <strong>↑↓ Charge / Reps</strong> appliquent directement la modification.</div></li>
-            <li><div class="tuto-num">5</div><div class="tuto-content">Le chronomètre de récupération se lance (S1, S2 et S3 uniquement).</div></li>
+            <li><div class="tuto-num">1</div><div class="tuto-content">L'application affiche une <strong>💡 Proposition</strong> : charge et répétitions calculées selon votre maxi et votre projet.</div></li>
+            <li><div class="tuto-num">2</div><div class="tuto-content">Si besoin, ajustez via les boutons <strong>↑ / ↓ Charge</strong> ou <strong>↑ / ↓ Reps</strong>. La roulette affiche le <strong>% du maxi</strong> pour chaque charge.</div></li>
+            <li><div class="tuto-num">3</div><div class="tuto-content">Réalisez la série, puis indiquez votre <strong>ressenti</strong> (F / D / TD / E).</div></li>
+            <li><div class="tuto-num">4</div><div class="tuto-content">L'application adapte la proposition pour la série suivante. Le chrono de récupération se lance.</div></li>
           </ol>
         </div>
         <div class="card">
-          <div class="tuto-card-title">Les 4 boutons de ressenti</div>
+          <div class="tuto-card-title">Faire une série — mode autonome</div>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.5">En mode autonome, c'est vous qui choisissez librement la charge et les répétitions via les roulettes. Indiquez ensuite votre ressenti. L'application ne propose pas d'adaptation mais vous avertit si votre effort est insuffisant.</p>
+        </div>
+        <div class="card">
+          <div class="tuto-card-title">Les 4 ressentis</div>
           <div class="tuto-ressenti-grid">
             <div class="tuto-ressenti-badge td"><div class="tuto-rlabel">TD — Très Difficile</div><p>À la limite. La charge est parfaitement adaptée.</p></div>
             <div class="tuto-ressenti-badge f"><div class="tuto-rlabel">F — Facile</div><p>Vous auriez pu faire bien plus. La charge va augmenter.</p></div>
             <div class="tuto-ressenti-badge d"><div class="tuto-rlabel">D — Difficile</div><p>Dur mais réussi. Légère adaptation.</p></div>
             <div class="tuto-ressenti-badge e"><div class="tuto-rlabel">E — Échec</div><p>Série non terminée. Charge et/ou reps réduits.</p></div>
           </div>
+          <p style="font-size:.82rem;color:var(--muted);margin-top:.6rem;line-height:1.4">💡 Vous vous êtes trompé(e) de ressenti ? Appuyez sur le <strong>✏️</strong> à gauche du badge de la série précédente pour le corriger, tant que la série suivante n'est pas terminée.</p>
         </div>
         <div class="card">
-          <div class="tuto-card-title">🧍 Ateliers spéciaux</div>
-          <p style="font-size:.85rem;color:var(--muted)">Lombaires, Abdo Sol, Gainage sol — pas de charge à régler. Indiquez simplement <strong>Ok</strong> ou <strong>Échec</strong>.</p>
-        </div>
-        <div class="card">
-          <div class="tuto-card-title">Couleur des ateliers sur la page Séances</div>
-          <div class="tuto-color-item" style="margin-top:.4rem"><div class="tuto-color-dot" style="background:var(--muted)"></div>Non encore travaillé</div>
-          <div class="tuto-color-item"><div class="tuto-color-dot" style="background:var(--green)"></div>Validé lors d'une séance précédente</div>
-          <div class="tuto-color-item"><div class="tuto-color-dot" style="background:var(--blue)"></div>Validé lors de la séance en cours</div>
+          <div class="tuto-card-title">🧍 Ateliers spéciaux (Lombaires, Abdo Sol, Gainage)</div>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.5;margin-bottom:.5rem">Pas de charge à régler. Le déroulement est :</p>
+          <ol class="tuto-steps" style="margin-top:.2rem">
+            <li><div class="tuto-num">1</div><div class="tuto-content">Appuyez sur <strong>✓ Fait</strong> quand la série est terminée (ou utilisez le chrono pour le Gainage).</div></li>
+            <li><div class="tuto-num">2</div><div class="tuto-content">Indiquez votre <strong>ressenti</strong> (F / D / TD / E).</div></li>
+            <li><div class="tuto-num">3</div><div class="tuto-content">Le chrono de récupération se lance, la série suivante s'affiche.</div></li>
+          </ol>
+          <p style="font-size:.82rem;color:var(--muted);margin-top:.5rem;line-height:1.4">⏱ <strong>Gainage sol</strong> — Un chrono guidé enchaîne automatiquement les 4 phases. Durée : 15 s par phase (niveaux 1 et 3) ou 30 s (niveaux 2 et 4). Appuyez sur <strong>Arrêter</strong> si vous ne tenez plus.</p>
         </div>
         <div class="tuto-alert">
           <strong>⚠️ Recalcul de maxi obligatoire</strong> — L'application peut vous rediriger vers le calcul du maxi dans ces cas :
           <ul style="margin:.4rem 0 .2rem 1rem;font-size:.83rem">
-            <li>2 fois Facile d'affilée — maxi probablement sous-évalué</li>
+            <li>2 fois Facile d'affilée (mode guidé) — maxi probablement sous-évalué</li>
             <li>2 fois Échec d'affilée — maxi probablement surévalué</li>
-            <li>Plafond absolu atteint avec ressenti F</li>
-            <li>Plancher absolu atteint avec ressenti E</li>
+            <li>Charge et répétitions max atteintes avec ressenti F</li>
+            <li>Charge et répétitions min atteintes avec ressenti E</li>
           </ul>
           Le chrono ne s'affiche pas dans ces cas. L'ancien maxi reste visible en référence.
         </div>
@@ -1901,29 +1902,33 @@ function buildTuto() {
         <div class="ressource-section-title"><span style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-size:.8rem;font-weight:700;width:1.5rem;height:1.5rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">5</span> 🏅 Fin de séance &amp; Badges</div>
         <div class="card">
           <div class="tuto-card-title">Terminer la séance</div>
-          <p style="font-size:.85rem;color:var(--muted);line-height:1.5">Dès que vous avez validé <strong>4 ateliers ou plus</strong>, le bouton <strong>"✅ Enregistrer ma séance"</strong> apparaît dans le menu ☰. Appuyez dessus, puis confirmez.</p>
+          <ol class="tuto-steps" style="margin-top:.4rem">
+            <li><div class="tuto-num">1</div><div class="tuto-content">Appuyez sur <strong>☰</strong> en haut à droite.</div></li>
+            <li><div class="tuto-num">2</div><div class="tuto-content">Appuyez sur <strong>✅ Enregistrer ma séance</strong> (visible dès 4 ateliers validés).</div></li>
+            <li><div class="tuto-num">3</div><div class="tuto-content">Confirmez. Le bilan et votre badge s'affichent.</div></li>
+          </ol>
         </div>
         <div class="card">
           <div class="tuto-card-title">📊 Bilan de la séance</div>
-          <p style="font-size:.85rem;color:var(--muted);line-height:1.5;margin-bottom:.4rem">Après confirmation, un bilan détaillé s'affiche. Pour chaque atelier :</p>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.5;margin-bottom:.4rem">Après confirmation, un bilan détaillé s'affiche pour chaque atelier :</p>
           <ul style="margin:.3rem 0 .3rem 1rem;font-size:.84rem;color:var(--muted)">
-            <li>Les <strong style="color:var(--text)">4 carrés de ressenti</strong> dans l'ordre des séries</li>
-            <li>La <strong style="color:var(--text)">meilleure série TD ou D</strong> avec charge et répétitions</li>
-            <li><strong style="color:var(--green)">↑</strong> progression · <strong style="color:#c0392b">↓</strong> régression · <strong style="color:var(--muted)">=</strong> stable vs séance précédente</li>
-            <li>🔄 si un recalcul de maxi a été effectué</li>
+            <li>Les <strong style="color:var(--text)">carrés de ressenti</strong> dans l'ordre des séries</li>
+            <li>La <strong style="color:var(--text)">meilleure charge TD ou D</strong> avec les répétitions</li>
+            <li><strong style="color:var(--green)">↑</strong> progression · <strong style="color:#c0392b">↓</strong> régression · <strong style="color:var(--muted)">=</strong> stable par rapport à la séance précédente</li>
+            <li>🔄 si un recalcul de maxi a été déclenché pendant la séance</li>
           </ul>
         </div>
         <div class="card">
           <div class="tuto-card-title">Les badges</div>
-          <div class="tuto-color-item" style="margin-top:.4rem"><img src="images/badge-carton-small.png" style="width:32px;height:32px;object-fit:contain"><strong style="color:#e74c3c">Carton Rouge</strong> — Moins de 4 ateliers</div>
+          <div class="tuto-color-item" style="margin-top:.4rem"><img src="images/badge-carton-small.png" style="width:32px;height:32px;object-fit:contain"><strong style="color:#e74c3c">Carton</strong> — Moins de 4 ateliers validés</div>
           <div class="tuto-color-item"><img src="images/badge-bronze-small.png" style="width:32px;height:32px;object-fit:contain"><strong>Bronze</strong> — 4 ateliers validés</div>
           <div class="tuto-color-item"><img src="images/badge-argent-small.png" style="width:32px;height:32px;object-fit:contain"><strong>Argent</strong> — 5 ateliers validés</div>
           <div class="tuto-color-item"><img src="images/badge-or-small.png"    style="width:32px;height:32px;object-fit:contain"><strong>Or</strong> — 6 ateliers ou plus</div>
         </div>
-        <div class="tuto-alert"><strong>⚠️ Important :</strong> Utilisez toujours "Enregistrer ma séance" avant de vous déconnecter, sinon votre badge ne sera pas enregistré.</div>
+        <div class="tuto-alert"><strong>⚠️ Important :</strong> Sans "Enregistrer ma séance", votre badge ne sera pas comptabilisé. Si vous vous reconnectez le même jour après avoir enregistré, la séance est verrouillée — vous ne pouvez pas enregistrer deux fois.</div>
         <div class="card">
-          <div class="tuto-card-title">🏅 Page Mes Badges</div>
-          <p style="font-size:.85rem;color:var(--muted)">Consultez votre dernier badge et l'historique complet depuis le bouton <strong>Badges</strong> dans le menu du bas.</p>
+          <div class="tuto-card-title">📈 Page Badges / Bilan</div>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.5">Consultez votre badge du jour, l'historique de vos badges sur le cycle et votre <strong>graphique de progression</strong> (moyenne des ressentis séance par séance) depuis le bouton <strong>Badges/Bilan</strong> dans la barre du bas.</p>
         </div>
       </div>
 
@@ -2035,10 +2040,7 @@ function buildSeriesSpecialHTML(a, localSeries) {
     if (local.resultat && !local.ressenti && isEditable()) {
       html += `<div class="serie-row active-serie" id="sr-${key}-${s}">
         <div class="serie-num">${s+1}</div>
-        <div class="serie-info">
-          <span style="font-size:.85rem;font-weight:700;color:${couleur}">${label}</span>
-        </div>
-        <div class="serie-ressenti" id="res-${key}-${s}" style="align-items:center">
+        <div class="serie-ressenti" id="res-${key}-${s}" style="align-items:center;flex:1;justify-content:flex-end">
           <span style="font-size:.7rem;color:var(--muted);margin-right:.3rem;white-space:nowrap">Ressenti ?</span>
           ${['F','D','TD','E'].map(r=>`<button class="ressenti-btn" onclick="onRessentiSpeciale('${nomEsc}',${s},'${r}')">${r}</button>`).join('')}
         </div>
@@ -2050,10 +2052,7 @@ function buildSeriesSpecialHTML(a, localSeries) {
       html += `<div class="serie-row done" id="sr-${key}-${s}">
         <div class="serie-num">${s+1}</div>
         <div class="serie-info"><div class="serie-charge">${maxiLabel}</div></div>
-        <div style="display:flex;align-items:center;gap:.4rem">
-          <span style="font-size:.85rem;font-weight:700;color:${couleur}">${label}</span>
-          ${ressentiSpan}
-        </div>
+        ${ressentiSpan}
       </div>`;
     }
   }
@@ -2077,9 +2076,7 @@ function buildSeriesSpecialHTML(a, localSeries) {
         <div class="serie-info"><div class="serie-charge">${maxiLabel}</div></div>
         <div style="display:flex;gap:.5rem;flex-shrink:0">
           <button style="background:rgba(46,204,113,.15);border:1px solid var(--green);border-radius:8px;color:var(--green);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
-            ${isEditable()?`onclick="onSerieSpeciale('${nomEsc}',${s},'ok')"`:disabled}>✓ Ok</button>
-          <button style="background:rgba(231,76,60,.1);border:1px solid var(--red,#e74c3c);border-radius:8px;color:var(--red,#e74c3c);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
-            ${isEditable()?`onclick="onSerieSpeciale('${nomEsc}',${s},'echec')"`:disabled}>✗ Échec</button>
+            ${isEditable()?`onclick="onSerieSpeciale('${nomEsc}',${s},'ok')"`:disabled}>✓ Fait</button>
         </div>
       </div>`;
     }
@@ -2097,34 +2094,6 @@ async function onSerieSpeciale(nomAtelier, serieIndex, resultat) {
   const a = ATELIERS.find(x => x.nom === nomAtelier);
   const sgEl = document.getElementById('sg-'+key);
 
-  // Interruption si 2 échecs — pas besoin de demander le ressenti
-  const nbEchecs = state.serieLocale[nomAtelier].filter(s => s && s.resultat === 'echec').length;
-  if (nbEchecs >= 2) {
-    const estLombairesA0 = getAtelierType(nomAtelier) === 'lombaires' && parseFloat(state.maxis[nomAtelier]) === 0;
-    const estGainageNiv1 = getAtelierType(nomAtelier) === 'gainage' && parseInt(state.maxis[nomAtelier]) <= 1;
-    const estNiveauMinimal = estLombairesA0 || estGainageNiv1;
-    delete state.serieLocale[nomAtelier];
-    saveSerieLocale();
-    if (!estNiveauMinimal) clearMaxiForAtelier(nomAtelier);
-    if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, []);
-    const bravo = document.getElementById('bravo-'+key);
-    if (bravo) {
-      bravo.classList.add('visible');
-      const bravoEmoji = bravo.querySelector('.bravo-emoji');
-      const bravoText  = bravo.querySelector('.bravo-text');
-      const bravoSub   = bravo.querySelector('.bravo-sub');
-      if (bravoEmoji) bravoEmoji.textContent = '⬇️';
-      if (bravoText) { bravoText.textContent = '2 Échecs !'; bravoText.style.color = 'var(--red)'; }
-      if (estNiveauMinimal) {
-        if (bravoSub) bravoSub.innerHTML = 'Vous êtes déjà au niveau minimal. Parlez-en avec votre enseignant.';
-      } else {
-        if (bravoSub) bravoSub.innerHTML = 'Votre maxi est probablement surévalué. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.<br><em>Vous allez être redirigé(e) automatiquement.</em>';
-        setTimeout(() => allerAuxMaxis(nomAtelier), 10000);
-      }
-    }
-    return;
-  }
-
   // Afficher le sélecteur de ressenti
   if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, state.serieLocale[nomAtelier]);
 }
@@ -2134,11 +2103,43 @@ function onRessentiSpeciale(nomAtelier, serieIndex, ressenti) {
   const local = state.serieLocale[nomAtelier]?.[serieIndex];
   if (!local) return;
   local.ressenti = ressenti;
+  // E = échec : on met à jour le résultat pour la cohérence des comptages
+  if (ressenti === 'E') local.resultat = 'echec';
   saveSerieLocale();
 
   const a = ATELIERS.find(x => x.nom === nomAtelier);
   const sgEl = document.getElementById('sg-'+key);
   const localSeries = state.serieLocale[nomAtelier];
+
+  // Interruption si 2 ressenti E cumulés
+  if (ressenti === 'E') {
+    const nbEchecs = localSeries.filter(s => s && s.resultat === 'echec').length;
+    if (nbEchecs >= 2) {
+      const estLombairesA0 = getAtelierType(nomAtelier) === 'lombaires' && parseFloat(state.maxis[nomAtelier]) === 0;
+      const estGainageNiv1 = getAtelierType(nomAtelier) === 'gainage' && parseInt(state.maxis[nomAtelier]) <= 1;
+      const estNiveauMinimal = estLombairesA0 || estGainageNiv1;
+      delete state.serieLocale[nomAtelier];
+      saveSerieLocale();
+      if (!estNiveauMinimal) clearMaxiForAtelier(nomAtelier);
+      if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, []);
+      const bravo = document.getElementById('bravo-'+key);
+      if (bravo) {
+        bravo.classList.add('visible');
+        const bravoEmoji = bravo.querySelector('.bravo-emoji');
+        const bravoText  = bravo.querySelector('.bravo-text');
+        const bravoSub   = bravo.querySelector('.bravo-sub');
+        if (bravoEmoji) bravoEmoji.textContent = '⬇️';
+        if (bravoText) { bravoText.textContent = '2 Échecs !'; bravoText.style.color = 'var(--red)'; }
+        if (estNiveauMinimal) {
+          if (bravoSub) bravoSub.innerHTML = 'Vous êtes déjà au niveau minimal. Parlez-en avec votre enseignant.';
+        } else {
+          if (bravoSub) bravoSub.innerHTML = 'Votre maxi est probablement surévalué. Vous devez refaire votre recherche de maxi pour cet atelier avant de continuer.<br><em>Vous allez être redirigé(e) automatiquement.</em>';
+          setTimeout(() => allerAuxMaxis(nomAtelier), 10000);
+        }
+      }
+      return;
+    }
+  }
 
   if (localSeries.length >= 4) {
     if (sgEl && a) sgEl.innerHTML = buildSeriesSpecialHTML(a, localSeries);
@@ -2188,17 +2189,17 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
     const pctDone = showPct ? ` <span style="font-size:.65rem;color:var(--muted);font-weight:400">(${Math.round(local.charge / maxi * 100)}%)</span>` : '';
     const isLastDone = (s === doneSeries - 1) && (doneSeries < 4) && isEditable();
     const nomEsc = a.nom.replace(/'/g,"\\'");
+    const rColors = {F:'#2980b9',D:'#27ae60',TD:'#f39c12',E:'#c0392b'};
+    const ressentiSpan = local.ressenti
+      ? `<span id="res-${key}-${s}" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:${rColors[local.ressenti]||'#444'};color:#fff;font-size:.7rem;font-weight:700;flex-shrink:0">${local.ressenti}</span>`
+      : `<span id="res-${key}-${s}"></span>`;
     html += `<div class="serie-row done" id="sr-${key}-${s}">
       <div class="serie-num">${s+1}</div>
       <div class="serie-info">
         <div class="serie-charge">${local.reps} <span style="color:var(--blue);font-weight:400">×</span> ${local.charge} ${a.unite}${pctDone}</div>
       </div>
       ${isLastDone ? `<button class="btn-corriger-ressenti" onclick="activerCorrectionRessenti('${nomEsc}','${key}',${s})" title="Corriger le ressenti">✏️</button>` : ''}
-      <div class="serie-ressenti" id="res-${key}-${s}">
-        ${['F','D','TD','E'].map(r=>`
-          <button class="ressenti-btn ${local.ressenti===r?'selected-'+r:''}" disabled>${r}</button>
-        `).join('')}
-      </div>
+      ${ressentiSpan}
     </div>`;
   }
 
@@ -2401,9 +2402,7 @@ function showGainageRessentis(nomAtelier, serieIndex, elapsed, total) {
       <div style="font-size:.8rem;color:var(--muted);margin-bottom:.4rem">Résultat :</div>
       <div style="display:flex;gap:.5rem">
         <button style="background:rgba(46,204,113,.15);border:1px solid var(--green);border-radius:8px;color:var(--green);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
-          ${isEditable()?`onclick="onSerieSpeciale('${nomEsc}',${serieIndex},'ok')"`:disabled}>✓ Ok</button>
-        <button style="background:rgba(231,76,60,.1);border:1px solid var(--red,#e74c3c);border-radius:8px;color:var(--red,#e74c3c);font-weight:700;font-size:.8rem;padding:.4rem .7rem;cursor:pointer"
-          ${isEditable()?`onclick="onSerieSpeciale('${nomEsc}',${serieIndex},'echec')"`:disabled}>✗ Échec</button>
+          ${isEditable()?`onclick="onSerieSpeciale('${nomEsc}',${serieIndex},'ok')"`:disabled}>✓ Fait</button>
       </div>
     </div>`;
 }
@@ -2618,14 +2617,13 @@ function activerCorrectionRessenti(nomAtelier, key, serieIndex) {
   const resEl = document.getElementById('res-' + key + '-' + serieIndex);
   if (!resEl) return;
   const nomEsc = nomAtelier.replace(/'/g,"\\'");
-  resEl.style.alignItems = 'center';
-  resEl.innerHTML = `<span style="font-size:.7rem;color:var(--muted);margin-right:.3rem;white-space:nowrap">Modifier ?</span>`
-    + ['F','D','TD','E'].map(r => `
+  const btns = ['F','D','TD','E'].map(r => `
     <button class="ressenti-btn ${local.ressenti===r?'selected-'+r:''}"
-      onclick="onRessenti('${nomEsc}','${local.unite}',${serieIndex},'${r}',${local.charge},${local.reps},${local.intensite})">
-      ${r}
-    </button>
+      onclick="onRessenti('${nomEsc}','${local.unite}',${serieIndex},'${r}',${local.charge},${local.reps},${local.intensite})">${r}</button>
   `).join('');
+  resEl.outerHTML = `<div id="res-${key}-${serieIndex}" style="display:flex;align-items:center;gap:.35rem;flex-shrink:0">
+    <span style="font-size:.7rem;color:var(--muted);margin-right:.1rem;white-space:nowrap">Modifier ?</span>${btns}
+  </div>`;
   const row = document.getElementById('sr-' + key + '-' + serieIndex);
   if (row) { const btn = row.querySelector('.btn-corriger-ressenti'); if (btn) btn.style.display = 'none'; }
 }
