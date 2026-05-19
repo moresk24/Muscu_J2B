@@ -2818,14 +2818,12 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
     case 'e-choix': {
       const repsDejaMin = currentReps <= p.repsMin;
       sugBox.innerHTML = `
-        <div class="suggestion-title">⬇️ Diminuer l'effort</div>
+        <div class="suggestion-title">BUT : ⬇️ Diminuer l'effort</div>
         <div class="suggestion-text">Comment souhaitez-vous ajuster ?</div>
-        <div class="suggestion-actions" style="margin-top:.6rem">
+        <div class="suggestion-actions" style="margin-top:.6rem;flex-wrap:wrap">
           <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↓ La charge</button>
           ${repsDejaMin ? '' : `<button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixReps('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↓ Les reps</button>`}
-        </div>
-        <div style="margin-top:.4rem">
-          <button class="btn btn-outline" style="width:100%" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.reps})">= Garder la même série</button>
+          <button class="btn btn-outline" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="applySuggestion('${nomAtelier}',${params.intensite},${params.charge},${params.reps})">=  Même série</button>
         </div>`;
       break;
     }
@@ -2888,7 +2886,7 @@ function showSuggestion(nomAtelier, key, unite, ressenti, nextSerie, currentChar
 
     case 'fd-choix':
       sugBox.innerHTML = `
-        <div class="suggestion-title">⬆️ Augmenter l'effort</div>
+        <div class="suggestion-title">BUT : ⬆️ Augmenter l'effort</div>
         <div class="suggestion-text">Que souhaitez-vous modifier ?</div>
         <div class="suggestion-actions" style="margin-top:.6rem">
           <button class="btn" onmouseenter="onSugBtnIn(this)" onmouseleave="onSugBtnOut(this)" onclick="appliquerChoixCharge('${nomAtelier}','${key}','${unite}','${ressenti}',${params.charge},${params.reps},${params.intensite})">↑ La charge</button>
