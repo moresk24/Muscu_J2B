@@ -487,13 +487,13 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .recup-timer.active{display:block}
 .recup-timer-count{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.05em;color:var(--blue);line-height:1;}
 .seance-atelier-card{
-  background:var(--s1);border:1px solid var(--border);border-radius:14px;
+  background:var(--s1);border:2px solid var(--border);border-radius:14px;
   margin-bottom:.6rem;display:flex;align-items:center;gap:.75rem;
   padding:.85rem 1rem;cursor:pointer;transition:border-color .2s;
 }
 .seance-atelier-card:active{opacity:.8}
 .seance-atelier-card.validated-atelier{border-color:var(--green)}
-.seance-atelier-card.seance-en-cours{border-color:var(--blue)}
+.seance-atelier-card.seance-en-cours{border-color:var(--blue);background:rgba(61,139,255,.07)}
 
 /* ═══════════════════════════════════════════
    TOAST

@@ -2193,12 +2193,12 @@ function buildSeriesHTML(atelier, maxi, localSeries) {
       <div class="serie-info">
         <div class="serie-charge">${local.reps} <span style="color:var(--blue);font-weight:400">×</span> ${local.charge} ${a.unite}${pctDone}</div>
       </div>
+      ${isLastDone ? `<button class="btn-corriger-ressenti" onclick="activerCorrectionRessenti('${nomEsc}','${key}',${s})" title="Corriger le ressenti">✏️</button>` : ''}
       <div class="serie-ressenti" id="res-${key}-${s}">
         ${['F','D','TD','E'].map(r=>`
           <button class="ressenti-btn ${local.ressenti===r?'selected-'+r:''}" disabled>${r}</button>
         `).join('')}
       </div>
-      ${isLastDone ? `<button class="btn-corriger-ressenti" onclick="activerCorrectionRessenti('${nomEsc}','${key}',${s})" title="Corriger le ressenti">✏️</button>` : ''}
     </div>`;
   }
 
