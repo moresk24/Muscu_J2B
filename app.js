@@ -2575,7 +2575,8 @@ function activerCorrectionRessenti(nomAtelier, key, serieIndex) {
   const resEl = document.getElementById('res-' + key + '-' + serieIndex);
   if (!resEl) return;
   const nomEsc = nomAtelier.replace(/'/g,"\\'");
-  resEl.innerHTML = ['F','D','TD','E'].map(r => `
+  resEl.innerHTML = `<span style="font-size:.7rem;color:var(--muted);margin-right:.3rem;white-space:nowrap">Modifier ?</span>`
+    + ['F','D','TD','E'].map(r => `
     <button class="ressenti-btn ${local.ressenti===r?'selected-'+r:''}"
       onclick="onRessenti('${nomEsc}','${local.unite}',${serieIndex},'${r}',${local.charge},${local.reps},${local.intensite})">
       ${r}
